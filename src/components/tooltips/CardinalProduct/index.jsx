@@ -49,6 +49,30 @@ const style = {
     display: "flex",
     justifyContent: "center",
   },
+  table: {
+    mt: 1,
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  key: {
+    fontSize: 12,
+  },
+  data: {
+    fontSize: 12,
+    justifySelf: "flex-end",
+  },
+  noPurchaseHistory: {
+    minHeight: 300,
+    border: "1px solid",
+    borderColor: "divider",
+    borderRadius: 2,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    color: "warning.main",
+    fontSize: 15,
+    fontWeight: 800,
+  },
 };
 
 const _months = [
@@ -65,10 +89,19 @@ const _months = [
   "Nov",
   "Dec",
 ];
-
-const CardinalProduct = ({ data, barChartData, lineChartData }) => {
+const cardinalProductKeys = [
+  "Hist. Lowest",
+  "Last SFDC order",
+  "Last SFDC cost",
+];
+const CardinalProduct = ({ data, analysisData = {}, sfdcOutdated }) => {
   const { name, cin, lastUpdated, contract, stockStatus, stock, returnable } =
     data;
+  const { lowestHistCost, lastSFDCdate, lastSFDCcost, shipQty, maxUnitCost } =
+    analysisData;
+  const lineChartData = maxUnitCost.map((v) =>
+    Number(v.replaceAll(/[^0-9.]+/g, ""))
+  );
   //should get dayjs from date of dailyorder
   const month = dayjs().get("month");
   const months =
@@ -76,11 +109,8 @@ const CardinalProduct = ({ data, barChartData, lineChartData }) => {
       ? _months.slice(month - 6, month + 1)
       : _months.slice(11 - (5 - month), 12).concat(_months.slice(0, month + 1));
   const [barChart, setBarChart] = React.useState(true);
-  const handleBarChartButton = React.useCallback(() => {
-    setBarChart(true);
-  }, []);
-  const handleLineChartButton = React.useCallback(() => {
-    setBarChart(false);
+  const handleToggleButton = React.useCallback((e, value) => {
+    setBarChart(value);
   }, []);
 
   return (
@@ -102,20 +132,46 @@ const CardinalProduct = ({ data, barChartData, lineChartData }) => {
           <Box sx={style.headLineItem}>
             {returnable === "done" ? "RETURNABLE" : "NON-RETURNABLE"}
           </Box>
-          <ToggleButtonGroup size="small">
-            <ToggleButton onClick={handleBarChartButton}>
-              <BarChartIcon />
-            </ToggleButton>
-            <ToggleButton onClick={handleLineChartButton}>
-              <TimelineIcon />
-            </ToggleButton>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            onChange={handleToggleButton}
+          >
+            <ToggleButton value={true} children={<BarChartIcon />} />
+            <ToggleButton value={false} children={<TimelineIcon />} />
           </ToggleButtonGroup>
         </Box>
+        <Box sx={style.table}>
+          <Box>
+            {cardinalProductKeys.map((v) => (
+              <Typography key={v} sx={style.key}>
+                {v}
+              </Typography>
+            ))}
+          </Box>
+          <Box>
+            <Typography sx={style.data}>{lowestHistCost}</Typography>
+            <Typography
+              sx={
+                sfdcOutdated
+                  ? { ...style.data, color: "warning.main" }
+                  : style.data
+              }
+            >
+              {lastSFDCdate}
+            </Typography>
+            <Typography sx={style.data}>{lastSFDCcost}</Typography>
+          </Box>
+        </Box>
         <Box>
-          {barChart ? (
-            <BarChart xData={months} yData={barChartData} />
+          {lowestHistCost ? (
+            barChart ? (
+              <BarChart xData={months} yData={shipQty} />
+            ) : (
+              <LineChart xData={months} yData={lineChartData} />
+            )
           ) : (
-            <LineChart xData={months} yData={lineChartData} />
+            <Box sx={style.noPurchaseHistory}>NO PURCHASE HISTORY</Box>
           )}
         </Box>
       </Box>

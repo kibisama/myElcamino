@@ -53,6 +53,7 @@ const formats = {
     let title = "";
     let subtitle = "";
     let badge;
+    let sfdcOutdated = false;
     const cardinalProduct = v.cardinalProduct;
     const lastUpdated = cardinalProduct?.lastUpdated;
     if (lastUpdated) {
@@ -60,10 +61,26 @@ const formats = {
       if (estNetCost) {
         title += estNetCost;
         subtitle += cardinalProduct.netUoiCost;
-        if (!cardinalProduct.contract) {
-          badge = "warning";
-        } else if (!cardinalProduct.lastOrdered) {
-          badge = "warning";
+        const analysis = v.cardinalProductAnalysis;
+        switch (true) {
+          case cardinalProduct.brandName !== "— —":
+            break;
+          case !cardinalProduct.contract:
+            badge = "error";
+            break;
+          case cardinalProduct.stockStatus !== "IN STOCK":
+            badge = "warning";
+            break;
+          case !analysis:
+            badge = "warning";
+            break;
+          case dayjs()
+            .subtract(2, "month")
+            .isAfter(dayjs(analysis.lastSFDCdate)):
+            badge = "warning";
+            sfdcOutdated = true;
+            break;
+          default:
         }
       } else {
         title += "N/A";
@@ -78,10 +95,8 @@ const formats = {
           subtitle ? (
             <CardinalProduct
               data={v.cardinalProduct}
-              barChartData={v.cardinalProductAnalysis.shipQty}
-              lineChartData={v.cardinalProductAnalysis.maxUnitCost.map((v) =>
-                Number(v.replaceAll(/[^0-9.]+/g, ""))
-              )}
+              analysisData={v.cardinalProductAnalysis}
+              sfdcOutdated={sfdcOutdated}
             />
           ) : null
         }
