@@ -15,6 +15,7 @@ const style = {
 
 const DailyOrder = () => {
   const { list } = useSelector((state) => state.order);
+  console.log(list);
   return (
     <Box sx={style.container}>
       <Box sx={style.toolbar}>

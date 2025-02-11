@@ -6,6 +6,8 @@ import {
   Typography,
   styled,
 } from "@mui/material";
+import { tooltipClasses } from "@mui/material/Tooltip";
+
 import CustomTooltip from "../CustomTooltip";
 
 const style = {
@@ -34,24 +36,83 @@ const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({
       ? theme.palette.grey[700]
       : theme.palette.grey[300],
 }));
-
-const TableCell = ({ title, subtitle, badge, tooltip }) => {
-  const content = title ? (
-    <StyledBadge variant="dot" color={badge}>
+// const TableCell = ({ title, subtitle, badge, tooltip }) => {
+//   const content = title ? (
+//     <StyledBadge variant="dot" color={badge}>
+//       <Box>
+//         <Typography sx={subtitle ? style.title : style.titleOnly}>
+//           {title}
+//         </Typography>
+//         {subtitle && <Typography sx={style.subtitle}>{subtitle}</Typography>}
+//       </Box>
+//     </StyledBadge>
+//   ) : (
+//     <StyledCircularProgress size={20} />
+//   );
+//   return (
+//     <Box sx={style.container}>
+//       {tooltip && title ? (
+//         <CustomTooltip title={tooltip}>{content}</CustomTooltip>
+//       ) : (
+//         content
+//       )}
+//     </Box>
+//   );
+// };
+const TableCell = ({ data = {}, textStyle, tooltip, onClickTooltip }) => {
+  const content =
+    data === "PENDING" ? (
+      <StyledCircularProgress size={18} />
+    ) : data === "NA" ? (
+      <Typography sx={{ ...style.titleOnly, color: "text.disabled" }}>
+        NA
+      </Typography>
+    ) : (
       <Box>
-        <Typography sx={subtitle ? style.title : style.titleOnly}>
-          {title}
+        <Typography
+          sx={
+            data.subtitle
+              ? textStyle
+                ? { ...style.title, ...textStyle }
+                : style.title
+              : textStyle
+              ? { ...style.titleOnly, ...textStyle }
+              : style.titleOnly
+          }
+        >
+          {data.title}
         </Typography>
-        {subtitle && <Typography sx={style.subtitle}>{subtitle}</Typography>}
+        {data.subtitle && (
+          <Typography
+            sx={
+              textStyle ? { ...style.subtitle, ...textStyle } : style.subtitle
+            }
+          >
+            {data.subtitle}
+          </Typography>
+        )}
       </Box>
-    </StyledBadge>
-  ) : (
-    <StyledCircularProgress size={20} />
-  );
+    );
   return (
     <Box sx={style.container}>
-      {tooltip && title ? (
-        <CustomTooltip title={tooltip}>{content}</CustomTooltip>
+      {data.tooltip ? (
+        <CustomTooltip
+          sx={
+            onClickTooltip
+              ? {
+                  [`& .${tooltipClasses.tooltip}`]: {
+                    ":hover": {
+                      cursor: "pointer",
+                    },
+                  },
+                }
+              : null
+          }
+          title={tooltip}
+          onClick={onClickTooltip}
+        >
+          {content}
+        </CustomTooltip>
       ) : (
         content
       )}

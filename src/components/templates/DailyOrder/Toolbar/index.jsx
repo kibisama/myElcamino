@@ -30,12 +30,12 @@ const Toolbar = () => {
   const dispatchFn = () => {
     clearTimeout(timeout.current);
     dispatch(asyncGetDailyOrder(date.format("MM-DD-YYYY")));
-    timeout.current = setTimeout(() => dispatchFn(), 60000);
+    timeout.current = setTimeout(() => dispatchFn(), 300000);
   };
   React.useEffect(() => {
     dispatchFn();
     return () => clearTimeout(timeout.current);
-  }, [date]);
+  }, [date]); // ignore dep
   return (
     <Box sx={style.container}>
       <CustomDatePicker value={date} maxDate={today} onChange={handleChange} />

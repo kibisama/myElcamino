@@ -1,194 +1,163 @@
 import dayjs from "dayjs";
-import CardinalProduct from "../../../tooltips/CardinalProduct";
-import CardinalAlt from "../../../tooltips/CardinalAlt";
-import PsDetails from "../../../tooltips/PsDetails";
-import PsAlts from "../../../tooltips/PsAlts";
+import { CardinalProduct, PsItem } from "../../../tooltips/DailyOrder";
 import TableCell from "../../../customs/TableCell";
 
+const cahNoData = "— —";
+const isSameOrCheaper = (a, b) => {
+  return (
+    Number(b.replaceAll(/[^0-9.]+/g, "")) >=
+    Number(a.replaceAll(/[^0-9.]+/g, ""))
+  );
+};
+const cardinalProduct = (_tooltip, time) => {
+  const { contract, stockStatus, rebateEligible, returnable, lastSFDCDate } =
+    _tooltip.data;
+  const _lastUpdated = dayjs(_tooltip.lastUpdated);
+  const lastUpdated = dayjs().isSame(_lastUpdated, "day")
+    ? "Today " + _lastUpdated.format("HH:mm:ss")
+    : _lastUpdated.format("MM/DD/YYYY HH:mm:ss");
+  const option = {
+    _contract: contract === "NO CONTRACT" ? { color: "error.main" } : undefined,
+    _stockStatus:
+      stockStatus === "OUT OF STOCK"
+        ? { color: "error.main" }
+        : stockStatus === "LOW STOCK"
+        ? { color: "warning.main" }
+        : undefined,
+    _rebateEligible: rebateEligible
+      ? { color: "warning.main" }
+      : { color: "text.disabled" },
+    _returnable: returnable ? undefined : { color: "error.main" },
+    _lastSFDCDate:
+      lastSFDCDate !== cahNoData
+        ? dayjs(time).isAfter(
+            dayjs(lastSFDCDate, "MM/DD/YYYY").add(3, "month")
+          ) && { color: "warning.main" }
+        : undefined,
+  };
+  return (
+    <CardinalProduct
+      data={_tooltip.data}
+      lastUpdated={lastUpdated}
+      option={option}
+    />
+  );
+};
+
 const formats = {
+  time: (v) => {
+    const data = { title: dayjs(v.time).format("hh:mm A") };
+    return <TableCell data={data} />;
+  },
   package: (v) => {
-    let title = "";
-    let subtitle = "";
-    const pkg = v.package;
-    if (pkg) {
-      if (pkg.brand_name) {
-        if (pkg.brand_name.length > 20) {
-          title += pkg.brand_name.substring(0, pkg.brand_name.indexOf(" "));
-        } else {
-          title += pkg.brand_name;
-        }
-        if (pkg.strength) {
-          title += " " + pkg.strength;
-        }
-        if (pkg.size) {
-          title += " (" + pkg.size + ")";
-        }
-        const manufacturer_name = pkg.manufacturer_name;
-        if (manufacturer_name) {
-          if (manufacturer_name.length > 10) {
-            const indexOfSpace = manufacturer_name.indexOf(" ");
-            if (indexOfSpace > 4) {
-              subtitle += manufacturer_name.substring(0, indexOfSpace);
-            } else {
-              subtitle += manufacturer_name.substring(
-                0,
-                manufacturer_name.indexOf(" ", 4)
-              );
-            }
-          } else {
-            subtitle += manufacturer_name;
-          }
-        }
-      }
-    } else {
-      // gtin 없을수 있음 현재
-      title = v.gtin;
-    }
-    return <TableCell title={title} subtitle={subtitle} />;
+    return <TableCell data={v.package} />;
   },
-  item: (v) => <TableCell title={v.item.cost ?? "UNKNOWN"} />,
-  qty: (v) => <TableCell title={v.item.length} />,
-
-  cardinalProduct: (v) => {
-    let title = "";
-    let subtitle = "";
-    let badge;
-    let sfdcOutdated = false;
-    const cardinalProduct = v.cardinalProduct;
-    const lastUpdated = cardinalProduct?.lastUpdated;
-    if (lastUpdated) {
-      const estNetCost = cardinalProduct.estNetCost;
-      if (estNetCost) {
-        title += estNetCost;
-        subtitle += cardinalProduct.netUoiCost;
-        const analysis = v.cardinalProductAnalysis;
-        switch (true) {
-          case cardinalProduct.brandName !== "— —":
-            break;
-          case !cardinalProduct.contract:
-            badge = "error";
-            break;
-          case cardinalProduct.stockStatus !== "IN STOCK":
-            badge = "warning";
-            break;
-          case !analysis:
-            badge = "warning";
-            break;
-          case dayjs()
-            .subtract(2, "month")
-            .isAfter(dayjs(analysis.lastSFDCdate)):
-            badge = "warning";
-            sfdcOutdated = true;
-            break;
-          default:
+  qty: (v) => {
+    return <TableCell data={v.qty} />;
+  },
+  cahProduct: (v) => {
+    const estNetCost = v.cahProduct.title;
+    const pkgPrice = v.psItem.title;
+    const textStyle = v.cahSource.subtitle
+      ? { color: "text.disabled" }
+      : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
+      ? { color: "primary.main", fontWeight: 600 }
+      : undefined;
+    const _tooltip = v.cahProduct.tooltip;
+    let tooltip;
+    let onClickTooltip;
+    if (_tooltip) {
+      tooltip = cardinalProduct(_tooltip, v.time);
+      onClickTooltip = () => {
+        const cin = _tooltip.data.cin;
+        if (cin) {
+          window.open(
+            `https://vantus.cardinalhealth.com/product/${cin}?tab=more-details`,
+            "_blank"
+          );
         }
-      } else {
-        title += "N/A";
-      }
+      };
     }
     return (
       <TableCell
-        title={title}
-        subtitle={subtitle}
-        badge={badge}
-        tooltip={
-          subtitle ? (
-            <CardinalProduct
-              data={v.cardinalProduct}
-              analysisData={v.cardinalProductAnalysis}
-              sfdcOutdated={sfdcOutdated}
-            />
-          ) : null
-        }
+        data={v.cahProduct}
+        textStyle={textStyle}
+        tooltip={tooltip}
+        onClickTooltip={onClickTooltip}
       />
     );
   },
-  cardinalAlt: (v) => {
-    let title = "";
-    let subtitle = "";
-    const lastUpdated = v.cardinalProduct?.lastUpdated;
-    if (lastUpdated) {
-      const estNetCost = v.cardinalAlt?.estNetCost;
-      if (estNetCost) {
-        title += estNetCost;
-        subtitle += v.cardinalAlt.netUoiCost;
-      } else {
-        title += "N/A";
-      }
+  cahSource: (v) => {
+    const cahSource = v.cahSource;
+    const textStyle = !!cahSource.subtitle
+      ? undefined
+      : cahSource.title === "NA*"
+      ? { color: "text.disabled" }
+      : { color: "primary.main", fontWeight: 800 };
+    let tooltip;
+    let onClickTooltip;
+    const _tooltip = cahSource.tooltip;
+    if (_tooltip) {
+      tooltip = cardinalProduct(_tooltip, v.time);
+      onClickTooltip = () => {
+        const cin = _tooltip.data.cin;
+        if (cin) {
+          window.open(
+            `https://vantus.cardinalhealth.com/product/${cin}?tab=more-details`,
+            "_blank"
+          );
+        }
+      };
     }
     return (
       <TableCell
-        title={title}
-        subtitle={subtitle}
-        tooltip={
-          subtitle ? (
-            <CardinalAlt data={v.cardinalAlt} lastUpdated={lastUpdated} />
-          ) : null
-        }
+        data={cahSource}
+        textStyle={textStyle}
+        tooltip={tooltip}
+        onClickTooltip={onClickTooltip}
       />
     );
   },
-  psDetails: (v) => {
-    let title = "";
-    let subtitle = "";
-    let shortDated = false;
-    const pkgPrice = v.psDetails?.pkgPrice;
-    if (pkgPrice) {
-      title += pkgPrice;
-      if (pkgPrice !== "N/A") {
-        subtitle += v.psDetails.unitPrice;
-      }
-      const shortDate = dayjs().add(11, "month");
-      const expDate = dayjs(v.psDetails.lotExpDate, "MM/YY");
-      if (expDate.isBefore(shortDate)) {
-        shortDated = true;
-      }
+  psItem: (v) => {
+    const psItem = v.psItem;
+    const _tooltip = psItem.tooltip;
+    let tooltip;
+    let onClickTooltip;
+    if (_tooltip) {
+      const data = _tooltip.data;
+      const time = dayjs(v.time);
+      const _lastUpdated = dayjs(_tooltip.lastUpdated);
+      const lastUpdated = time.isSame(_lastUpdated, "day")
+        ? "Today " + _lastUpdated.format("HH:mm:ss")
+        : _lastUpdated.format("MM/DD/YYYY HH:mm:ss");
+      const option = {
+        shortDated: time
+          .add(11, "month")
+          .isAfter(dayjs(data.lotExpDate, "MM/YY")),
+      };
+      onClickTooltip = () =>
+        window.open(
+          `https://pharmsaver.net/Pharmacy/Order.aspx?q=${data.ndc.replaceAll(
+            "-",
+            ""
+          )}`,
+          "_blank"
+        );
+      tooltip = (
+        <PsItem data={data} lastUpdated={lastUpdated} option={option} />
+      );
     }
     return (
       <TableCell
-        title={title}
-        subtitle={subtitle}
-        badge={shortDated ? "warning" : ""}
-        tooltip={
-          subtitle ? (
-            <PsDetails
-              data={v.psDetails}
-              lastUpdated={v.psLastUpdated}
-              shortDated={shortDated}
-            />
-          ) : null
-        }
+        data={psItem}
+        tooltip={tooltip}
+        onClickTooltip={onClickTooltip}
       />
     );
   },
-  psAlts: (v) => {
-    let title = "";
-    let subtitle = "";
-    let badge;
-    const alt = v.psAlts[0];
-    if (alt) {
-      const pkgPrice = alt.pkgPrice;
-      title += pkgPrice;
-      if (pkgPrice !== "N/A") {
-        subtitle += alt.unitPrice;
-        const shortDate = dayjs().add(11, "month");
-        const expDate = dayjs(alt.lotExpDate, "MM/YY");
-        if (expDate.isBefore(shortDate)) {
-          badge = "warning";
-        }
-      }
-    }
-    return (
-      <TableCell
-        title={title}
-        subtitle={subtitle}
-        badge={badge}
-        tooltip={subtitle ? <PsAlts data={v.psAlts} /> : null}
-      />
-    );
+  psSearch: (v) => {
+    return <TableCell data={v.psSearch} />;
   },
-
-  status: (v) => <TableCell title={v.status} />,
 };
 
 export default formats;

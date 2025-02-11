@@ -2,49 +2,62 @@ import CustomTable from "../../../customs/CustomTable";
 import formats from "./formats";
 
 const heads = [
+  "",
   "ITEM",
-  "COST",
   "QTY",
-  "CH PRICE",
-  "CH ALT",
-  "PS PRICE",
-  "PS ALT",
-  "STATUS",
+  "CARDINAL",
+  "CONTRACT",
+  "PHARMSAVER",
+  "DEALS",
+  "RECOMMENDATION",
+  // "ORDERED",
 ];
 const keys = [
+  "time",
   "package",
-  "item",
   "qty",
-  "cardinalProduct",
-  "cardinalAlt",
-  "psDetails",
-  "psAlts",
-  "status",
+  "cahProduct",
+  "cahSource",
+  "psItem",
+  "psSearch",
+  "",
+  // "",
 ];
-
 const cellStyles = {
-  package: () => {
-    return { width: "25%" };
+  //
+  time: () => {
+    return { width: 90 };
   },
   qty: () => {
-    return { width: "5%" };
+    return { width: 63 };
+  },
+  cahProduct: () => {
+    return { width: 133 };
+  },
+  cahSource: () => {
+    return { width: 133 };
+  },
+  psItem: () => {
+    return { width: 133 };
+  },
+  psSearch: () => {
+    return { width: 133 };
   },
 };
 
 const ListTable = ({ rows }) => {
-  console.log(rows);
   return (
     <CustomTable
       heads={heads}
       keys={keys}
       rows={rows}
       formats={formats}
-      //   cellStyles={cellStyles}
+      cellStyles={cellStyles}
       rowOnClick={(v) => {
-        const ndc11 = v.package.ndc11;
-        if (ndc11) {
-          window.navigator.clipboard.writeText(ndc11);
-        }
+        // const ndc11 = v.package.ndc11;
+        // if (ndc11) {
+        //   window.navigator.clipboard.writeText(ndc11);
+        // }
       }}
       hover
     />
