@@ -4,6 +4,9 @@ const style = {
   container: {
     width: 300,
   },
+  header: {
+    p: 0.5,
+  },
   name: {
     fontSize: 14,
     fontWeight: 600,
@@ -13,16 +16,15 @@ const style = {
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  mfr: {
+  cin: {
     fontSize: 12,
-    color: "text.secondary",
   },
   lastUpdated: {
     fontSize: 10,
   },
   table: {
-    p: 1,
-    minHeight: 88,
+    p: 0.5,
+    minHeight: 82,
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "space-between",
@@ -34,12 +36,18 @@ const style = {
     borderColor: "divider",
     borderRadius: 1,
     p: 1,
-    minWidth: 140,
+    minWidth: 143,
     display: "flex",
     justifyContent: "center",
     fontSize: 11,
     fontWeight: 800,
     color: "primary.main",
+  },
+  topValue: {
+    display: "flex",
+    justifyContent: "flex-end",
+    width: "100%",
+    fontSize: 11,
   },
   key: {
     width: "50%",
@@ -47,6 +55,9 @@ const style = {
     fontWeight: 600,
   },
   value: {
+    display: "flex",
+    justifyContent: "flex-end",
+    width: "50%",
     fontSize: 13,
   },
 };
@@ -71,12 +82,17 @@ const CardinalProduct = ({ data, lastUpdated, option }) => {
   const { _contract, _stockStatus, _rebateEligible, _returnable } = option;
   return (
     <Box sx={style.container}>
-      <Box>
+      <Box sx={style.header}>
         <Typography sx={style.name}>{name}</Typography>
         <Box sx={style.subtitle}>
-          <Typography sx={style.mfr}>{mfr}</Typography>
+          <Typography sx={style.cin}>{cin}</Typography>
           <Typography sx={style.lastUpdated}>{lastUpdated}</Typography>
         </Box>
+      </Box>
+      <Divider />
+      <Box sx={{ ...style.table, minHeight: 42 }}>
+        <Box sx={style.topValue}>{ndc}</Box>
+        <Box sx={style.topValue}>{mfr}</Box>
       </Box>
       <Divider />
       <Box sx={style.table}>
@@ -89,10 +105,6 @@ const CardinalProduct = ({ data, lastUpdated, option }) => {
       </Box>
       <Divider />
       <Box sx={style.table}>
-        <Box sx={style.key}>CIN</Box>
-        <Box sx={style.value}>{cin}</Box>
-        <Box sx={style.key}>NDC</Box>
-        <Box sx={style.value}>{ndc}</Box>
         <Box sx={style.key}>LAST COST</Box>
         <Box sx={style.value}>{lastCost}</Box>
         <Box sx={style.key}>LAST ORDERED</Box>

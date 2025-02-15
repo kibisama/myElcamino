@@ -1,5 +1,9 @@
 import dayjs from "dayjs";
-import { CardinalProduct, PsItem } from "../../../tooltips/DailyOrder";
+import {
+  CardinalProduct,
+  PsItem,
+  PsSearch,
+} from "../../../tooltips/DailyOrder";
 import TableCell from "../../../customs/TableCell";
 
 const cahNoData = "— —";
@@ -56,13 +60,13 @@ const formats = {
     return <TableCell data={v.qty} />;
   },
   cahProduct: (v) => {
-    const estNetCost = v.cahProduct.title;
-    const pkgPrice = v.psItem.title;
+    // const estNetCost = v.cahProduct.title;
+    // const pkgPrice = v.psItem.title;
     const textStyle = v.cahSource.subtitle
       ? { color: "text.disabled" }
-      : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
-      ? { color: "primary.main", fontWeight: 600 }
-      : undefined;
+      : // : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
+        // ? { color: "primary.main", fontWeight: 600 }
+        undefined;
     const _tooltip = v.cahProduct.tooltip;
     let tooltip;
     let onClickTooltip;
@@ -156,7 +160,20 @@ const formats = {
     );
   },
   psSearch: (v) => {
-    return <TableCell data={v.psSearch} />;
+    const psSearch = v.psSearch;
+    const _tooltip = psSearch.tooltip;
+    let tooltip;
+    let onClickTooltip;
+    if (_tooltip) {
+      // 중복 함수화
+      const time = dayjs(v.time);
+      const _lastUpdated = dayjs(_tooltip.lastUpdated);
+      const lastUpdated = time.isSame(_lastUpdated, "day")
+        ? "Today " + _lastUpdated.format("HH:mm:ss")
+        : _lastUpdated.format("MM/DD/YYYY HH:mm:ss");
+      tooltip = <PsSearch lastUpdated={lastUpdated} data={_tooltip.data} />;
+    }
+    return <TableCell data={psSearch} tooltip={tooltip} />;
   },
 };
 

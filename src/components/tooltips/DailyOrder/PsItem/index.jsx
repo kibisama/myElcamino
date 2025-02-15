@@ -4,63 +4,81 @@ const style = {
   container: {
     width: 300,
   },
+  header: {
+    p: 0.5,
+  },
   description: {
     fontSize: 14,
     fontWeight: 600,
   },
-  subtitle: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  mfr: {
+  ndc: {
     fontSize: 12,
-    color: "text.secondary",
   },
   lastUpdated: {
     justifySelf: "flex-end",
     fontSize: 10,
   },
   table: {
-    p: 1,
-    minHeight: 88,
+    p: 0.5,
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "space-between",
     alignContent: "space-between",
   },
+  topValue: {
+    display: "flex",
+    justifyContent: "flex-end",
+    width: "100%",
+    fontSize: 11,
+  },
   key: {
-    width: "25%",
+    width: "27%",
     fontSize: 13,
     fontWeight: 600,
   },
   value: {
     display: "flex",
     justifyContent: "flex-end",
-    width: "75%",
+    width: "73%",
     fontSize: 13,
   },
 };
 
-const PsItem = ({ data, lastUpdated, option }) => {
-  const { description, ndc, manufacturer, qtyAvl, lotExpDate, wholesaler } =
-    data;
+const PsItem = ({ data, lastUpdated, option = {}, variant, sx }) => {
+  const {
+    description,
+    ndc,
+    manufacturer,
+    pkgPrice,
+    unitPrice,
+    qtyAvl,
+    lotExpDate,
+    wholesaler,
+  } = data;
   const { shortDated } = option;
   return (
-    <Box sx={style.container}>
-      <Box>
+    <Box sx={variant ? { ...{ width: 294 }, ...sx } : style.container}>
+      <Box sx={style.header}>
         <Typography sx={style.description}>{description}</Typography>
-        <Box sx={style.subtitle}>
-          <Typography sx={style.mfr}>{manufacturer}</Typography>
-          <Typography sx={style.lastUpdated}>{lastUpdated}</Typography>
-        </Box>
+        <Typography sx={style.lastUpdated}>{lastUpdated}</Typography>
+      </Box>
+      <Divider />
+      <Box sx={{ ...style.table, minHeight: 42 }}>
+        <Box sx={style.topValue}>{ndc}</Box>
+        <Box sx={style.topValue}>{manufacturer}</Box>
       </Box>
       <Divider />
       <Box sx={style.table}>
-        <Box sx={style.key}>NDC</Box>
-        <Box sx={style.value}>{ndc}</Box>
         <Box sx={style.key}>VENDOR</Box>
         <Box sx={{ ...style.value, fontWeight: 600 }}>{wholesaler}</Box>
+        {variant && (
+          <>
+            <Box sx={style.key}>COST</Box>
+            <Box sx={style.value}>{pkgPrice}</Box>
+            <Box sx={style.key}>UNIT COST</Box>
+            <Box sx={style.value}>{unitPrice}</Box>
+          </>
+        )}
         <Box
           sx={shortDated ? { ...style.key, color: "warning.main" } : style.key}
         >

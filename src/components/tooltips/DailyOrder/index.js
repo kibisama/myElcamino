@@ -1,3 +1,4 @@
 import CardinalProduct from "./CardinalProduct";
 import PsItem from "./PsItem";
-export { CardinalProduct, PsItem };
+import PsSearch from "./PsSearch";
+export { CardinalProduct, PsItem, PsSearch };

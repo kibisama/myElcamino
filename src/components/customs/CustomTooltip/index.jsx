@@ -27,7 +27,7 @@ const CustomTooltip = styled(({ className, onClick, ...props }) => (
     maxWidth: "100%",
     color: theme.palette.text.primary,
     border: "1px solid",
-    borderRadius: 4,
+    borderRadius: 8,
     backgroundColor: theme.palette.background.paper,
     borderColor: theme.palette.grey[500],
     ":hover": {

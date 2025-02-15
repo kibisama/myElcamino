@@ -9,7 +9,7 @@ const heads = [
   "CONTRACT",
   "PHARMSAVER",
   "DEALS",
-  "RECOMMENDATION",
+  // "RECOMMENDATION",
   // "ORDERED",
 ];
 const keys = [
@@ -20,7 +20,7 @@ const keys = [
   "cahSource",
   "psItem",
   "psSearch",
-  "",
+  // "",
   // "",
 ];
 const cellStyles = {
