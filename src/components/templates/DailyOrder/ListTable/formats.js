@@ -6,7 +6,16 @@ import {
 } from "../../../tooltips/DailyOrder";
 import TableCell from "../../../customs/TableCell";
 
-const cahNoData = "— —";
+const ENUM = {
+  CAH_NO_DATA: "— —",
+  CAH_PRODUCT_TYPE_BRAND: "Branded Drug",
+  CAH_PRODUCT_TYPE_GENERIC: "Generic Drug",
+  PENDING: "PENDING",
+  NA: "NA",
+  BRAND: "BRAND",
+  NO_CONTRACT: "NO CONTRACT",
+};
+
 const isSameOrCheaper = (a, b) => {
   return (
     Number(b.replaceAll(/[^0-9.]+/g, "")) >=
@@ -33,7 +42,7 @@ const cardinalProduct = (_tooltip, time) => {
       : { color: "text.disabled" },
     _returnable: returnable ? undefined : { color: "error.main" },
     _lastSFDCDate:
-      lastSFDCDate !== cahNoData
+      lastSFDCDate !== ENUM.CAH_NO_DATA
         ? dayjs(time).isAfter(
             dayjs(lastSFDCDate, "MM/DD/YYYY").add(3, "month")
           ) && { color: "warning.main" }
@@ -60,14 +69,17 @@ const formats = {
     return <TableCell data={v.qty} />;
   },
   cahProduct: (v) => {
+    const cahProduct = v.cahProduct;
     // const estNetCost = v.cahProduct.title;
     // const pkgPrice = v.psItem.title;
-    const textStyle = v.cahSource.subtitle
-      ? { color: "text.disabled" }
-      : // : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
-        // ? { color: "primary.main", fontWeight: 600 }
-        undefined;
-    const _tooltip = v.cahProduct.tooltip;
+    const textStyle =
+      // tooltip 업데이트중 공백기간 텍스트적용 해제해야함 브랜드면 미리정보줘야함
+      v.cahSource.subtitle && cahProduct.tooltip?.data.contract !== ENUM.BRAND
+        ? { color: "text.disabled" }
+        : // : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
+          // ? { color: "primary.main", fontWeight: 600 }
+          undefined;
+    const _tooltip = cahProduct.tooltip;
     let tooltip;
     let onClickTooltip;
     if (_tooltip) {
@@ -84,7 +96,7 @@ const formats = {
     }
     return (
       <TableCell
-        data={v.cahProduct}
+        data={cahProduct}
         textStyle={textStyle}
         tooltip={tooltip}
         onClickTooltip={onClickTooltip}
