@@ -5,7 +5,7 @@ import CustomBoxButton from "../../../customs/CustomBoxButton";
 
 const style = {
   container: {
-    maxWidth: 969,
+    maxWidth: 952,
   },
   content: {
     p: 0.25,
