@@ -7,12 +7,14 @@ import {
   setSource,
   setCost,
   setIsUpdated,
+  setStatus,
   setError,
 } from "../../../../reduxjs@toolkit/scanSlice";
 import CustomToggleButtonGroup from "../../../customs/CustomToggleButtonGroup";
 import CurrencyInput from "../../../customs/CurrencyInput";
 import ScanStatusDiagram from "./ScanStatusDiagram";
 import useScanDetection from "../../../../hooks/useScanDetection";
+import lasolisa from "../../../../wav/lasolisa.wav";
 
 const style = {
   container: {
@@ -65,7 +67,7 @@ const ScanInputForm = ({ state }) => {
     },
     [dispatch]
   );
-  const { mode, source, cost, isUpdated } = state;
+  const { mode, source, cost, isUpdated, status } = state;
   const disabled = mode !== "RECEIVE";
 
   const timeout = React.useRef(null);
@@ -73,10 +75,17 @@ const ScanInputForm = ({ state }) => {
     if (isUpdated) {
       timeout.current = setTimeout(() => {
         dispatch(setIsUpdated(false));
+        dispatch(setStatus());
       }, 3000);
     }
     return () => clearTimeout(timeout.current);
   }, [dispatch, isUpdated]);
+  React.useEffect(() => {
+    if (status === 208) {
+      new Audio(lasolisa).play();
+      dispatch(setStatus());
+    }
+  }, [dispatch, status]);
   const onComplete = React.useCallback(
     (code) => {
       if (document.activeElement === document.querySelector("input").current) {

@@ -5,7 +5,6 @@ import { setOpen } from "../../../../../reduxjs@toolkit/scanSlice";
 import { Box } from "@mui/material";
 import CustomIconButton from "../../../../customs/CustomIconButton";
 import QrCodeIcon from "@mui/icons-material/QrCode";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import AppsIcon from "@mui/icons-material/Apps";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -13,7 +12,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 const style = {
   container: {
-    width: 240,
+    width: 180,
     display: "flex",
     justifyContent: "space-between",
   },
@@ -36,7 +35,6 @@ const Tools = () => {
         children={<QrCodeIcon />}
         onClick={handleQrCodeButton}
       />
-      <CustomIconButton children={<FormatListBulletedIcon />} />
       <CustomIconButton children={<AppsIcon />} />
       <CustomIconButton children={<NotificationsIcon />} />
       <CustomIconButton

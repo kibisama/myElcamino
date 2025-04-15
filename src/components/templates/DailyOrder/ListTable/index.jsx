@@ -7,25 +7,23 @@ const heads = [
   "QTY",
   "CARDINAL",
   "CONTRACT",
+  // "MARK",
   "PHARMSAVER",
   "DEALS",
-  // "RECOMMENDATION",
   // "ORDERED",
 ];
 const keys = [
-  "time",
+  "date",
   "package",
   "qty",
-  "cahProduct",
-  "cahSource",
-  "psItem",
-  "psSearch",
-  // "",
+  "cahPrd",
+  "cahSrc",
+  "psPkg",
+  "psAlt",
   // "",
 ];
 const cellStyles = {
-  //
-  time: () => {
+  date: () => {
     return { width: 90 };
   },
   qty: () => {

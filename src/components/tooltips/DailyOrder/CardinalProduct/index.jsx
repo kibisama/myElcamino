@@ -1,4 +1,5 @@
 import { Box, Divider, Typography } from "@mui/material";
+import CustomTooltip from "../../../customs/CustomTooltip";
 
 const style = {
   container: {
@@ -41,7 +42,7 @@ const style = {
     justifyContent: "center",
     fontSize: 11,
     fontWeight: 800,
-    color: "primary.main",
+    // color: "primary.main",
   },
   topValue: {
     display: "flex",
@@ -62,24 +63,30 @@ const style = {
   },
 };
 
-const getHeadlineStyle = (v) =>
-  v ? { ...style.headlineItem, ...v } : style.headlineItem;
-const CardinalProduct = ({ data, lastUpdated, option }) => {
+// const HeadlineItem = () => {
+//   return <Box sx={style.headlineItem} />;
+// };
+const CardinalProduct = ({ data }) => {
+  const lastUpdated = data.lastUpdated;
+  if (data.data === "PENDING") {
+    //
+    return;
+  }
   const {
     name,
-    mfr,
+    cin,
     contract,
     stockStatus,
     stock,
-    cin,
-    ndc,
-    lastCost,
-    lastOrdered,
-    lowestHistCost,
-    lastSFDCCost,
-    lastSFDCDate,
-  } = data;
-  const { _contract, _stockStatus, _rebateEligible, _returnable } = option;
+    avlAlertUpdated,
+    avlAlertExpected,
+    avlAlertAddMsg,
+  } = data.data;
+  const stockHeadline = (
+    <Box sx={style.headlineItem}>
+      {stockStatus + (stock ? ` (${stock})` : null)}
+    </Box>
+  );
   return (
     <Box sx={style.container}>
       <Box sx={style.header}>
@@ -90,21 +97,25 @@ const CardinalProduct = ({ data, lastUpdated, option }) => {
         </Box>
       </Box>
       <Divider />
-      <Box sx={{ ...style.table, minHeight: 42 }}>
+      {/* <Box sx={{ ...style.table, minHeight: 42 }}>
         <Box sx={style.topValue}>{ndc}</Box>
         <Box sx={style.topValue}>{mfr}</Box>
-      </Box>
+      </Box> */}
       <Divider />
       <Box sx={style.table}>
-        <Box sx={getHeadlineStyle(_contract)}>{contract}</Box>
-        <Box sx={getHeadlineStyle(_stockStatus)}>
-          {stockStatus} {stock ? `(${stock})` : null}
-        </Box>
-        <Box sx={getHeadlineStyle(_rebateEligible)}>REBATE ELIGIBLE</Box>
-        <Box sx={getHeadlineStyle(_returnable)}>RETURNABLE</Box>
+        <Box sx={style.headlineItem}>{contract}</Box>
+        {avlAlertUpdated ? (
+          <CustomTooltip title={avlAlertExpected}>
+            {stockHeadline}
+          </CustomTooltip>
+        ) : (
+          stockHeadline
+        )}
+        <Box sx={style.headlineItem}>REBATE ELIGIBLE</Box>
+        <Box sx={style.headlineItem}>RETURNABLE</Box>
       </Box>
       <Divider />
-      <Box sx={style.table}>
+      {/* <Box sx={style.table}>
         <Box sx={style.key}>LAST COST</Box>
         <Box sx={style.value}>{lastCost}</Box>
         <Box sx={style.key}>LAST ORDERED</Box>
@@ -115,7 +126,7 @@ const CardinalProduct = ({ data, lastUpdated, option }) => {
         <Box sx={style.value}>{lastSFDCDate}</Box>
         <Box sx={style.key}>HISTORICAL LOW</Box>
         <Box sx={style.value}>{lowestHistCost}</Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

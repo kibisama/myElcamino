@@ -5,21 +5,24 @@ const CustomTooltip = styled(({ className, onClick, ...props }) => (
   <Tooltip
     {...props}
     classes={{ popper: className }}
-    // depreciated
-    // PopperProps={{
-    //   disablePortal: true,
-    //   popperOptions: {
-    //     positionFixed: true,
-    //     modifiers: {
-    //       preventOverflow: {
-    //         enabled: true,
-    //         boundariesElement: 'window',
-    //       },
-    //     },
-    //   },
-    // }}
     slots={{ transition: Zoom }}
-    slotProps={{ tooltip: { onClick: onClick }, transition: { timeout: 250 } }}
+    slotProps={{
+      tooltip: {
+        onClick: onClick,
+      },
+      transition: { timeout: 125 },
+      // popper: {
+      //   anchorEl: document.querySelector("body"),
+      //   modifiers: [
+      //     {
+      //       name: "offset",
+      //       options: {
+      //         offset: [-420, 0],
+      //       },
+      //     },
+      //   ],
+      // },
+    }}
     disableFocusListener={true}
   />
 ))(({ theme }) => ({

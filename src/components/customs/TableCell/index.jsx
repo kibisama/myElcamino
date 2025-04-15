@@ -59,7 +59,13 @@ const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({
 //     </Box>
 //   );
 // };
-const TableCell = ({ data = {}, textStyle, tooltip, onClickTooltip }) => {
+const TableCell = ({
+  data = {},
+  tooltip,
+  placement,
+  textStyle,
+  onClickTooltip,
+}) => {
   const content =
     data === "PENDING" ? (
       <StyledCircularProgress size={18} />
@@ -95,8 +101,9 @@ const TableCell = ({ data = {}, textStyle, tooltip, onClickTooltip }) => {
     );
   return (
     <Box sx={style.container}>
-      {data.tooltip ? (
+      {data.data ? (
         <CustomTooltip
+          placement={placement}
           sx={
             onClickTooltip
               ? {

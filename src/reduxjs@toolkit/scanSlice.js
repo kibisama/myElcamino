@@ -5,8 +5,7 @@ const asyncInvScan = createAsyncThunk(
   "scanSlice/asyncInvScan",
   async (body, { rejectWithValue }) => {
     try {
-      const res = await scanInv(body);
-      return res.data;
+      return await scanInv(body);
     } catch (e) {
       return rejectWithValue(e.response.data);
     }
@@ -22,6 +21,7 @@ const scanSlice = createSlice({
     cost: undefined,
     isUpdating: false,
     isUpdated: false,
+    status: null,
     error: null,
   },
   reducers: {
@@ -44,6 +44,9 @@ const scanSlice = createSlice({
     setIsUpdated: (state, action) => {
       state.isUpdated = action.payload;
     },
+    setStatus: (state, action) => {
+      state.status = null;
+    },
     setError: (state, action) => {
       state.isUpdated = false;
       state.error = action.payload;
@@ -55,12 +58,9 @@ const scanSlice = createSlice({
       state.isUpdating = true;
     });
     builder.addCase(asyncInvScan.fulfilled, (state, action) => {
-      if (action.payload.error != null) {
-        state.error = action.payload.error;
-      } else {
-        state.error = null;
-        state.isUpdated = true;
-      }
+      state.status = action.payload.status;
+      state.error = null;
+      state.isUpdated = true;
       state.isUpdating = false;
     });
     builder.addCase(asyncInvScan.rejected, (state, action) => {
@@ -71,6 +71,13 @@ const scanSlice = createSlice({
 });
 
 export default scanSlice.reducer;
-export const { setOpen, setMode, setSource, setCost, setIsUpdated, setError } =
-  scanSlice.actions;
+export const {
+  setOpen,
+  setMode,
+  setSource,
+  setCost,
+  setIsUpdated,
+  setStatus,
+  setError,
+} = scanSlice.actions;
 export { asyncInvScan };
