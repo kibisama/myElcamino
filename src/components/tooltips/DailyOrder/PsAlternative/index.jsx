@@ -4,9 +4,6 @@ import PsPackage from "../PsPackage";
 import CustomBoxButton from "../../../customs/CustomBoxButton";
 
 const style = {
-  container: {
-    maxWidth: 952,
-  },
   content: {
     p: 0.25,
   },
@@ -48,7 +45,15 @@ const style = {
 
 const PsAlternative = ({ data, packageData, lastUpdated }) => {
   return (
-    <Box sx={style.container}>
+    <Box
+      sx={
+        data.length > 2
+          ? { width: 952 }
+          : data.length > 1
+          ? { width: 636 }
+          : null
+      }
+    >
       <Box sx={{ ...style.content, ...style.header }}>
         <Typography sx={style.title}>PHARMSAVER DEALS</Typography>
         <LastUpdated data={lastUpdated} />
