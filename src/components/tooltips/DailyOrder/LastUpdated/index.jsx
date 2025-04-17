@@ -16,7 +16,7 @@ const LastUpdated = ({ sx, data }) => {
     : lastUpdated.format("MM/DD/YYYY HH:mm:ss");
   const _style = dateDayjs.isSame(lastUpdated, "day")
     ? style
-    : { ...style, color: "warning.main" };
+    : { ...style, color: "warning.light" };
   return <Typography sx={{ ..._style, ...sx }}>{string}</Typography>;
 };
 
