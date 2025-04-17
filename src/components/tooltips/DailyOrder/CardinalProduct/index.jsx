@@ -2,8 +2,8 @@ import { Box, Divider, Typography, styled } from "@mui/material";
 import CustomTooltip from "../../../customs/CustomTooltip";
 import LastUpdated from "../LastUpdated";
 import CustomCircularProgress from "../../../customs/CustomCircularProgress";
-
-/** @type {Object<string, import("@mui/material").SxProps>} */
+/** @typedef {import("@mui/material").SxProps>} SxProps */
+/** @type {Object<string, SxProps>} */
 const style = {
   container: {
     width: 300,
@@ -92,6 +92,58 @@ const style = {
     color: "text.disabled",
   },
 };
+
+/**
+ * @typedef {"IN STOCK"|"LOW STOCK"|"OUT OF STOCK"|"INELIGIBLE"} StockStatus
+ * @typedef {"primary"|"info"|"warning"|"error"} Style
+ */
+
+/**
+ * @param {StockStatus} stockStatus
+ * @param {string} stock
+ * @returns {Style|null}
+ */
+const getStockStyle = (stockStatus, stock) => {
+  switch (stockStatus) {
+    case "IN STOCK":
+      if (stock && Number(stock.match(/\d+/)[0]) > 9) {
+        return "primary";
+      } else {
+        return "warning";
+      }
+    case "LOW STOCK":
+      if (stock && Number(stock.match(/\d+/)[0]) === 0) {
+        return "error";
+      } else {
+        return "warning";
+      }
+    case "OUT OF STOCK":
+      return "warning";
+    case "INELIGIBLE":
+      return "error";
+    default:
+      return null;
+  }
+};
+/**
+ * @param {Style} style
+ * @returns {SxProps|null}
+ */
+const getStyle = (style) => {
+  switch (style) {
+    case "primary":
+      return style.primary;
+    case "info":
+      return style.info;
+    case "warning":
+      return style.warning;
+    case "error":
+      return style.error;
+    default:
+      return null;
+  }
+};
+
 const CardinalDscBox = styled(({ ...props }) => <Box {...props} />)(
   ({ theme }) => ({
     margin: 2,
@@ -111,6 +163,7 @@ const CardinalProduct = ({ data, lastUpdated }) => {
     cin,
     name,
     brandName,
+    amu,
     mfr,
     ndc,
     contract,
@@ -156,6 +209,7 @@ const CardinalProduct = ({ data, lastUpdated }) => {
           children={contract ? contract : brandName ? "BRAND" : "NO CONTRACT"}
         />
         <CardinalDscBox
+          sx={getStyle(getStockStyle(stockStatus, stock))}
           children={stock ? `${stockStatus} (${stock})` : stockStatus}
         />
         <CardinalDscBox
@@ -175,7 +229,7 @@ const CardinalProduct = ({ data, lastUpdated }) => {
       </Box>
       <Divider />
       <Box>
-        {ndc ? (
+        {amu ? (
           <Box sx={style.contentTable}>
             <Box>
               <Typography sx={style.key}>LAST COST</Typography>
