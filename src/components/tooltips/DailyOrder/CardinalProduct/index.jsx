@@ -79,8 +79,8 @@ const style = {
   primary: {
     color: "primary.main",
   },
-  secondary: {
-    color: "secondary.main",
+  info: {
+    color: "info.light",
   },
   warning: {
     color: "warning.light",
@@ -152,13 +152,7 @@ const CardinalProduct = ({ data, lastUpdated }) => {
       <Divider />
       <Box sx={style.list}>
         <CardinalDscBox
-          sx={
-            contract
-              ? style.primary
-              : brandName
-              ? style.secondary
-              : style.warning
-          }
+          sx={contract ? style.primary : brandName ? style.info : style.warning}
           children={contract ? contract : brandName ? "BRAND" : "NO CONTRACT"}
         />
         <CardinalDscBox
