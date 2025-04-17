@@ -95,7 +95,7 @@ const style = {
 
 /**
  * @typedef {"IN STOCK"|"LOW STOCK"|"OUT OF STOCK"|"INELIGIBLE"} StockStatus
- * @typedef {"primary"|"info"|"warning"|"error"} Style
+ * @typedef {"primary"|"info"|"warning"|"error"|"disabled"} Style
  */
 
 /**
@@ -106,10 +106,10 @@ const style = {
 const getStockStyle = (stockStatus, stock) => {
   switch (stockStatus) {
     case "IN STOCK":
-      if (stock && Number(stock.match(/\d+/)[0]) > 9) {
-        return "primary";
-      } else {
+      if (stock && Number(stock.match(/\d+/)[0]) < 10) {
         return "warning";
+      } else {
+        return "primary";
       }
     case "LOW STOCK":
       if (stock && Number(stock.match(/\d+/)[0]) === 0) {
@@ -118,9 +118,9 @@ const getStockStyle = (stockStatus, stock) => {
         return "warning";
       }
     case "OUT OF STOCK":
-      return "warning";
-    case "INELIGIBLE":
       return "error";
+    case "INELIGIBLE":
+      return "disabled";
     default:
       return null;
   }
@@ -139,6 +139,8 @@ const getStyle = (_style) => {
       return style.warning;
     case "error":
       return style.error;
+    case "disabled":
+      return style.disabled;
     default:
       return null;
   }
