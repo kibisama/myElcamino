@@ -126,11 +126,11 @@ const getStockStyle = (stockStatus, stock) => {
   }
 };
 /**
- * @param {Style} style
+ * @param {Style} _style
  * @returns {SxProps|null}
  */
-const getStyle = (style) => {
-  switch (style) {
+const getStyle = (_style) => {
+  switch (_style) {
     case "primary":
       return style.primary;
     case "info":
