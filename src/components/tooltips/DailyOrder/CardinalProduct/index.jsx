@@ -165,6 +165,10 @@ const CardinalProduct = ({ data, lastUpdated }) => {
           children={stock ? `${stockStatus} (${stock})` : stockStatus}
         />
         <CardinalDscBox
+          sx={rebateEligible === false ? style.disabled : null}
+          children="REBATE ELIGIBLE"
+        />
+        <CardinalDscBox
           sx={
             returnable === true
               ? style.primary
@@ -173,10 +177,6 @@ const CardinalProduct = ({ data, lastUpdated }) => {
               : style.disabled
           }
           children="RETURNABLE"
-        />
-        <CardinalDscBox
-          sx={rebateEligible === false ? style.disabled : null}
-          children="REBATE ELIGIBLE"
         />
       </Box>
       <Divider />
