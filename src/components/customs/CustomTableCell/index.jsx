@@ -1,14 +1,8 @@
 import React from "react";
-import {
-  Badge,
-  Box,
-  CircularProgress,
-  Typography,
-  styled,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { tooltipClasses } from "@mui/material/Tooltip";
-
 import CustomTooltip from "../CustomTooltip";
+import CustomCircularProgress from "../CustomCircularProgress";
 
 const style = {
   container: {
@@ -24,41 +18,6 @@ const style = {
   },
 };
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    top: 3,
-    right: -5,
-  },
-}));
-const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({
-  color:
-    theme.palette.mode === "dark"
-      ? theme.palette.grey[700]
-      : theme.palette.grey[300],
-}));
-// const TableCell = ({ title, subtitle, badge, tooltip }) => {
-//   const content = title ? (
-//     <StyledBadge variant="dot" color={badge}>
-//       <Box>
-//         <Typography sx={subtitle ? style.title : style.titleOnly}>
-//           {title}
-//         </Typography>
-//         {subtitle && <Typography sx={style.subtitle}>{subtitle}</Typography>}
-//       </Box>
-//     </StyledBadge>
-//   ) : (
-//     <StyledCircularProgress size={20} />
-//   );
-//   return (
-//     <Box sx={style.container}>
-//       {tooltip && title ? (
-//         <CustomTooltip title={tooltip}>{content}</CustomTooltip>
-//       ) : (
-//         content
-//       )}
-//     </Box>
-//   );
-// };
 const TableCell = ({
   data = {},
   tooltip,
@@ -68,7 +27,7 @@ const TableCell = ({
 }) => {
   const content =
     data === "PENDING" ? (
-      <StyledCircularProgress size={18} />
+      <CustomCircularProgress size={18} />
     ) : data === "NA" ? (
       <Typography sx={{ ...style.titleOnly, color: "text.disabled" }}>
         NA

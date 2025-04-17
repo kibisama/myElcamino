@@ -1,6 +1,7 @@
-import TableCell from "../../../customs/TableCell";
+import CustomTableCell from "../../../customs/CustomTableCell";
 import PsPackage from "../../../tooltips/DailyOrder/PsPackage";
 import PsAlternative from "../../../tooltips/DailyOrder/PsAlternative";
+import CardinalProduct from "../../../tooltips/DailyOrder/CardinalProduct";
 
 // const ENUM = {
 //   CAH_NO_DATA: "— —",
@@ -53,29 +54,61 @@ import PsAlternative from "../../../tooltips/DailyOrder/PsAlternative";
 //   );
 // };
 
+const handleOnClickPs = (data) =>
+  data?.ndc &&
+  window.open(
+    `https://pharmsaver.net/Pharmacy/Order.aspx?q=${data.ndc.replaceAll(
+      "-",
+      ""
+    )}`,
+    "_blank"
+  );
+const handleOnClickCah = (data) =>
+  data?.cin &&
+  window.open(
+    `https://vantus.cardinalhealth.com/product/${data.cin}?tab=more-details`,
+    "_blank"
+  );
+
 const formats = {
   date: (v) => {
-    return <TableCell data={v.date} />;
+    return <CustomTableCell data={v.date} />;
   },
   package: (v) => {
-    return <TableCell data={v.package} />;
+    return <CustomTableCell data={v.package} />;
   },
   qty: (v) => {
-    return <TableCell data={v.qty} />;
+    return <CustomTableCell data={v.qty} />;
   },
   cahPrd: (v) => {
+    const cahPrd = v.cahPrd;
+    const data = cahPrd.data;
     return (
-      <TableCell
-        data={v.cahPrd}
-        // tooltip={<CardinalProduct data={v.cahPrd.data} />}
+      <CustomTableCell
+        data={cahPrd}
+        tooltip={
+          data && (
+            <CardinalProduct data={data.data} lastUpdated={data.lastUpdated} />
+          )
+        }
+        onClickTooltip={() => handleOnClickCah(data.data)}
+        placement={"left"}
       />
     );
   },
   cahSrc: (v) => {
+    const cahSrc = v.cahSrc;
+    const data = cahSrc.data;
     return (
-      <TableCell
-        data={v.cahSrc}
-        // tooltip={<CardinalProduct data={v.cahSrc.data} />}
+      <CustomTableCell
+        data={cahSrc}
+        tooltip={
+          data && (
+            <CardinalProduct data={data.data} lastUpdated={data.lastUpdated} />
+          )
+        }
+        onClickTooltip={() => handleOnClickCah(data.data)}
+        placement={"left"}
       />
     );
   },
@@ -83,11 +116,12 @@ const formats = {
     const psPkg = v.psPkg;
     const data = psPkg.data;
     return (
-      <TableCell
+      <CustomTableCell
         data={psPkg}
         tooltip={
           data && <PsPackage data={data.data} lastUpdated={data.lastUpdated} />
         }
+        onClickTooltip={() => handleOnClickPs(data.data)}
         placement={"left"}
       />
     );
@@ -96,7 +130,7 @@ const formats = {
     const psAlt = v.psAlt;
     const data = psAlt.data;
     return (
-      <TableCell
+      <CustomTableCell
         data={psAlt}
         tooltip={
           data && (
@@ -116,7 +150,6 @@ const formats = {
   //   // const estNetCost = v.cahProduct.title;
   //   // const pkgPrice = v.psItem.title;
   //   const textStyle =
-  //     // tooltip 업데이트중 공백기간 텍스트적용 해제해야함 브랜드면 미리정보줘야함
   //     v.cahSource.subtitle && cahProduct.tooltip?.data.contract !== ENUM.BRAND
   //       ? { color: "text.disabled" }
   //       : // : estNetCost && pkgPrice && isSameOrCheaper(estNetCost, pkgPrice)
@@ -138,7 +171,7 @@ const formats = {
   //     };
   //   }
   //   return (
-  //     <TableCell
+  //     <CustomTableCell
   //       data={cahProduct}
   //       textStyle={textStyle}
   //       tooltip={tooltip}
@@ -169,66 +202,13 @@ const formats = {
   //     };
   //   }
   //   return (
-  //     <TableCell
+  //     <CustomTableCell
   //       data={cahSource}
   //       textStyle={textStyle}
   //       tooltip={tooltip}
   //       onClickTooltip={onClickTooltip}
   //     />
   //   );
-  // },
-  // psItem: (v) => {
-  //   const psItem = v.psItem;
-  //   const _tooltip = psItem.tooltip;
-  //   let tooltip;
-  //   let onClickTooltip;
-  //   if (_tooltip) {
-  //     const data = _tooltip.data;
-  //     const time = dayjs(v.time);
-  //     const _lastUpdated = dayjs(_tooltip.lastUpdated);
-  //     const lastUpdated = time.isSame(_lastUpdated, "day")
-  //       ? "Today " + _lastUpdated.format("HH:mm:ss")
-  //       : _lastUpdated.format("MM/DD/YYYY HH:mm:ss");
-  //     const option = {
-  //       shortDated: time
-  //         .add(11, "month")
-  //         .isAfter(dayjs(data.lotExpDate, "MM/YY")),
-  //     };
-  //     onClickTooltip = () =>
-  //       window.open(
-  //         `https://pharmsaver.net/Pharmacy/Order.aspx?q=${data.ndc.replaceAll(
-  //           "-",
-  //           ""
-  //         )}`,
-  //         "_blank"
-  //       );
-  //     tooltip = (
-  //       <PsItem data={data} lastUpdated={lastUpdated} option={option} />
-  //     );
-  //   }
-  //   return (
-  //     <TableCell
-  //       data={psItem}
-  //       tooltip={tooltip}
-  //       onClickTooltip={onClickTooltip}
-  //     />
-  //   );
-  // },
-  // psSearch: (v) => {
-  //   const psSearch = v.psSearch;
-  //   const _tooltip = psSearch.tooltip;
-  //   let tooltip;
-  //   let onClickTooltip;
-  //   if (_tooltip) {
-  //     // 중복 함수화
-  //     const time = dayjs(v.time);
-  //     const _lastUpdated = dayjs(_tooltip.lastUpdated);
-  //     const lastUpdated = time.isSame(_lastUpdated, "day")
-  //       ? "Today " + _lastUpdated.format("HH:mm:ss")
-  //       : _lastUpdated.format("MM/DD/YYYY HH:mm:ss");
-  //     tooltip = <PsSearch lastUpdated={lastUpdated} data={_tooltip.data} />;
-  //   }
-  //   return <TableCell data={psSearch} tooltip={tooltip} />;
   // },
 };
 

@@ -51,12 +51,7 @@ const ListTable = ({ rows }) => {
       rows={rows}
       formats={formats}
       cellStyles={cellStyles}
-      rowOnClick={(v) => {
-        // const ndc11 = v.package.ndc11;
-        // if (ndc11) {
-        //   window.navigator.clipboard.writeText(ndc11);
-        // }
-      }}
+      // rowOnClick={(v) => {}}
       hover
     />
   );

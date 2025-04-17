@@ -35,13 +35,23 @@ const style = {
   },
   sameSize: {
     outline: "2px solid",
-    outlineColor: "secondary.light",
+    outlineColor: "info.light",
     "&:hover": {
       outline: "3px solid",
-      outlineColor: "secondary.main",
+      outlineColor: "info.main",
     },
   },
 };
+
+const handleOnClickPs = (data) =>
+  data?.ndc &&
+  window.open(
+    `https://pharmsaver.net/Pharmacy/Order.aspx?q=${data.ndc.replaceAll(
+      "-",
+      ""
+    )}`,
+    "_blank"
+  );
 
 const PsAlternative = ({ data, packageData, lastUpdated }) => {
   return (
@@ -68,7 +78,10 @@ const PsAlternative = ({ data, packageData, lastUpdated }) => {
               ? style.sameSize
               : null;
           return (
-            <CustomBoxButton sx={{ ...style.item, ..._style }}>
+            <CustomBoxButton
+              sx={{ ...style.item, ..._style }}
+              onClick={() => handleOnClickPs(v)}
+            >
               <PsPackage data={v} />
             </CustomBoxButton>
           );

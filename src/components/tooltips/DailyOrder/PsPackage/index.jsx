@@ -20,7 +20,7 @@ const style = {
   },
   description: {
     fontSize: 14,
-    fontWeight: 800,
+    fontWeight: 600,
     justifySelf: "center",
   },
   manufacturer: {
@@ -35,7 +35,7 @@ const style = {
   },
   keyError: {
     fontSize: 13,
-    color: "warning.main",
+    color: "warning.light",
     fontWeight: 600,
   },
   value: {
@@ -45,7 +45,7 @@ const style = {
   valueError: {
     fontSize: 13,
     justifySelf: "flex-end",
-    color: "warning.main",
+    color: "warning.light",
   },
 };
 

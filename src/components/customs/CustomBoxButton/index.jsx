@@ -2,7 +2,7 @@ import { Box, styled } from "@mui/material";
 
 export default styled(({ ...props }) => <Box {...props} />)(({ theme }) => ({
   outline: "1px solid",
-  outlineColor: theme.palette.divider,
+  outlineColor: theme.palette.grey[500],
   borderRadius: 8,
   ":hover": {
     outline: "2px solid",

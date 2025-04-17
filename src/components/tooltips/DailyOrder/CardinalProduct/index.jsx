@@ -1,132 +1,207 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography, styled } from "@mui/material";
 import CustomTooltip from "../../../customs/CustomTooltip";
+import LastUpdated from "../LastUpdated";
+import CustomCircularProgress from "../../../customs/CustomCircularProgress";
 
+/** @type {Object<string, import("@mui/material").SxProps>} */
 const style = {
   container: {
     width: 300,
   },
+  content: {
+    p: 0.25,
+  },
   header: {
-    p: 0.5,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+  },
+  cin: {
+    fontSize: 15,
+    fontWeight: 600,
   },
   name: {
     fontSize: 14,
     fontWeight: 600,
+    justifySelf: "center",
+  },
+  mfr: {
+    fontSize: 10,
+    color: "text.secondary",
+    justifySelf: "center",
   },
   subtitle: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  cin: {
-    fontSize: 12,
-  },
   lastUpdated: {
     fontSize: 10,
   },
-  table: {
-    p: 0.5,
-    minHeight: 82,
+  list: {
+    p: 0.25,
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    alignContent: "space-between",
   },
-  headlineItem: {
-    height: "100%",
-    border: "1px solid",
-    borderColor: "divider",
-    borderRadius: 1,
-    p: 1,
-    minWidth: 143,
+  contentTable: {
+    p: 0.25,
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  circularProgress: {
+    p: 0.25,
+    height: 82,
+    width: "100%",
     display: "flex",
     justifyContent: "center",
-    fontSize: 11,
-    fontWeight: 800,
-    // color: "primary.main",
-  },
-  topValue: {
-    display: "flex",
-    justifyContent: "flex-end",
-    width: "100%",
-    fontSize: 11,
+    alignItems: "center",
   },
   key: {
-    width: "50%",
     fontSize: 13,
+    color: "text.secondary",
+    fontWeight: 600,
+  },
+  keyError: {
+    fontSize: 13,
+    color: "warning.light",
     fontWeight: 600,
   },
   value: {
-    display: "flex",
-    justifyContent: "flex-end",
-    width: "50%",
     fontSize: 13,
+    justifySelf: "flex-end",
+  },
+  valueError: {
+    fontSize: 13,
+    justifySelf: "flex-end",
+    color: "warning.light",
+  },
+  primary: {
+    color: "primary.main",
+  },
+  secondary: {
+    color: "secondary.main",
+  },
+  warning: {
+    color: "warning.light",
+  },
+  error: {
+    color: "error.light",
+  },
+  disabled: {
+    color: "text.disabled",
   },
 };
-
-// const HeadlineItem = () => {
-//   return <Box sx={style.headlineItem} />;
-// };
-const CardinalProduct = ({ data }) => {
-  const lastUpdated = data.lastUpdated;
-  if (data.data === "PENDING") {
-    //
-    return;
-  }
+const CardinalDscBox = styled(({ ...props }) => <Box {...props} />)(
+  ({ theme }) => ({
+    margin: 2,
+    padding: 6,
+    fontSize: 12,
+    fontWeight: 800,
+    minWidth: 144,
+    display: "flex",
+    justifyContent: "center",
+    border: "1px solid",
+    borderColor: theme.palette.grey[500],
+    borderRadius: 4,
+  })
+);
+const CardinalProduct = ({ data, lastUpdated }) => {
   const {
-    name,
     cin,
+    name,
+    brandName,
+    mfr,
+    ndc,
     contract,
     stockStatus,
     stock,
+    rebateEligible,
+    returnable,
     avlAlertUpdated,
     avlAlertExpected,
     avlAlertAddMsg,
-  } = data.data;
-  const stockHeadline = (
-    <Box sx={style.headlineItem}>
-      {stockStatus + (stock ? ` (${stock})` : null)}
-    </Box>
-  );
+    histLow,
+    lastOrdered,
+    lastCost,
+    lastSFDCDate,
+    lastSFDCCost,
+  } = data;
   return (
     <Box sx={style.container}>
-      <Box sx={style.header}>
+      <Box sx={{ ...style.content, ...style.header }}>
+        <Typography sx={style.cin}>{cin}</Typography>
+        <LastUpdated data={lastUpdated} />
+      </Box>
+      <Divider />
+      <Box sx={style.content}>
         <Typography sx={style.name}>{name}</Typography>
-        <Box sx={style.subtitle}>
-          <Typography sx={style.cin}>{cin}</Typography>
-          <Typography sx={style.lastUpdated}>{lastUpdated}</Typography>
+        <Typography sx={style.mfr}>{mfr}</Typography>
+      </Box>
+      <Divider />
+      <Box sx={style.contentTable}>
+        <Box>
+          <Typography sx={style.key}>NDC</Typography>
+          <Typography sx={style.key}>LAST ORDERED</Typography>
+        </Box>
+        <Box>
+          <Typography sx={style.value}>{ndc}</Typography>
+          <Typography sx={style.value}>{lastOrdered}</Typography>
         </Box>
       </Box>
       <Divider />
-      {/* <Box sx={{ ...style.table, minHeight: 42 }}>
-        <Box sx={style.topValue}>{ndc}</Box>
-        <Box sx={style.topValue}>{mfr}</Box>
-      </Box> */}
-      <Divider />
-      <Box sx={style.table}>
-        <Box sx={style.headlineItem}>{contract}</Box>
-        {avlAlertUpdated ? (
-          <CustomTooltip title={avlAlertExpected}>
-            {stockHeadline}
-          </CustomTooltip>
-        ) : (
-          stockHeadline
-        )}
-        <Box sx={style.headlineItem}>REBATE ELIGIBLE</Box>
-        <Box sx={style.headlineItem}>RETURNABLE</Box>
+      <Box sx={style.list}>
+        <CardinalDscBox
+          sx={
+            contract
+              ? style.primary
+              : brandName
+              ? style.secondary
+              : style.warning
+          }
+          children={contract ? contract : brandName ? "BRAND" : "NO CONTRACT"}
+        />
+        <CardinalDscBox
+          children={stock ? `${stockStatus} (${stock})` : stockStatus}
+        />
+        <CardinalDscBox
+          sx={
+            returnable === true
+              ? style.primary
+              : returnable === false
+              ? style.error
+              : style.disabled
+          }
+          children="RETURNABLE"
+        />
+        <CardinalDscBox
+          sx={rebateEligible === false ? style.disabled : null}
+          children="REBATE ELIGIBLE"
+        />
       </Box>
       <Divider />
-      {/* <Box sx={style.table}>
-        <Box sx={style.key}>LAST COST</Box>
-        <Box sx={style.value}>{lastCost}</Box>
-        <Box sx={style.key}>LAST ORDERED</Box>
-        <Box sx={style.value}>{lastOrdered}</Box>
-        <Box sx={style.key}>LAST SFDC COST</Box>
-        <Box sx={style.value}>{lastSFDCCost}</Box>
-        <Box sx={style.key}>LAST SFDC DATE</Box>
-        <Box sx={style.value}>{lastSFDCDate}</Box>
-        <Box sx={style.key}>HISTORICAL LOW</Box>
-        <Box sx={style.value}>{lowestHistCost}</Box>
-      </Box> */}
+      <Box>
+        {ndc ? (
+          <Box sx={style.contentTable}>
+            <Box>
+              <Typography sx={style.key}>LAST COST</Typography>
+              <Typography sx={style.key}>LAST SFDC ORDERED</Typography>
+              <Typography sx={style.key}>LAST SFDC COST</Typography>
+              <Typography sx={style.key}>HISTORICAL LOW</Typography>
+            </Box>
+            <Box>
+              <Typography sx={style.value}>{lastCost}</Typography>
+              <Typography sx={style.value}>{lastSFDCDate}</Typography>
+              <Typography sx={style.value}>{lastSFDCCost}</Typography>
+              <Typography sx={style.value}>{histLow}</Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Box sx={style.circularProgress}>
+            <CustomCircularProgress />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
