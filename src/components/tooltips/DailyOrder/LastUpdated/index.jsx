@@ -11,7 +11,7 @@ const LastUpdated = ({ sx, data }) => {
   const { date } = useSelector((state) => state.order);
   const dateDayjs = dayjs(date, "MM-DD-YYYY");
   const lastUpdated = dayjs(data);
-  const string = dateDayjs.isSame(dayjs(), "day")
+  const string = lastUpdated.isSame(dayjs(), "day")
     ? "Today " + lastUpdated.format("HH:mm:ss")
     : lastUpdated.format("MM/DD/YYYY HH:mm:ss");
   const _style = dateDayjs.isSame(lastUpdated, "day")

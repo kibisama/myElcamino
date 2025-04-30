@@ -75,15 +75,16 @@ const formats = {
     return <CustomTableCell data={v.date} />;
   },
   package: (v) => {
-    return <CustomTableCell data={v.package} />;
-  },
-  qty: (v) => {
+    console.log(v);
     return (
       <CustomTableCell
-        data={v.qty}
-        tooltip={v.qty.data && v.qty.data.data.stock}
+        data={v.package}
+        tooltip={v.package.data && v.package.data.data.stock}
       />
     );
+  },
+  qty: (v) => {
+    return <CustomTableCell data={v.qty} />;
   },
   cahPrd: (v) => {
     const cahPrd = v.cahPrd;

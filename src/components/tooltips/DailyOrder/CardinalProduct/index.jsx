@@ -1,6 +1,7 @@
 import { Box, Divider, Typography, styled } from "@mui/material";
-import CustomTooltip from "../../../customs/CustomTooltip";
 import LastUpdated from "../LastUpdated";
+import CustomTooltip from "../../../customs/CustomTooltip";
+import AvlAlert from "./AvlAlert";
 import CustomCircularProgress from "../../../customs/CustomCircularProgress";
 /** @typedef {import("@mui/material").SxProps>} SxProps */
 /** @type {Object<string, SxProps>} */
@@ -182,6 +183,7 @@ const CardinalProduct = ({ data, lastUpdated }) => {
     lastSFDCDate,
     lastSFDCCost,
   } = data;
+
   return (
     <Box sx={style.container}>
       <Box sx={{ ...style.content, ...style.header }}>
@@ -210,10 +212,19 @@ const CardinalProduct = ({ data, lastUpdated }) => {
           sx={contract ? style.primary : brandName ? style.info : style.warning}
           children={contract ? contract : brandName ? "BRAND" : "NO CONTRACT"}
         />
-        <CardinalDscBox
-          sx={getStyle(getStockStyle(stockStatus, stock))}
-          children={stock ? `${stockStatus} (${stock})` : stockStatus}
-        />
+        {avlAlertUpdated ? (
+          <CustomTooltip title={<AvlAlert data={data} />}>
+            <CardinalDscBox
+              sx={getStyle(getStockStyle(stockStatus, stock))}
+              children={stock ? `${stockStatus} (${stock})` : stockStatus}
+            />
+          </CustomTooltip>
+        ) : (
+          <CardinalDscBox
+            sx={getStyle(getStockStyle(stockStatus, stock))}
+            children={stock ? `${stockStatus} (${stock})` : stockStatus}
+          />
+        )}
         <CardinalDscBox
           sx={rebateEligible === false ? style.disabled : null}
           children="REBATE ELIGIBLE"
