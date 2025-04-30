@@ -216,7 +216,9 @@ const CardinalProduct = ({ data, lastUpdated }) => {
           <CustomTooltip title={<AvlAlert data={data} />}>
             <CardinalDscBox
               sx={getStyle(getStockStyle(stockStatus, stock))}
-              children={stock ? `${stockStatus} (${stock})` : stockStatus}
+              children={
+                stock ? `${stockStatus} (${stock})*` : stockStatus + "*"
+              }
             />
           </CustomTooltip>
         ) : (
