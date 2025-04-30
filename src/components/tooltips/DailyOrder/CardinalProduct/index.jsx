@@ -175,8 +175,6 @@ const CardinalProduct = ({ data, lastUpdated }) => {
     rebateEligible,
     returnable,
     avlAlertUpdated,
-    avlAlertExpected,
-    avlAlertAddMsg,
     histLow,
     lastOrdered,
     lastCost,
@@ -217,14 +215,20 @@ const CardinalProduct = ({ data, lastUpdated }) => {
             <CardinalDscBox
               sx={getStyle(getStockStyle(stockStatus, stock))}
               children={
-                stock ? `${stockStatus} (${stock})*` : stockStatus + "*"
+                stock && stockStatus !== "OUT OF STOCK"
+                  ? `${stockStatus} (${stock})*`
+                  : stockStatus + "*"
               }
             />
           </CustomTooltip>
         ) : (
           <CardinalDscBox
             sx={getStyle(getStockStyle(stockStatus, stock))}
-            children={stock ? `${stockStatus} (${stock})` : stockStatus}
+            children={
+              stock && stockStatus !== "OUT OF STOCK"
+                ? `${stockStatus} (${stock})`
+                : stockStatus
+            }
           />
         )}
         <CardinalDscBox
