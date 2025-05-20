@@ -3,7 +3,8 @@ import LastUpdated from "../LastUpdated";
 import CustomTooltip from "../../../customs/CustomTooltip";
 import AvlAlert from "./AvlAlert";
 import CustomCircularProgress from "../../../customs/CustomCircularProgress";
-/** @typedef {import("@mui/material").SxProps>} SxProps */
+
+/** @typedef {import("@mui/material").SxProps} SxProps */
 /** @type {Object<string, SxProps>} */
 const style = {
   container: {
