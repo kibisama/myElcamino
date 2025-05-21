@@ -5,10 +5,11 @@ import { setOpen } from "../../../../../reduxjs@toolkit/scanSlice";
 import { Box } from "@mui/material";
 import CustomIconButton from "../../../../customs/CustomIconButton";
 import QrCodeIcon from "@mui/icons-material/QrCode";
-import AppsIcon from "@mui/icons-material/Apps";
+
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import Apps from "./Apps";
 
 const style = {
   container: {
@@ -35,7 +36,7 @@ const Tools = () => {
         children={<QrCodeIcon />}
         onClick={handleQrCodeButton}
       />
-      <CustomIconButton children={<AppsIcon />} />
+      <Apps />
       <CustomIconButton children={<NotificationsIcon />} />
       <CustomIconButton
         children={darkMode ? <LightModeIcon /> : <DarkModeIcon />}
