@@ -1,5 +1,6 @@
 import { Box, Typography, Divider } from "@mui/material";
-/** @typedef {import("@mui/material").SxProps>} SxProps */
+
+/** @typedef {import("@mui/material").SxProps} SxProps */
 /** @type {Object<string, SxProps>} */
 const style = {
   container: {

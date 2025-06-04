@@ -1,17 +1,8 @@
 import CustomTableCell from "../../../customs/CustomTableCell";
+import Pkg from "../../../tooltips/DailyOrder/Pkg";
 import PsPackage from "../../../tooltips/DailyOrder/PsPackage";
 import PsAlternative from "../../../tooltips/DailyOrder/PsAlternative";
 import CardinalProduct from "../../../tooltips/DailyOrder/CardinalProduct";
-
-// const ENUM = {
-//   CAH_NO_DATA: "— —",
-//   CAH_PRODUCT_TYPE_BRAND: "Branded Drug",
-//   CAH_PRODUCT_TYPE_GENERIC: "Generic Drug",
-//   PENDING: "PENDING",
-//   NA: "NA",
-//   BRAND: "BRAND",
-//   NO_CONTRACT: "NO CONTRACT",
-// };
 
 // const isSameOrCheaper = (a, b) => {
 //   return (
@@ -75,10 +66,27 @@ const formats = {
     return <CustomTableCell data={v.date} />;
   },
   package: (v) => {
+<<<<<<< HEAD
+=======
+    console.log(v);
+    const pkg = v.package;
+    const data = pkg.data;
+    const cahPrd = v.cahPrd;
+>>>>>>> 1abbb42850ee80d5d4f6a17dbc24e67d55dd71d3
     return (
       <CustomTableCell
-        data={v.package}
-        tooltip={v.package.data && v.package.data.data.stock}
+        data={pkg}
+        tooltip={
+          data && (
+            <Pkg
+              data={data}
+              url={
+                cahPrd &&
+                `${process.env.REACT_APP_CLIENT_API_ADDRESS}/cah/img/${cahPrd.cin}`
+              }
+            />
+          )
+        }
       />
     );
   },

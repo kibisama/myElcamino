@@ -3,7 +3,7 @@ import { ButtonBase, styled } from "@mui/material";
 const CustomIconButton = styled(({ ...props }) => <ButtonBase {...props} />)(
   ({ theme }) => ({
     width: "fit-content",
-    height: "fit-conte`nt",
+    height: "fit-content",
     padding: "0.5rem",
     border: "1px solid transparent",
     borderRadius: 4,
