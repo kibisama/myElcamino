@@ -17,7 +17,7 @@ const scanSlice = createSlice({
   initialState: {
     open: false,
     mode: "RECEIVE",
-    source: "CARDINAL",
+    source: "SECONDARY",
     cost: undefined,
     isUpdating: false,
     isUpdated: false,

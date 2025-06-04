@@ -75,7 +75,6 @@ const formats = {
     return <CustomTableCell data={v.date} />;
   },
   package: (v) => {
-    console.log(v);
     return (
       <CustomTableCell
         data={v.package}

@@ -50,8 +50,25 @@ const ListTable = ({ rows }) => {
       keys={keys}
       rows={rows}
       formats={formats}
+      tableStyle={{ mb: 5 }}
       cellStyles={cellStyles}
-      // rowOnClick={(v) => {}}
+      rowOnClick={(v) => {
+        console.log(v);
+        const ndc = v.package?.data?.data?.ndc11;
+        if (ndc) {
+          const textArea = document.createElement("textarea");
+          textArea.value = ndc;
+          document.body.appendChild(textArea);
+          textArea.focus({ preventScroll: true });
+          textArea.select();
+          try {
+            document.execCommand("copy");
+          } catch (err) {
+            console.error("Unable to copy to clipboard", err);
+          }
+          document.body.removeChild(textArea);
+        }
+      }}
       hover
     />
   );

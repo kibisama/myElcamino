@@ -48,11 +48,12 @@ const CustomTable = ({
   rowStyles,
   rowOnClick,
   cellStyles = {},
+  tableStyle = {},
   aligns = {},
   hover = false,
 }) => {
   return (
-    <TableContainer component={StyledBox}>
+    <TableContainer sx={tableStyle} component={StyledBox}>
       <Table>
         <TableHead>
           <StyledTableRow>
@@ -74,8 +75,10 @@ const CustomTable = ({
               rowStyles instanceof Function ? rowStyles(v) : undefined;
             const _rowOnClick = rowOnClick
               ? (e) => {
-                  e.preventDefault();
-                  rowOnClick(v);
+                  if (e.target.tagName !== "INPUT") {
+                    e.preventDefault();
+                    rowOnClick(v);
+                  }
                 }
               : undefined;
             return (
