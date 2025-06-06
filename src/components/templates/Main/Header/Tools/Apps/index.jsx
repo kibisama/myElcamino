@@ -6,6 +6,9 @@ import CustomLgIconButton from "../../../../../customs/CustomLgIconButton";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import GestureIcon from "@mui/icons-material/Gesture";
 
+import { setApps } from "../../../../../../reduxjs@toolkit/globalSlice";
+import { useDispatch } from "react-redux";
+
 const style = {
   tabs: {
     fontWeight: 600,
@@ -20,6 +23,7 @@ const style = {
 };
 
 const AppList = ({ value }) => {
+  const dispatch = useDispatch();
   return (
     <div hidden={value !== 2}>
       <Box sx={style.list}>
@@ -29,6 +33,9 @@ const AppList = ({ value }) => {
         />
         <CustomLgIconButton
           icon={<GestureIcon sx={style.appIcon} />}
+          onClick={() => {
+            dispatch(setApps("PICKUP"));
+          }}
           label="PICKUP"
         />
       </Box>

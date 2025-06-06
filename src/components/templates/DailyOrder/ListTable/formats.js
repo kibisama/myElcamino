@@ -66,13 +66,10 @@ const formats = {
     return <CustomTableCell data={v.date} />;
   },
   package: (v) => {
-<<<<<<< HEAD
-=======
     console.log(v);
     const pkg = v.package;
     const data = pkg.data;
     const cahPrd = v.cahPrd;
->>>>>>> 1abbb42850ee80d5d4f6a17dbc24e67d55dd71d3
     return (
       <CustomTableCell
         data={pkg}

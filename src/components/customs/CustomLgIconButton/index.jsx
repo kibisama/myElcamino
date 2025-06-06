@@ -1,6 +1,6 @@
 import { Box, Typography, useTheme } from "@mui/material";
 
-const CustomLgIconButton = ({ sx, icon, label }) => {
+const CustomLgIconButton = ({ sx, icon, label, onClick }) => {
   const { palette } = useTheme();
   return (
     <Box
@@ -23,6 +23,7 @@ const CustomLgIconButton = ({ sx, icon, label }) => {
         },
         ...sx,
       }}
+      onClick={onClick}
     >
       {icon}
       <Typography sx={{ fontSize: 9, fontWeight: 600 }}>{label}</Typography>
