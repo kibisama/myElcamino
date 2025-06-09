@@ -7,3 +7,7 @@ export const scanInv = (body) => client.post("inv/scan", body);
 export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 
 export const getPickupItems = () => client.get("apps/pickup");
+export const removePickupItems = (body) =>
+  client.post("apps/pickup/remove", body);
+export const addPickupItems = (body) => client.post("apps/pickup/add", body);
+export const getCanvas = () => client.get("apps/pickup/canvas");

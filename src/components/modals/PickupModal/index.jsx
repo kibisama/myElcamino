@@ -1,38 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 
-import { Modal } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import ModalBox from "../ModalBox";
 import ModalHeader from "../ModalHeader";
+import NumberInput from "../../customs/NumberInput";
+import SignatureBox from "./SignatureBox";
+import ItemsList from "./ItemsList";
+
+import { addPickupItems } from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
-import { getPickupItems } from "../../../lib/api/client";
-
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
-const socket = io(URL);
+let socket;
+
+const style = {
+  content: {
+    p: 2,
+    display: "flex",
+    justifyContent: "space-between",
+  },
+};
 
 export default function PcikupModal() {
+  if (!socket) {
+    socket = io(URL);
+  }
   const dispatch = useDispatch();
   const { apps } = useSelector((state) => state.global);
   const handleClose = () => {
     dispatch(setApps(null));
   };
 
-  const [items, setItems] = useState([]);
+  const [rxNumber, setRxNumber] = useState("");
 
-  useEffect(() => {
-    (async function () {
-      await getPickupItems();
-    })();
-    function onGet(data) {
-      setItems(data);
-    }
-    socket.on("get", onGet);
-    return () => {
-      socket.off("get", onGet);
-    };
-  }, []);
   return (
     <Modal
       sx={{
@@ -42,9 +45,31 @@ export default function PcikupModal() {
       }}
       open={apps}
     >
-      <ModalBox sx={{ width: 1080 }}>
+      <ModalBox sx={{ width: 800 }}>
         <ModalHeader handleClose={handleClose} />
-        {items}
+        <Box sx={style.content}>
+          <Box>
+            <NumberInput
+              label="Rx Number"
+              value={rxNumber}
+              onChange={(e) => {
+                setRxNumber(e.target.value);
+              }}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter") {
+                  try {
+                    await addPickupItems({ item: rxNumber });
+                    setRxNumber("");
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }
+              }}
+            />
+          </Box>
+          <SignatureBox socket={socket} />
+          <ItemsList socket={socket} />
+        </Box>
       </ModalBox>
     </Modal>
   );
