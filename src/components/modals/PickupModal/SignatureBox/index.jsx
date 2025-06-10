@@ -10,16 +10,23 @@ export default function SignatureBox({ socket }) {
     function refresh(data) {
       signRef.current.fromDataURL(data);
     }
-    socket.on("connect", async () => {
+    async function onConnect() {
       try {
         await getCanvas();
       } catch (e) {
         console.log(e);
       }
-    });
+    }
+    function clear() {
+      signRef.current.clear();
+    }
+    socket.on("connect", onConnect);
     socket.on("canvas", refresh);
+    socket.on("clear-canvas", clear);
     return () => {
+      socket.off("connect", onConnect);
       socket.off("canvas", refresh);
+      socket.off("clear-canvas", clear);
       clearTimeout(timeout.current);
     };
   }, []);

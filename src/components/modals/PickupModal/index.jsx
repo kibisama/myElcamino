@@ -3,16 +3,17 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 
-import { Box, Modal } from "@mui/material";
+import { Box, Modal, Button } from "@mui/material";
 import ModalBox from "../ModalBox";
 import ModalHeader from "../ModalHeader";
 import NumberInput from "../../customs/NumberInput";
 import SignatureBox from "./SignatureBox";
 import ItemsList from "./ItemsList";
 
-import { addPickupItems } from "../../../lib/api/client";
+import { addPickupItems, clearPickup } from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
+import RelationBox from "./RelationBox";
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
@@ -66,7 +67,18 @@ export default function PcikupModal() {
                 }
               }}
             />
+            <Button
+              onClick={async () => {
+                try {
+                  await clearPickup();
+                } catch (e) {
+                  console.log(e);
+                }
+              }}
+              children="CLEAR"
+            />
           </Box>
+          <RelationBox socket={socket} />
           <SignatureBox socket={socket} />
           <ItemsList socket={socket} />
         </Box>

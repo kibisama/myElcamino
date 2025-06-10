@@ -11,3 +11,8 @@ export const removePickupItems = (body) =>
   client.post("apps/pickup/remove", body);
 export const addPickupItems = (body) => client.post("apps/pickup/add", body);
 export const getCanvas = () => client.get("apps/pickup/canvas");
+export const clearPickup = () => client.get("apps/pickup/clear");
+export const getPickupRelation = () => client.get("apps/pickup/relation");
+
+export const selectPickupRelation = (body) =>
+  client.post("apps/pickup/relation", body);
