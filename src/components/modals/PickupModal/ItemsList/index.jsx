@@ -3,25 +3,30 @@ import CustomList from "../../../customs/CustomList";
 import { Box, Typography } from "@mui/material";
 import { getPickupItems, removePickupItems } from "../../../../lib/api/client";
 
-const ItemsList = ({ socket }) => {
+const ItemsList = ({ socket, open, readOnly }) => {
   const [items, setItems] = React.useState([]);
   React.useEffect(() => {
     function onGet(data) {
       setItems(data);
     }
-    socket.on("connect", async function () {
+    async function onConnect() {
       try {
         await getPickupItems();
       } catch (e) {
         console.log(e);
       }
-    });
+    }
+
+    onConnect();
+
+    socket.on("connect", onConnect);
     socket.on("get", onGet);
 
     return () => {
+      socket.off("connect", onConnect);
       socket.off("get", onGet);
     };
-  }, []);
+  }, [open]);
   return (
     <Box
       sx={{
@@ -30,19 +35,21 @@ const ItemsList = ({ socket }) => {
         alignItems: "center",
       }}
     >
-      <Typography sx={{ fontWeight: 800, mb: 1 }}>Rx List</Typography>
+      <Typography sx={{ fontWeight: 600, mb: 1 }}>Rx List</Typography>
       <CustomList
         sx={{
           p: 1.25,
           outline: "solid 1px",
           borderRadius: 2,
-          width: 180,
-          height: 540,
+          width: 140,
+          height: 400,
         }}
         items={items}
         onClickItem={async (v) => {
           try {
-            await removePickupItems({ item: v });
+            if (!readOnly) {
+              await removePickupItems({ item: v });
+            }
           } catch (e) {
             console.log(e);
           }

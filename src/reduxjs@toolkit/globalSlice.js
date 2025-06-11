@@ -5,6 +5,7 @@ const globalSlice = createSlice({
   initialState: {
     darkMode: true,
     apps: null,
+    screen: "",
   },
   reducers: {
     setDarkMode: (state, action) => {
@@ -12,6 +13,9 @@ const globalSlice = createSlice({
     },
     setApps: (state, action) => {
       state.apps = action.payload;
+    },
+    setScreen: (state, action) => {
+      state.screen = action.payload;
     },
   },
 });

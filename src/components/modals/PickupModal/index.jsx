@@ -9,11 +9,11 @@ import ModalHeader from "../ModalHeader";
 import NumberInput from "../../customs/NumberInput";
 import SignatureBox from "./SignatureBox";
 import ItemsList from "./ItemsList";
+import RelationBox from "./RelationBox";
 
 import { addPickupItems, clearPickup } from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
-import RelationBox from "./RelationBox";
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
@@ -50,37 +50,42 @@ export default function PcikupModal() {
         <ModalHeader handleClose={handleClose} />
         <Box sx={style.content}>
           <Box>
-            <NumberInput
-              label="Rx Number"
-              value={rxNumber}
-              onChange={(e) => {
-                setRxNumber(e.target.value);
-              }}
-              onKeyDown={async (e) => {
-                if (e.key === "Enter") {
+            <Box>
+              <NumberInput
+                label="Rx Number"
+                value={rxNumber}
+                onChange={(e) => {
+                  setRxNumber(e.target.value);
+                }}
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    try {
+                      await addPickupItems({ item: rxNumber });
+                      setRxNumber("");
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }
+                }}
+              />
+              <Button
+                onClick={async () => {
                   try {
-                    await addPickupItems({ item: rxNumber });
                     setRxNumber("");
+                    await clearPickup();
                   } catch (e) {
                     console.log(e);
                   }
-                }
-              }}
-            />
-            <Button
-              onClick={async () => {
-                try {
-                  await clearPickup();
-                } catch (e) {
-                  console.log(e);
-                }
-              }}
-              children="CLEAR"
-            />
+                }}
+                children="CLEAR"
+              />
+              <RelationBox socket={socket} open={apps} />
+            </Box>
+            <SignatureBox socket={socket} open={apps} />
           </Box>
-          <RelationBox socket={socket} />
-          <SignatureBox socket={socket} />
-          <ItemsList socket={socket} />
+          <Box>
+            <ItemsList socket={socket} open={apps} />
+          </Box>
         </Box>
       </ModalBox>
     </Modal>

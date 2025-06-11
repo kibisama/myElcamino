@@ -49,7 +49,7 @@ const ContentBox = () => {
   return (
     <Box>
       <Tabs variant="fullWidth" value={value} onChange={handleChange}>
-        <Tab sx={style.tabs} value={1} label="Screens" />
+        <Tab sx={style.tabs} value={1} label="Screen" />
         <Tab sx={style.tabs} value={2} label="Apps" />
       </Tabs>
       <AppList value={value} />

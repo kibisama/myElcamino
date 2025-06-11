@@ -9,6 +9,8 @@ const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(
   const { onChange, ...other } = props;
   return (
     <NumericFormat
+      decimalScale={0}
+      allowNegative={false}
       {...other}
       getInputRef={ref}
       onValueChange={(values) => {

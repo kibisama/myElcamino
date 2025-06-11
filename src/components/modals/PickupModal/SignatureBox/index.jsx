@@ -3,7 +3,7 @@ import SignatureCanvas from "react-signature-canvas";
 import { Box } from "@mui/material";
 import { getCanvas } from "../../../../lib/api/client";
 
-export default function SignatureBox({ socket }) {
+export default function SignatureBox({ socket, open }) {
   const signRef = React.useRef(null);
   const timeout = React.useRef(null);
   React.useEffect(() => {
@@ -20,6 +20,7 @@ export default function SignatureBox({ socket }) {
     function clear() {
       signRef.current.clear();
     }
+    onConnect();
     socket.on("connect", onConnect);
     socket.on("canvas", refresh);
     socket.on("clear-canvas", clear);
@@ -29,14 +30,15 @@ export default function SignatureBox({ socket }) {
       socket.off("clear-canvas", clear);
       clearTimeout(timeout.current);
     };
-  }, []);
+  }, [open]);
   return (
     <Box
       sx={{
-        width: 400,
-        height: 200,
+        pt: 0.5,
+        width: 490,
+        height: 150,
         outline: "1px solid",
-        borderRadius: 2,
+        borderRadius: 1,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -46,7 +48,7 @@ export default function SignatureBox({ socket }) {
         <SignatureCanvas
           ref={signRef}
           backgroundColor="rgb(255,255,255)"
-          canvasProps={{ width: 380, height: 180 }}
+          canvasProps={{ width: 480, height: 140 }}
           onBegin={() => {
             function update() {
               socket.emit("canvas", signRef.current.toDataURL());
