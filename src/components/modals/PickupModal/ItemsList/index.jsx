@@ -38,9 +38,11 @@ const ItemsList = ({ socket, open, readOnly }) => {
       <Typography sx={{ fontWeight: 600, mb: 1 }}>Rx List</Typography>
       <CustomList
         sx={{
-          p: 1.25,
+          boxSizing: "border-box",
+          p: 0.5,
           outline: "solid 1px",
-          borderRadius: 2,
+          outlineColor: "divider",
+          borderRadius: 1,
           width: 140,
           height: 400,
         }}

@@ -1,6 +1,7 @@
-import { Box, Button, styled, Typography } from "@mui/material";
+import { Box, Button, styled, Paper, Typography } from "@mui/material";
 import ItemsList from "../../modals/PickupModal/ItemsList";
 import SignatureBox from "../../modals/PickupModal/SignatureBox";
+import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -18,17 +19,21 @@ const StyledButton = styled(({ ...props }) => <Button {...props} />)(
 
 const style = {
   container: {
-    outline: "1px solid black",
-    backgroundColor: "background.paper",
-    p: 1,
+    boxSizing: "border-box",
     width: 800,
     height: 480,
+    p: 1.5,
     display: "flex",
   },
   logo: {
     fontWeight: 800,
     fontSize: 36,
-    color: "primary.dark",
+    color: "#009688",
+    justifySelf: "flex-end",
+  },
+  clock: {
+    fontWeight: 600,
+    fontSize: 18,
     justifySelf: "flex-end",
   },
 };
@@ -39,14 +44,15 @@ const Pickup = () => {
   }
   return (
     <Box sx={style.container}>
-      <Box>
+      <Box sx={{ pt: 2 }}>
         <ItemsList socket={socket} readOnly />
       </Box>
-      <Box>
+      <Box sx={{ flex: 1 }}>
         <Box>
-          <Typography sx={style.logo}>EL CAMINO PHARMACY</Typography>
+          <Typography sx={style.logo}>El Camino Pharmacy</Typography>
+          <Clock sx={style.clock} />
         </Box>
-        <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Box sx={{ display: "flex" }}>
           <SignatureBox socket={socket} />
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <StyledButton children="ACCEPT" endIcon={<CheckIcon />} />
