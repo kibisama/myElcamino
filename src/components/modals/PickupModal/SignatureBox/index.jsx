@@ -1,6 +1,5 @@
 import React from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { Box } from "@mui/material";
 import { getCanvas } from "../../../../lib/api/client";
 
 export default function SignatureBox({ socket, open }) {
@@ -32,36 +31,21 @@ export default function SignatureBox({ socket, open }) {
     };
   }, [open]);
   return (
-    <Box
-      sx={{
-        pt: 0.5,
-        width: 490,
-        height: 150,
-        outline: "1px solid",
-        borderRadius: 1,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+    <SignatureCanvas
+      ref={signRef}
+      backgroundColor="rgb(255,255,255)"
+      canvasProps={{ width: 500, height: 150 }}
+      onBegin={() => {
+        function update() {
+          socket.emit("canvas", signRef.current.toDataURL());
+          timeout.current = setTimeout(update, 500);
+        }
+        timeout.current = setTimeout(update, 500);
       }}
-    >
-      <Box>
-        <SignatureCanvas
-          ref={signRef}
-          backgroundColor="rgb(255,255,255)"
-          canvasProps={{ width: 480, height: 140 }}
-          onBegin={() => {
-            function update() {
-              socket.emit("canvas", signRef.current.toDataURL());
-              timeout.current = setTimeout(update, 500);
-            }
-            timeout.current = setTimeout(update, 500);
-          }}
-          onEnd={() => {
-            clearTimeout(timeout.current);
-            socket.emit("canvas", signRef.current.toDataURL());
-          }}
-        />
-      </Box>
-    </Box>
+      onEnd={() => {
+        clearTimeout(timeout.current);
+        socket.emit("canvas", signRef.current.toDataURL());
+      }}
+    />
   );
 }

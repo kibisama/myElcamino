@@ -6,10 +6,10 @@ const style = {
   listItem: { height: 36, width: "100%" },
 };
 
-export default function CustomList({ sx, items, onClickItem }) {
+export default function CustomList({ sx, items, maxHeight, onClickItem }) {
   return (
     <Box sx={sx}>
-      <List sx={{ overflow: "auto", height: "100%" }}>
+      <List sx={{ p: 0, overflow: "auto", maxHeight }}>
         {items.map((v, i) => (
           <ListItem sx={style.listItem} key={i}>
             <ListItemButton sx={style.listItem}>
