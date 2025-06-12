@@ -60,8 +60,10 @@ export default function PcikupModal() {
                 onKeyDown={async (e) => {
                   if (e.key === "Enter") {
                     try {
-                      await addPickupItems({ item: rxNumber });
-                      setRxNumber("");
+                      if (rxNumber) {
+                        await addPickupItems({ item: rxNumber });
+                        setRxNumber("");
+                      }
                     } catch (e) {
                       console.log(e);
                     }

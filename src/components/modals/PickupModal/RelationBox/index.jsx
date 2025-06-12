@@ -12,7 +12,7 @@ import {
   selectPickupRelation,
 } from "../../../../lib/api/client";
 
-const RelationBox = ({ socket, open }) => {
+const RelationBox = ({ socket, open, row }) => {
   const [value, setValue] = React.useState("self");
   React.useEffect(() => {
     async function onConnect() {
@@ -38,6 +38,7 @@ const RelationBox = ({ socket, open }) => {
       <FormControl>
         <FormLabel>Relation</FormLabel>
         <RadioGroup
+          row={row}
           value={value}
           onChange={async (e) => {
             try {
