@@ -2,7 +2,7 @@ import React from "react";
 import CustomList from "../../../customs/CustomList";
 import { getPickupItems, removePickupItems } from "../../../../lib/api/client";
 
-const ItemsList = ({ socket, open, readOnly, sx }) => {
+const ItemsList = ({ socket, open, readOnly = false, sx }) => {
   const [items, setItems] = React.useState([]);
   React.useEffect(() => {
     function onGet(data) {
@@ -32,17 +32,19 @@ const ItemsList = ({ socket, open, readOnly, sx }) => {
         width: 132,
         ...sx,
       }}
-      maxHeight={380}
+      height={380}
       items={items}
-      onClickItem={async (v) => {
-        try {
-          if (!readOnly) {
-            await removePickupItems({ item: v });
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }}
+      onClickItem={
+        readOnly
+          ? undefined
+          : async (v) => {
+              try {
+                await removePickupItems({ item: v });
+              } catch (e) {
+                console.log(e);
+              }
+            }
+      }
     />
   );
 };

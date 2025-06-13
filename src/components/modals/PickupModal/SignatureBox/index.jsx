@@ -1,8 +1,8 @@
 import React from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { getCanvas } from "../../../../lib/api/client";
+import { getPickupCanvas } from "../../../../lib/api/client";
 
-export default function SignatureBox({ socket, open }) {
+export default function SignatureBox({ socket, open, onBegin }) {
   const signRef = React.useRef(null);
   const timeout = React.useRef(null);
   React.useEffect(() => {
@@ -11,7 +11,7 @@ export default function SignatureBox({ socket, open }) {
     }
     async function onConnect() {
       try {
-        await getCanvas();
+        await getPickupCanvas();
       } catch (e) {
         console.log(e);
       }
@@ -36,6 +36,7 @@ export default function SignatureBox({ socket, open }) {
       backgroundColor="rgb(255,255,255)"
       canvasProps={{ width: 500, height: 150 }}
       onBegin={() => {
+        onBegin && onBegin();
         function update() {
           socket.emit("canvas", signRef.current.toDataURL());
           timeout.current = setTimeout(update, 500);

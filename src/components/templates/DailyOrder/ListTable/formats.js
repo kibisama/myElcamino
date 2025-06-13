@@ -73,17 +73,17 @@ const formats = {
     return (
       <CustomTableCell
         data={pkg}
-        tooltip={
-          data && (
-            <Pkg
-              data={data}
-              url={
-                cahPrd &&
-                `${process.env.REACT_APP_CLIENT_API_ADDRESS}/cah/img/${cahPrd.cin}`
-              }
-            />
-          )
-        }
+        // tooltip={
+        //   data && (
+        //     <Pkg
+        //       data={data}
+        //       url={
+        //         cahPrd &&
+        //         `${process.env.REACT_APP_CLIENT_API_ADDRESS}/cah/img/${cahPrd.cin}`
+        //       }
+        //     />
+        //   )
+        // }
       />
     );
   },

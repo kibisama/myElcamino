@@ -1,11 +1,9 @@
 import React from "react";
 import {
   FormControl,
-  FormLabel,
   FormControlLabel,
   Radio,
   RadioGroup,
-  Box,
 } from "@mui/material";
 import {
   getPickupRelation,
@@ -34,31 +32,32 @@ const RelationBox = ({ socket, open, row }) => {
     };
   }, [open]);
   return (
-    <Box>
-      <FormControl>
-        <FormLabel>Relation</FormLabel>
-        <RadioGroup
-          row={row}
-          value={value}
-          onChange={async (e) => {
-            try {
-              await selectPickupRelation({ relation: e.target.value });
-            } catch (e) {
-              console.log(e);
-            }
-          }}
-        >
-          <FormControlLabel value="self" control={<Radio />} label="Self" />
-          <FormControlLabel value="family" control={<Radio />} label="Family" />
-          <FormControlLabel
-            value="gc"
-            control={<Radio />}
-            label="Guardian/Caregiver"
-          />
-          <FormControlLabel value="other" control={<Radio />} label="Other" />
-        </RadioGroup>
-      </FormControl>
-    </Box>
+    <FormControl>
+      <RadioGroup
+        row={row}
+        value={value}
+        onChange={async (e) => {
+          try {
+            await selectPickupRelation({ relation: e.target.value });
+          } catch (e) {
+            console.log(e);
+          }
+        }}
+      >
+        <FormControlLabel value="self" control={<Radio />} label="Self" />
+        <FormControlLabel
+          value="ff"
+          control={<Radio />}
+          label="Family/Friend"
+        />
+        <FormControlLabel
+          value="gc"
+          control={<Radio />}
+          label="Guardian/Caregiver"
+        />
+        <FormControlLabel value="other" control={<Radio />} label="Other" />
+      </RadioGroup>
+    </FormControl>
   );
 };
 

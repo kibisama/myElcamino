@@ -1,11 +1,12 @@
-import { Box, Button, styled, Paper, Typography } from "@mui/material";
+import React from "react";
+import { Box, Button, styled, Typography } from "@mui/material";
 import ItemsList from "../../modals/PickupModal/ItemsList";
 import SignatureBox from "../../modals/PickupModal/SignatureBox";
 import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import { clearPickupCanvas } from "../../../lib/api/client";
+import { getPickupCanvas, clearPickupCanvas } from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
 
@@ -17,8 +18,6 @@ const StyledButton = styled(({ ...props }) => <Button {...props} />)(
   ({ theme }) => ({
     width: 120,
     height: 90,
-    // border: "1px solid",
-    // borderColor: theme.palette.grey[500],
     borderRadius: 0,
   })
 );
@@ -66,9 +65,46 @@ const style = {
 };
 
 const Pickup = () => {
+  const [disableSubmit, setDisableSubmit] = React.useState(true);
   if (!socket) {
     socket = io(URL);
   }
+
+  const onBegin = () => {
+    setDisableSubmit(false);
+  };
+
+  React.useEffect(() => {
+    function onCanvas(data) {
+      console.log(data);
+      if (data) {
+        setDisableSubmit(false);
+      }
+    }
+    function onClear() {
+      setDisableSubmit(true);
+    }
+    async function onConnect() {
+      try {
+        await getPickupCanvas();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    onConnect();
+
+    socket.on("connect", onConnect);
+    socket.on("canvas", onCanvas);
+    socket.on("clear-canvas", onClear);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("canvas", onCanvas);
+      socket.off("clear-canvas", onClear);
+    };
+  }, []);
+
   return (
     <div>
       <Box sx={style.background} />
@@ -116,16 +152,21 @@ const Pickup = () => {
               }}
             >
               <Box sx={style.signatureBox}>
-                <SignatureBox socket={socket} />
+                <SignatureBox socket={socket} onBegin={onBegin} />
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <StyledButton
+                  disabled={disableSubmit}
                   sx={{
                     color: "#26a69a",
                     backgroundColor: "#80cbc4",
-                    borderBottom: "transparent",
+                    borderBottom: "1px solid",
+                    borderColor: "#9e9e9e",
                     ":hover": {
                       backgroundColor: "#4db6ac",
+                    },
+                    "&.Mui-disabled": {
+                      backgroundColor: "background.paper",
                     },
                   }}
                   children={
@@ -134,12 +175,21 @@ const Pickup = () => {
                         color: "#fafafa",
                         fontWeight: 600,
                         fontSize: 14,
+                        ...(disableSubmit ? { color: "#9e9e9e" } : {}),
                       }}
                     >
                       ACCEPT
                     </Typography>
                   }
-                  endIcon={<CheckIcon sx={{ color: "#fafafa" }} />}
+                  endIcon={
+                    <CheckIcon
+                      sx={
+                        disableSubmit
+                          ? { color: "#9e9e9e" }
+                          : { color: "#fafafa" }
+                      }
+                    />
+                  }
                 />
                 <StyledButton
                   sx={{ color: "error.main" }}
