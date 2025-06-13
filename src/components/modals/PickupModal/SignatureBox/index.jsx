@@ -1,6 +1,6 @@
 import React from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { getPickupCanvas } from "../../../../lib/api/client";
+import { getPickupData } from "../../../../lib/api/client";
 
 export default function SignatureBox({ socket, open, onBegin }) {
   const signRef = React.useRef(null);
@@ -9,22 +9,19 @@ export default function SignatureBox({ socket, open, onBegin }) {
     function refresh(data) {
       signRef.current.fromDataURL(data);
     }
-    async function onConnect() {
-      try {
-        await getPickupCanvas();
-      } catch (e) {
-        console.log(e);
-      }
-    }
     function clear() {
       signRef.current.clear();
     }
-    onConnect();
-    socket.on("connect", onConnect);
+    (async function () {
+      try {
+        await getPickupData("canvas");
+      } catch (e) {
+        console.log(e);
+      }
+    })();
     socket.on("canvas", refresh);
     socket.on("clear-canvas", clear);
     return () => {
-      socket.off("connect", onConnect);
       socket.off("canvas", refresh);
       socket.off("clear-canvas", clear);
       clearTimeout(timeout.current);

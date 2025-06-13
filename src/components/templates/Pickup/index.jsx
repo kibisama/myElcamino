@@ -6,7 +6,7 @@ import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import { getPickupCanvas, clearPickupCanvas } from "../../../lib/api/client";
+import { getPickupData, clearPickupCanvas } from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
 
@@ -76,7 +76,6 @@ const Pickup = () => {
 
   React.useEffect(() => {
     function onCanvas(data) {
-      console.log(data);
       if (data) {
         setDisableSubmit(false);
       }
@@ -84,22 +83,18 @@ const Pickup = () => {
     function onClear() {
       setDisableSubmit(true);
     }
-    async function onConnect() {
+    (async function () {
       try {
-        await getPickupCanvas();
+        await getPickupData("canvas");
       } catch (e) {
         console.log(e);
       }
-    }
+    })();
 
-    onConnect();
-
-    socket.on("connect", onConnect);
     socket.on("canvas", onCanvas);
     socket.on("clear-canvas", onClear);
 
     return () => {
-      socket.off("connect", onConnect);
       socket.off("canvas", onCanvas);
       socket.off("clear-canvas", onClear);
     };

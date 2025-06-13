@@ -1,6 +1,6 @@
 import React from "react";
 import CustomList from "../../../customs/CustomList";
-import { getPickupItems, removePickupItems } from "../../../../lib/api/client";
+import { getPickupData, removePickupItems } from "../../../../lib/api/client";
 
 const ItemsList = ({ socket, open, readOnly = false, sx }) => {
   const [items, setItems] = React.useState([]);
@@ -8,22 +8,17 @@ const ItemsList = ({ socket, open, readOnly = false, sx }) => {
     function onGet(data) {
       setItems(data);
     }
-    async function onConnect() {
+    (async function () {
       try {
-        await getPickupItems();
+        await getPickupData("items");
       } catch (e) {
         console.log(e);
       }
-    }
-
-    onConnect();
-
-    socket.on("connect", onConnect);
-    socket.on("get", onGet);
+    })();
+    socket.on("items", onGet);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("get", onGet);
+      socket.off("items", onGet);
     };
   }, [open]);
   return (
