@@ -4,8 +4,17 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  styled,
 } from "@mui/material";
 import { getPickupData, setPickupRelation } from "../../../../lib/api/client";
+
+const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
+  ({ theme }) => ({
+    "&.Mui-checked": {
+      color: "#26a69a",
+    },
+  })
+);
 
 const RelationBox = ({ socket, open, row }) => {
   const [value, setValue] = React.useState("self");
@@ -26,8 +35,13 @@ const RelationBox = ({ socket, open, row }) => {
     };
   }, [open]);
 
-  const style = (v) =>
-    v === value ? { fontWeight: 600, color: "#009688" } : null;
+  const styleLabel = React.useCallback(
+    (v) =>
+      v === value
+        ? { typography: { sx: { fontWeight: 600 } } }
+        : { typography: { sx: { color: "text.secondary" } } },
+    []
+  );
 
   return (
     <FormControl>
@@ -36,7 +50,6 @@ const RelationBox = ({ socket, open, row }) => {
         value={value}
         onChange={async (e) => {
           try {
-            setValue(e.target.value);
             await setPickupRelation({ relation: e.target.value });
           } catch (e) {
             console.log(e);
@@ -44,35 +57,27 @@ const RelationBox = ({ socket, open, row }) => {
         }}
       >
         <FormControlLabel
-          sx={style("self")}
+          slotProps={styleLabel("self")}
           value="self"
-          control={
-            <Radio
-              sx={{
-                "&.Mui-checked": {
-                  color: "##009688",
-                },
-              }}
-            />
-          }
+          control={<CustomRadio />}
           label="Self"
         />
         <FormControlLabel
-          sx={style("ff")}
+          slotProps={styleLabel("ff")}
           value="ff"
-          control={<Radio />}
+          control={<CustomRadio />}
           label="Family/Friend"
         />
         <FormControlLabel
-          sx={style("gc")}
+          slotProps={styleLabel("gc")}
           value="gc"
-          control={<Radio />}
+          control={<CustomRadio />}
           label="Guardian/Caregiver"
         />
         <FormControlLabel
-          sx={style("other")}
+          slotProps={styleLabel("other")}
           value="other"
-          control={<Radio />}
+          control={<CustomRadio />}
           label="Other"
         />
       </RadioGroup>

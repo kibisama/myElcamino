@@ -62,6 +62,13 @@ const style = {
     justifyContent: "center",
     alignItems: "center",
   },
+  relationBox: {
+    borderTop: "1px solid #9e9e9e",
+    borderRight: "1px solid #9e9e9e",
+    display: "flex",
+    justifyContent: "center",
+    width: 519,
+  },
 };
 
 const Pickup = () => {
@@ -104,23 +111,15 @@ const Pickup = () => {
     <div>
       <Box sx={style.background} />
       <Box sx={style.container}>
-        <Box
+        <ItemsList
+          socket={socket}
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
+            alignSelf: "flex-end",
+            border: "1px solid",
+            borderColor: "#9e9e9e",
           }}
-        >
-          <Typography>Rx List</Typography>
-          <ItemsList
-            socket={socket}
-            sx={{
-              border: "1px solid",
-              borderColor: "#9e9e9e",
-            }}
-            readOnly
-          />
-        </Box>
+          readOnly
+        />
         <Box
           sx={{
             flex: 1,
@@ -134,7 +133,9 @@ const Pickup = () => {
             <Clock sx={style.clock} />
           </Box>
           <Box>
-            <RelationBox socket={socket} row />
+            <Box sx={style.relationBox}>
+              <RelationBox socket={socket} row />
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -153,8 +154,8 @@ const Pickup = () => {
                 <StyledButton
                   disabled={disableSubmit}
                   sx={{
-                    color: "#26a69a",
-                    backgroundColor: "#80cbc4",
+                    color: "#ffffff",
+                    backgroundColor: "#26a69a",
                     borderBottom: "1px solid",
                     borderColor: "#9e9e9e",
                     ":hover": {
