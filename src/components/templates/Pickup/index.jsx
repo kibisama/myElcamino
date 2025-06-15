@@ -5,12 +5,19 @@ import SignatureBox from "../../modals/PickupModal/SignatureBox";
 import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
+import LoadingSvg from "../../../svg/Loading";
+import VerifiedSvg from "../../../svg/Verified";
 
-import { getPickupData, clearPickupCanvas } from "../../../lib/api/client";
+import {
+  getPickupData,
+  clearPickupCanvas,
+  preSubmitPickup,
+} from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
 
 import RelationBox from "../../modals/PickupModal/RelationBox";
+
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
@@ -72,149 +79,219 @@ const style = {
 };
 
 const Pickup = () => {
-  const [disableSubmit, setDisableSubmit] = React.useState(true);
+  const [canvas, setCanvas] = React.useState(false);
+  const [items, setItems] = React.useState(false);
+  const [state, setState] = React.useState("standby");
   if (!socket) {
     socket = io(URL);
   }
-
-  const onBegin = () => {
-    setDisableSubmit(false);
-  };
+  const timeout = React.useRef(null);
 
   React.useEffect(() => {
     function onCanvas(data) {
       if (data) {
-        setDisableSubmit(false);
+        setCanvas(true);
       }
     }
+    function onItems(data) {
+      if (data?.length > 0) {
+        setItems(true);
+      } else {
+        setItems(false);
+      }
+    }
+    function onState(data) {
+      if (data === "submit") {
+        setState("submit");
+        timeout.current = setTimeout(() => {
+          setState("standby");
+        }, 5000);
+      }
+      setState(data);
+    }
     function onClear() {
-      setDisableSubmit(true);
+      setCanvas(false);
     }
     (async function () {
       try {
+        await getPickupData("state");
+        await getPickupData("items");
         await getPickupData("canvas");
       } catch (e) {
         console.log(e);
       }
     })();
-
+    socket.on("state", onState);
+    socket.on("items", onItems);
     socket.on("canvas", onCanvas);
     socket.on("clear-canvas", onClear);
 
     return () => {
+      socket.off("state", onState);
+      socket.off("items", onItems);
       socket.off("canvas", onCanvas);
       socket.off("clear-canvas", onClear);
+      clearTimeout(timeout.current);
     };
   }, []);
 
+  const disabled = !items || !canvas;
+
   return (
-    <div>
-      <Box sx={style.background} />
-      <Box sx={style.container}>
-        <ItemsList
-          socket={socket}
-          sx={{
-            alignSelf: "flex-end",
-            border: "1px solid",
-            borderColor: "#9e9e9e",
-          }}
-          readOnly
-        />
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box>
-            <Typography sx={style.logo}>El Camino Pharmacy</Typography>
-            <Clock sx={style.clock} />
-          </Box>
-          <Box>
-            <Box sx={style.relationBox}>
-              <RelationBox socket={socket} row />
+    <>
+      {state === "standby" ? (
+        <div>
+          <Box sx={style.background} />
+          <Box sx={style.container}>
+            <Box sx={{ alignSelf: "flex-end" }}>
+              <ItemsList
+                socket={socket}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "#9e9e9e",
+                }}
+                readOnly
+              />
             </Box>
             <Box
               sx={{
+                flex: 1,
                 display: "flex",
-                width: 640,
-                borderTop: "1px solid",
-                borderRight: "1px solid",
-                borderBottom: "1px solid",
-                borderColor: "#9e9e9e",
-                height: 170,
+                flexDirection: "column",
+                justifyContent: "space-between",
               }}
             >
-              <Box sx={style.signatureBox}>
-                <SignatureBox socket={socket} onBegin={onBegin} />
+              <Box>
+                <Typography sx={style.logo}>El Camino Pharmacy</Typography>
+                <Clock sx={style.clock} />
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <StyledButton
-                  disabled={disableSubmit}
+              <Box>
+                <Box sx={style.relationBox}>
+                  <RelationBox socket={socket} row />
+                </Box>
+                <Box
                   sx={{
-                    color: "#ffffff",
-                    backgroundColor: "#26a69a",
+                    display: "flex",
+                    width: 640,
+                    borderTop: "1px solid",
+                    borderRight: "1px solid",
                     borderBottom: "1px solid",
                     borderColor: "#9e9e9e",
-                    ":hover": {
-                      backgroundColor: "#4db6ac",
-                    },
-                    "&.Mui-disabled": {
-                      backgroundColor: "background.paper",
-                    },
+                    height: 170,
                   }}
-                  children={
-                    <Typography
-                      sx={{
-                        color: "#fafafa",
-                        fontWeight: 600,
-                        fontSize: 14,
-                        ...(disableSubmit ? { color: "#9e9e9e" } : {}),
+                >
+                  <Box sx={style.signatureBox}>
+                    <SignatureBox
+                      socket={socket}
+                      onBegin={() => {
+                        setCanvas(true);
                       }}
-                    >
-                      ACCEPT
-                    </Typography>
-                  }
-                  endIcon={
-                    <CheckIcon
-                      sx={
-                        disableSubmit
-                          ? { color: "#9e9e9e" }
-                          : { color: "#fafafa" }
+                    />
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <StyledButton
+                      disabled={disabled}
+                      sx={{
+                        color: "#ffffff",
+                        backgroundColor: "#26a69a",
+                        borderBottom: "1px solid",
+                        borderColor: "#9e9e9e",
+                        ":hover": {
+                          backgroundColor: "#4db6ac",
+                        },
+                        "&.Mui-disabled": {
+                          backgroundColor: "background.paper",
+                        },
+                      }}
+                      onClick={async () => {
+                        try {
+                          await preSubmitPickup();
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }}
+                      children={
+                        <Typography
+                          sx={{
+                            color: "#fafafa",
+                            fontWeight: 600,
+                            fontSize: 14,
+                            ...(disabled ? { color: "#9e9e9e" } : {}),
+                          }}
+                        >
+                          ACCEPT
+                        </Typography>
+                      }
+                      endIcon={
+                        <CheckIcon
+                          sx={
+                            disabled
+                              ? { color: "#9e9e9e" }
+                              : { color: "#fafafa" }
+                          }
+                        />
                       }
                     />
-                  }
-                />
-                <StyledButton
-                  sx={{ color: "error.main" }}
-                  onClick={async () => {
-                    try {
-                      await clearPickupCanvas();
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }}
-                  children={
-                    <Typography
-                      sx={{
-                        color: "#212121",
-                        fontWeight: 600,
-                        fontSize: 14,
+                    <StyledButton
+                      sx={{ color: "error.main" }}
+                      onClick={async () => {
+                        try {
+                          await clearPickupCanvas();
+                        } catch (e) {
+                          console.log(e);
+                        }
                       }}
-                    >
-                      CLEAR
-                    </Typography>
-                  }
-                  endIcon={<ClearIcon sx={{ color: "error.main" }} />}
-                />
+                      children={
+                        <Typography
+                          sx={{
+                            color: "#212121",
+                            fontWeight: 600,
+                            fontSize: 14,
+                          }}
+                        >
+                          CLEAR
+                        </Typography>
+                      }
+                      endIcon={<ClearIcon sx={{ color: "error.main" }} />}
+                    />
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
+        </div>
+      ) : state === "pre-submit" ? (
+        <Box
+          sx={{
+            ...style.container,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <LoadingSvg stroke={50} width="6.25%" color="#9e9e9e" />
         </Box>
-      </Box>
-    </div>
+      ) : (
+        <Box
+          sx={{
+            ...style.container,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <VerifiedSvg
+            stroke1={50}
+            stroke2={33.3333}
+            color1="#00c853"
+            color2="#424242"
+            width="6.25%"
+          />
+          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
+            Thank you!
+          </Typography>
+        </Box>
+      )}
+    </>
   );
 };
 

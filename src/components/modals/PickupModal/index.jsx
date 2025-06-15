@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 
-import { Box, Modal, Button } from "@mui/material";
+import { Box, Modal, Button, TextField } from "@mui/material";
 import ModalBox from "../ModalBox";
 import ModalHeader from "../ModalHeader";
 import NumberInput from "../../customs/NumberInput";
@@ -11,7 +11,13 @@ import SignatureBox from "./SignatureBox";
 import ItemsList from "./ItemsList";
 import RelationBox from "./RelationBox";
 
-import { addPickupItems, clearPickup } from "../../../lib/api/client";
+import {
+  getPickupData,
+  addPickupItems,
+  clearPickup,
+  changePickupNotes,
+  submitPickup,
+} from "../../../lib/api/client";
 
 import { io } from "socket.io-client";
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
@@ -22,6 +28,23 @@ const style = {
     p: 2,
     display: "flex",
     justifyContent: "space-between",
+  },
+  signatureBox: {
+    width: 520,
+    height: 170,
+    backgroundColor: "#bdbdbd",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  relationBox: {
+    mr: 1,
+    border: "1px solid",
+    borderRadius: 1,
+    borderColor: "divider",
+    display: "flex",
+    justifyContent: "center",
+    minWidth: 220,
   },
 };
 
@@ -36,6 +59,31 @@ export default function PcikupModal() {
   };
 
   const [rxNumber, setRxNumber] = useState("");
+  const [notes, setNotes] = useState("");
+  const [state, setState] = useState("standby");
+
+  useEffect(() => {
+    function onState(data) {
+      setState(data);
+    }
+    function onNotes(data) {
+      setNotes(data);
+    }
+    (async function () {
+      try {
+        await getPickupData("state");
+        await getPickupData("notes");
+      } catch (e) {
+        console.log(e);
+      }
+    })();
+    socket.on("state", onState);
+    socket.on("notes", onNotes);
+    return () => {
+      socket.off("state", onState);
+    };
+  }, []);
+  const disableSubmit = state !== "pre-submit";
 
   return (
     <Modal
@@ -46,12 +94,13 @@ export default function PcikupModal() {
       }}
       open={apps}
     >
-      <ModalBox sx={{ width: 800 }}>
+      <ModalBox sx={{ width: 800, height: 600 }}>
         <ModalHeader handleClose={handleClose} />
         <Box sx={style.content}>
           <Box>
             <Box>
               <NumberInput
+                sx={{ width: 140 }}
                 label="Rx Number"
                 value={rxNumber}
                 onChange={(e) => {
@@ -71,6 +120,7 @@ export default function PcikupModal() {
                 }}
               />
               <Button
+                disabled={!disableSubmit}
                 onClick={async () => {
                   try {
                     setRxNumber("");
@@ -79,15 +129,51 @@ export default function PcikupModal() {
                     console.log(e);
                   }
                 }}
-                children="CLEAR"
+                children="RESET"
               />
-              <RelationBox socket={socket} open={apps} />
+              <Button
+                disabled={disableSubmit}
+                onClick={async () => {
+                  try {
+                    await submitPickup();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+                children="SUBMIT"
+              />
+              <Box sx={{ display: "flex" }}>
+                <Box sx={style.relationBox}>
+                  <RelationBox socket={socket} open={apps} />
+                </Box>
+                <TextField
+                  value={notes}
+                  onChange={async (e) => {
+                    try {
+                      await changePickupNotes({ notes: e.target.value });
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }}
+                  fullWidth
+                  label="Notes"
+                  multiline
+                  rows={6}
+                />
+              </Box>
             </Box>
-            <SignatureBox socket={socket} open={apps} />
+            <Box sx={style.signatureBox}>
+              <SignatureBox socket={socket} open={apps} />
+            </Box>
           </Box>
-          <Box>
-            <ItemsList socket={socket} open={apps} />
-          </Box>
+          <ItemsList
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+            socket={socket}
+            open={apps}
+          />
         </Box>
       </ModalBox>
     </Modal>

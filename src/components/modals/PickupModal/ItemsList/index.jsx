@@ -1,4 +1,5 @@
 import React from "react";
+import { Box, Typography } from "@mui/material";
 import CustomList from "../../../customs/CustomList";
 import { getPickupData, removePickupItems } from "../../../../lib/api/client";
 
@@ -22,25 +23,30 @@ const ItemsList = ({ socket, open, readOnly = false, sx }) => {
     };
   }, [open]);
   return (
-    <CustomList
-      sx={{
-        width: 132,
-        ...sx,
-      }}
-      height={380}
-      items={items}
-      onClickItem={
-        readOnly
-          ? undefined
-          : async (v) => {
-              try {
-                await removePickupItems({ item: v });
-              } catch (e) {
-                console.log(e);
+    <Box>
+      <Typography sx={{ fontWeight: 600, justifySelf: "center" }}>{`Rx List${
+        items.length > 0 ? ` (${items.length})` : ""
+      }`}</Typography>
+      <CustomList
+        sx={{
+          width: 132,
+          ...sx,
+        }}
+        height={380}
+        items={items}
+        onClickItem={
+          readOnly
+            ? undefined
+            : async (v) => {
+                try {
+                  await removePickupItems({ item: v });
+                } catch (e) {
+                  console.log(e);
+                }
               }
-            }
-      }
-    />
+        }
+      />
+    </Box>
   );
 };
 

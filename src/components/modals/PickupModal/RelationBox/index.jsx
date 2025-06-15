@@ -35,14 +35,10 @@ const RelationBox = ({ socket, open, row }) => {
     };
   }, [open]);
 
-  const styleLabel = React.useCallback(
-    (v) =>
-      v === value
-        ? { typography: { sx: { fontWeight: 600 } } }
-        : { typography: { sx: { color: "text.secondary" } } },
-    []
-  );
-
+  const styleLabel = (v) =>
+    v === value
+      ? { typography: { sx: { color: "#26a69a" } } }
+      : { typography: { sx: { color: "text.secondary" } } };
   return (
     <FormControl>
       <RadioGroup

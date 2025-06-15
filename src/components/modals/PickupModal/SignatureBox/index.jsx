@@ -7,7 +7,9 @@ export default function SignatureBox({ socket, open, onBegin }) {
   const timeout = React.useRef(null);
   React.useEffect(() => {
     function refresh(data) {
-      signRef.current.fromDataURL(data);
+      if (data) {
+        signRef.current.fromDataURL(data);
+      }
     }
     function clear() {
       signRef.current.clear();
