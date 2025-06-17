@@ -2,21 +2,19 @@ import React from "react";
 import { Box, Button, styled, Typography } from "@mui/material";
 import ItemsList from "../../modals/PickupModal/ItemsList";
 import SignatureBox from "../../modals/PickupModal/SignatureBox";
+import RelationBox from "../../modals/PickupModal/RelationBox";
 import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import LoadingSvg from "../../../svg/Loading";
 import VerifiedSvg from "../../../svg/Verified";
-
+import WarningSvg from "../../../svg/Warning";
 import {
   getPickupData,
   clearPickupCanvas,
   preSubmitPickup,
 } from "../../../lib/api/client";
-
 import { io } from "socket.io-client";
-
-import RelationBox from "../../modals/PickupModal/RelationBox";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
@@ -139,7 +137,51 @@ const Pickup = () => {
 
   return (
     <>
-      {state === "standby" ? (
+      {state === "error" ? (
+        <Box
+          sx={{
+            ...style.container,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <WarningSvg width="12.5%" />
+          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
+            Error: Please try again!
+          </Typography>
+        </Box>
+      ) : state === "submit" ? (
+        <Box
+          sx={{
+            ...style.container,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <VerifiedSvg
+            stroke1={50}
+            stroke2={33.3333}
+            color1="#00c853"
+            color2="#424242"
+            width="6.25%"
+          />
+          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
+            Thank you!
+          </Typography>
+        </Box>
+      ) : state === "pre-submit" ? (
+        <Box
+          sx={{
+            ...style.container,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <LoadingSvg stroke={50} width="6.25%" color="#9e9e9e" />
+        </Box>
+      ) : (
         <div>
           <Box sx={style.background} />
           <Box sx={style.container}>
@@ -260,36 +302,6 @@ const Pickup = () => {
             </Box>
           </Box>
         </div>
-      ) : state === "pre-submit" ? (
-        <Box
-          sx={{
-            ...style.container,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <LoadingSvg stroke={50} width="6.25%" color="#9e9e9e" />
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            ...style.container,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <VerifiedSvg
-            stroke1={50}
-            stroke2={33.3333}
-            color1="#00c853"
-            color2="#424242"
-            width="6.25%"
-          />
-          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
-            Thank you!
-          </Typography>
-        </Box>
       )}
     </>
   );

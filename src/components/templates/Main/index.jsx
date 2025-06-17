@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { darkTheme, lightTheme } from "../../../lib/mui/theme";
 import CssBaseline from "@mui/material/CssBaseline";
+import DeliveryLog from "../DeliveryLog";
 
 const style = {
   container: {
@@ -16,14 +17,14 @@ const style = {
 };
 
 const Main = () => {
-  const { darkMode } = useSelector((state) => state.global);
-  const { apps } = useSelector((state) => state.global);
+  const { apps, darkMode, screen } = useSelector((state) => state.global);
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline>
         <Box sx={style.container}>
           <Header />
-          <DailyOrder />
+          {screen === "DAILY_ORDER" && <DailyOrder />}
+          {screen === "PICKUP" && <DeliveryLog />}
           <ScanModal />
           {apps === "PICKUP" && <PickupModal />}
         </Box>

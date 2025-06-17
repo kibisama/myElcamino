@@ -1,12 +1,15 @@
 import React from "react";
-import { Box, Popover, Tabs, Tab, useTheme } from "@mui/material";
+import { Box, Popover, Tabs, Tab, useTheme, Typography } from "@mui/material";
 import CustomIconButton from "../../../../../customs/CustomIconButton";
 import AppsIcon from "@mui/icons-material/Apps";
 import CustomLgIconButton from "../../../../../customs/CustomLgIconButton";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import GestureIcon from "@mui/icons-material/Gesture";
 
-import { setApps } from "../../../../../../reduxjs@toolkit/globalSlice";
+import {
+  setApps,
+  setScreen,
+} from "../../../../../../reduxjs@toolkit/globalSlice";
 import { useDispatch } from "react-redux";
 
 const style = {
@@ -53,7 +56,30 @@ const ContentBox = () => {
         <Tab sx={style.tabs} value={2} label="Apps" />
       </Tabs>
       <AppList value={value} />
+      <Screen value={value} />
     </Box>
+  );
+};
+
+const Screen = ({ value }) => {
+  const dispatch = useDispatch();
+  return (
+    <div hidden={value !== 1}>
+      <Typography
+        onClick={() => {
+          dispatch(setScreen("DAILY_ORDER"));
+        }}
+      >
+        Order List
+      </Typography>
+      <Typography
+        onClick={() => {
+          dispatch(setScreen("PICKUP"));
+        }}
+      >
+        Delivery Log
+      </Typography>
+    </div>
   );
 };
 

@@ -16,5 +16,7 @@ export const clearPickup = () => client.get("apps/pickup/clear");
 export const clearPickupCanvas = () => client.get("apps/pickup/clear-canvas");
 export const setPickupRelation = (body) =>
   client.post("apps/pickup/relation", body);
+export const setPickupDate = (body) => client.post("apps/pickup/date", body);
 export const preSubmitPickup = () => client.get("apps/pickup/pre-submit");
 export const submitPickup = () => client.get("apps/pickup/submit");
+export const findDeliveryLog = (body) => client.post("apps/pickup/find", body);
