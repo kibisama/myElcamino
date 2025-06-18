@@ -23,6 +23,18 @@ const style = {
   appIcon: {
     fontSize: 48,
   },
+  screenList: {
+    p: 2,
+  },
+  screenName: {
+    color: "text.primary",
+    ":hover": {
+      color: "primary.main",
+      cursor: "pointer",
+      textDecoration: "underline",
+      textDecorationColor: "primary.main",
+    },
+  },
 };
 
 const AppList = ({ value }) => {
@@ -64,22 +76,24 @@ const ContentBox = () => {
 const Screen = ({ value }) => {
   const dispatch = useDispatch();
   return (
-    <div hidden={value !== 1}>
+    <Box sx={style.screenList} hidden={value !== 1}>
       <Typography
+        sx={style.screenName}
         onClick={() => {
           dispatch(setScreen("DAILY_ORDER"));
         }}
       >
-        Order List
+        Order report
       </Typography>
       <Typography
+        sx={style.screenName}
         onClick={() => {
           dispatch(setScreen("PICKUP"));
         }}
       >
-        Delivery Log
+        Delivery log
       </Typography>
-    </div>
+    </Box>
   );
 };
 

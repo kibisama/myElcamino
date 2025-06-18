@@ -63,7 +63,11 @@ const CustomTable = ({
               </StyledTableCell>
             )}
             {keys.map((v, i) => (
-              <StyledTableCell key={i} align={aligns[v] ?? "center"}>
+              <StyledTableCell
+                sx={{ height: 36 }}
+                key={i}
+                align={aligns[v] ?? "center"}
+              >
                 {heads[i]}
               </StyledTableCell>
             ))}

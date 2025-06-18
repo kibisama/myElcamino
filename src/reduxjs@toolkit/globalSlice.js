@@ -6,7 +6,7 @@ const globalSlice = createSlice({
     darkMode: true,
     apps: null,
     // screen: "DAILY_ORDER",
-    screen: "PICKUP",
+    screen: "DAILY_ORDER",
   },
   reducers: {
     setDarkMode: (state, action) => {

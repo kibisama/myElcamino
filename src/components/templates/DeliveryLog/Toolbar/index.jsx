@@ -43,7 +43,8 @@ const Toolbar = () => {
     <Box sx={style.container}>
       <Box>
         <TextField
-          sx={{ width: 140 }}
+          sx={{ width: 140, mr: 0.5 }}
+          size="small"
           value={rxNumber}
           onChange={(e) => {
             setRxNumber(e.target.value);

@@ -19,8 +19,8 @@ const DeliveryLog = () => {
     <Box sx={style.container}>
       <Box sx={style.toolbar}>
         <Toolbar />
-        <ListTable rows={list} />
       </Box>
+      <ListTable rows={list} />
     </Box>
   );
 };

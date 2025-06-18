@@ -29,6 +29,7 @@ const style = {
   content: {
     p: 2,
     display: "flex",
+    flexDirection: "column",
     justifyContent: "space-between",
   },
   signatureBox: {
@@ -40,7 +41,6 @@ const style = {
     alignItems: "center",
   },
   relationBox: {
-    mr: 1,
     border: "1px solid",
     borderRadius: 1,
     borderColor: "divider",
@@ -90,6 +90,13 @@ export default function PcikupModal() {
     };
   }, []);
   const disableSubmit = state !== "pre-submit";
+  const handleSnackbarClose = async () => {
+    try {
+      await getPickupData("state");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <Modal
@@ -100,46 +107,67 @@ export default function PcikupModal() {
       }}
       open={apps}
     >
-      <ModalBox sx={{ width: 800, height: 600 }}>
+      <ModalBox sx={{ width: 700 }}>
         <ModalHeader handleClose={handleClose} />
         <Box sx={style.content}>
-          <Box>
-            <Box>
-              <NumberInput
-                sx={{ width: 140 }}
-                label="Rx Number"
-                value={rxNumber}
-                onChange={(e) => {
-                  setRxNumber(e.target.value);
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Box
+              sx={{
+                height: 416,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box
+                sx={{
+                  width: 410,
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
-                onKeyDown={async (e) => {
-                  if (e.key === "Enter") {
-                    try {
-                      if (rxNumber) {
-                        await addPickupItems({ item: rxNumber });
-                        setRxNumber("");
+              >
+                <NumberInput
+                  sx={{ width: 140 }}
+                  label="Rx Number"
+                  value={rxNumber}
+                  onChange={(e) => {
+                    setRxNumber(e.target.value);
+                  }}
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter") {
+                      try {
+                        if (rxNumber) {
+                          await addPickupItems({ item: rxNumber });
+                          setRxNumber("");
+                        }
+                      } catch (e) {
+                        console.log(e);
                       }
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }
-                }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
-                  value={date}
-                  onChange={async (date) => {
-                    try {
-                      setDate(date);
-                      await setPickupDate({ date });
-                    } catch (e) {
-                      console.log(e);
                     }
                   }}
-                  label="Delivery Date"
                 />
-              </LocalizationProvider>
-              <Box sx={{ display: "flex" }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    value={date}
+                    onChange={async (date) => {
+                      try {
+                        setDate(date);
+                        await setPickupDate({ date });
+                      } catch (e) {
+                        console.log(e);
+                      }
+                    }}
+                    label="Delivery Date"
+                  />
+                </LocalizationProvider>
+              </Box>
+              <Box
+                sx={{
+                  width: 520,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Box sx={style.relationBox}>
                   <RelationBox socket={socket} open={apps} />
                 </Box>
@@ -152,86 +180,89 @@ export default function PcikupModal() {
                       console.log(e);
                     }
                   }}
-                  fullWidth
+                  sx={{ width: 285 }}
                   label="Notes"
                   multiline
                   rows={6}
                 />
               </Box>
-            </Box>
-            <Box sx={style.signatureBox}>
-              <SignatureBox socket={socket} open={apps} />
-            </Box>
-            <Box sx={{ display: "flex" }}>
-              <Clock />
-              <Box>
-                <Button
-                  disabled={!disableSubmit}
-                  onClick={async () => {
-                    try {
-                      setRxNumber("");
-                      setDate(undefined);
-                      await clearPickup();
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }}
-                  children="RESET"
-                />
-                <Button
-                  disabled={disableSubmit}
-                  onClick={async () => {
-                    try {
-                      await submitPickup();
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }}
-                  children="SUBMIT"
-                />
+              <Box sx={style.signatureBox}>
+                <SignatureBox socket={socket} open={apps} />
               </Box>
             </Box>
+            <Box sx={{ alignSelf: "flex-end" }}>
+              <ItemsList
+                sx={{
+                  borderRadius: 1,
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+                socket={socket}
+                open={apps}
+              />
+            </Box>
           </Box>
-          <ItemsList
-            sx={{
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-            socket={socket}
-            open={apps}
-          />
+          <Box
+            sx={{ mt: 1.25, display: "flex", justifyContent: "space-between" }}
+          >
+            <Clock sx={{ alignSelf: "flex-end" }} />
+            <Box
+              sx={{
+                width: 220,
+                height: 40,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button
+                sx={{ width: 100 }}
+                variant="outlined"
+                disabled={!disableSubmit}
+                onClick={async () => {
+                  try {
+                    setRxNumber("");
+                    setDate(undefined);
+                    await clearPickup();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+                children="RESET"
+              />
+              <Button
+                sx={{ width: 100 }}
+                variant="outlined"
+                disabled={disableSubmit}
+                onClick={async () => {
+                  try {
+                    await submitPickup();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+                children="SUBMIT"
+              />
+            </Box>
+          </Box>
         </Box>
         <Snackbar
           open={state === "submit"}
           autoHideDuration={5000}
-          onClose={async () => {
-            try {
-              await getPickupData("state");
-            } catch (e) {
-              console.log(e);
-            }
-          }}
+          onClose={handleSnackbarClose}
         >
-          <Alert
-            onClose={async () => {
-              try {
-                await getPickupData("state");
-              } catch (e) {
-                console.log(e);
-              }
-            }}
-            severity="success"
-            variant="outlined"
-          >
+          <Alert onClose={handleSnackbarClose} severity="success">
             Success!
           </Alert>
         </Snackbar>
         <Snackbar
-          sx={{ backgroundColor: "primary.main" }}
+          onClose={handleSnackbarClose}
           open={state === "error"}
           autoHideDuration={5000}
-          message="Error"
-        />
+        >
+          <Alert onClose={handleSnackbarClose} severity="error">
+            Error!
+          </Alert>
+        </Snackbar>
       </ModalBox>
     </Modal>
   );
