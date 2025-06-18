@@ -6,7 +6,7 @@ import {
   RadioGroup,
   styled,
 } from "@mui/material";
-import { getPickupData, setPickupRelation } from "../../../../lib/api/client";
+import { setPickupRelation } from "../../../../lib/api/client";
 
 const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
   ({ theme }) => ({
@@ -19,13 +19,6 @@ const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
 const RelationBox = ({ socket, open, row }) => {
   const [value, setValue] = React.useState("self");
   React.useEffect(() => {
-    (async function () {
-      try {
-        await getPickupData("relation");
-      } catch (e) {
-        console.log(e);
-      }
-    })();
     function onRelation(data) {
       setValue(data);
     }
@@ -33,7 +26,7 @@ const RelationBox = ({ socket, open, row }) => {
     return () => {
       socket.off("relation", onRelation);
     };
-  }, [open]);
+  }, []);
 
   const styleLabel = (v) =>
     v === value

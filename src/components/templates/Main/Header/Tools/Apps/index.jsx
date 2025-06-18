@@ -5,6 +5,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import CustomLgIconButton from "../../../../../customs/CustomLgIconButton";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import GestureIcon from "@mui/icons-material/Gesture";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import {
   setApps,
@@ -16,8 +17,8 @@ const style = {
   tabs: {
     fontWeight: 600,
   },
-  list: {
-    p: 1,
+  appList: {
+    p: 2,
     display: "flex",
   },
   appIcon: {
@@ -41,7 +42,7 @@ const AppList = ({ value }) => {
   const dispatch = useDispatch();
   return (
     <div hidden={value !== 2}>
-      <Box sx={style.list}>
+      <Box sx={style.appList}>
         <CustomLgIconButton
           icon={<UploadFileRoundedIcon sx={style.appIcon} />}
           label="UPLOAD CSV"
@@ -52,6 +53,11 @@ const AppList = ({ value }) => {
             dispatch(setApps("PICKUP"));
           }}
           label="PICKUP"
+        />
+        <CustomLgIconButton
+          icon={<SettingsIcon sx={style.appIcon} />}
+          onClick={() => {}}
+          label="SETTINGS"
         />
       </Box>
     </div>

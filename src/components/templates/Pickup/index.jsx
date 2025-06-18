@@ -99,8 +99,7 @@ const Pickup = () => {
       }
     }
     function onState(data) {
-      if (data === "submit") {
-        setState("submit");
+      if (data === "submit" || data === "error") {
         timeout.current = setTimeout(() => {
           setState("standby");
         }, 5000);
@@ -115,6 +114,7 @@ const Pickup = () => {
         await getPickupData("state");
         await getPickupData("items");
         await getPickupData("canvas");
+        await getPickupData("relation");
       } catch (e) {
         console.log(e);
       }

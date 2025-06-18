@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 import { Alert, Box, Modal, Button, TextField, Snackbar } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -61,7 +62,7 @@ export default function PcikupModal() {
   };
 
   const [rxNumber, setRxNumber] = useState("");
-  const [date, setDate] = useState(undefined);
+  const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
   const [state, setState] = useState("standby");
 
@@ -69,26 +70,38 @@ export default function PcikupModal() {
     function onState(data) {
       setState(data);
       if (data === "submit") {
-        setDate(undefined);
+        setDate(null);
       }
     }
     function onNotes(data) {
       setNotes(data);
     }
+    function onDate(data) {
+      if (data) {
+        setDate(dayjs(data));
+      }
+    }
     (async function () {
       try {
         await getPickupData("state");
         await getPickupData("notes");
+        await getPickupData("items");
+        await getPickupData("canvas");
+        await getPickupData("relation");
+        await getPickupData("date");
       } catch (e) {
         console.log(e);
       }
     })();
     socket.on("state", onState);
     socket.on("notes", onNotes);
+    socket.on("date", onDate);
     return () => {
       socket.off("state", onState);
+      socket.off("notes", onNotes);
+      socket.off("date", onDate);
     };
-  }, []);
+  }, [apps]);
   const disableSubmit = state !== "pre-submit";
   const handleSnackbarClose = async () => {
     try {
@@ -221,7 +234,7 @@ export default function PcikupModal() {
                 onClick={async () => {
                   try {
                     setRxNumber("");
-                    setDate(undefined);
+                    setDate(null);
                     await clearPickup();
                   } catch (e) {
                     console.log(e);
