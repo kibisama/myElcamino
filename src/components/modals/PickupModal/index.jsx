@@ -140,6 +140,7 @@ export default function PcikupModal() {
                 }}
               >
                 <NumberInput
+                  autoFocus
                   sx={{ width: 140 }}
                   label="Rx Number"
                   value={rxNumber}

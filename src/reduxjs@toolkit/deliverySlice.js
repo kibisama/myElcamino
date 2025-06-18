@@ -31,10 +31,11 @@ const deliverySlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(asyncFindDeliveryLog.pending, (state, action) => {});
     builder.addCase(asyncFindDeliveryLog.fulfilled, (state, action) => {
-      console.log(action.payload.results);
       state.list = action.payload.results;
     });
-    builder.addCase(asyncFindDeliveryLog.rejected, (state, action) => {});
+    builder.addCase(asyncFindDeliveryLog.rejected, (state, action) => {
+      state.list = [];
+    });
   },
 });
 

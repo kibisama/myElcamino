@@ -26,9 +26,7 @@ const Toolbar = () => {
   const [deliveryDate, setDate] = useState(dayjs());
   const dispatch = useDispatch();
   const today = dayjs();
-  //   const handleChange = (value) => {
-  //     dispatch(setDate(dayjs(value).format("MM-DD-YYYY")));
-  //   };
+  const handleChange = (value) => setDate(dayjs(value));
 
   return (
     <Box sx={style.container}>
@@ -61,14 +59,13 @@ const Toolbar = () => {
             sx={{ width: 180, mr: 0.5 }}
             value={dayjs(deliveryDate, "MM-DD-YYYY")}
             maxDate={today}
-            // onChange={handle
-            // Change}
+            onChange={handleChange}
           />
           <CustomIconButton
             children={<SearchIcon />}
             onClick={async () => {
               try {
-                // dispatch(asyncFindDeliveryLog({ deliveryDate }));
+                dispatch(asyncFindDeliveryLog({ deliveryDate }));
               } catch (e) {
                 console.log(e);
               }

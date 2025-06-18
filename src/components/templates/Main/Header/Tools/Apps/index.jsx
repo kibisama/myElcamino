@@ -99,6 +99,30 @@ const Screen = ({ value }) => {
       >
         Delivery log
       </Typography>
+      <Typography
+        sx={style.screenName}
+        onClick={() => {
+          //
+        }}
+      >
+        Inventories
+      </Typography>
+      <Typography
+        sx={style.screenName}
+        onClick={() => {
+          //
+        }}
+      >
+        Invoices
+      </Typography>
+      <Typography
+        sx={style.screenName}
+        onClick={() => {
+          //
+        }}
+      >
+        CII reconciliation
+      </Typography>
     </Box>
   );
 };
