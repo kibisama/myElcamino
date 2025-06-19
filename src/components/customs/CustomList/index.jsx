@@ -14,14 +14,16 @@ export default function CustomList({ sx, items, height, onClickItem }) {
         {items.map((v, i) => (
           <ListItem sx={style.listItem} key={i}>
             {onClickItem ? (
-              <ListItemButton sx={style.listItem}>
+              <ListItemButton
+                onClick={() => {
+                  onClickItem(v);
+                }}
+                sx={style.listItem}
+              >
                 <ListItemText
                   slotProps={{
                     primary: {
                       sx: style.primary,
-                      onClick: () => {
-                        onClickItem(v);
-                      },
                     },
                   }}
                   primary={v}

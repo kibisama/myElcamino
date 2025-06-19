@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const useScanDetection = (_a) => {
   const _b = _a.timeToEvaluate,
@@ -8,7 +8,7 @@ const useScanDetection = (_a) => {
     _d = _a.startCharacter,
     startCharacter = React.useMemo(() => (_d === void 0 ? [] : _d), [_d]),
     _e = _a.endCharacter,
-    endCharacter = React.useMemo(() => (_e === void 0 ? ['Enter'] : _e), [_e]),
+    endCharacter = React.useMemo(() => (_e === void 0 ? ["Enter"] : _e), [_e]),
     onComplete = _a.onComplete,
     onError = _a.onError,
     _f = _a.minLength,
@@ -37,12 +37,12 @@ const useScanDetection = (_a) => {
     const code = current
       .slice(
         startCharacter.length > 0 ? 1 : 0,
-        current[current.length - 1].char === 'Enter'
+        current[current.length - 1].char === "Enter"
           ? current.length - 1
-          : current.length,
+          : current.length
       )
       .map((_a) => _a.char)
-      .join('');
+      .join("");
     if (
       avg <= averageWaitTime &&
       endCharacter.includes(current[current.length - 1]?.char)
@@ -90,7 +90,10 @@ const useScanDetection = (_a) => {
       if (stopPropagation) {
         event.stopPropagation();
       }
-      if (preventDefault) {
+      if (
+        (typeof preventDefault === "boolean" && preventDefault) ||
+        (typeof preventDefault === "function" && preventDefault(event))
+      ) {
         event.preventDefault();
       }
     },
@@ -103,19 +106,19 @@ const useScanDetection = (_a) => {
       stopPropagation,
       timeToEvaluate,
       minLength,
-    ],
+    ]
   );
 
   React.useEffect(
     () => () => {
       clearTimeout(timeout.current);
     },
-    [],
+    []
   );
   React.useEffect(() => {
-    container.addEventListener('keypress', onKeyPress);
+    container.addEventListener("keypress", onKeyPress);
     return () => {
-      container.removeEventListener('keypress', onKeyPress);
+      container.removeEventListener("keypress", onKeyPress);
     };
   }, [container, onKeyPress]);
 };

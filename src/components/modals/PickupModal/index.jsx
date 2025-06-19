@@ -22,6 +22,7 @@ import {
   submitPickup,
 } from "../../../lib/api/client";
 import { io } from "socket.io-client";
+import useScanDetection from "../../../hooks/useScanDetection";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
@@ -49,6 +50,10 @@ const style = {
     justifyContent: "center",
     minWidth: 220,
   },
+  alert: {
+    height: 200,
+    width: 400,
+  },
 };
 
 export default function PcikupModal() {
@@ -65,6 +70,18 @@ export default function PcikupModal() {
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
   const [state, setState] = useState("standby");
+
+  const onComplete = async (barcode) => {
+    const activeElement = document.activeElement;
+    if (activeElement.tagName !== "INPUT") {
+      try {
+        await addPickupItems({ item: barcode.match(/\d+/g).join("") });
+      } catch (e) {
+        setState("error");
+      }
+    }
+  };
+  useScanDetection({ onComplete });
 
   useEffect(() => {
     function onState(data) {
@@ -90,7 +107,7 @@ export default function PcikupModal() {
         await getPickupData("relation");
         await getPickupData("date");
       } catch (e) {
-        console.log(e);
+        setState("error");
       }
     })();
     socket.on("state", onState);
@@ -155,7 +172,7 @@ export default function PcikupModal() {
                           setRxNumber("");
                         }
                       } catch (e) {
-                        console.log(e);
+                        setState("error");
                       }
                     }
                   }}
@@ -168,7 +185,7 @@ export default function PcikupModal() {
                         setDate(date);
                         await setPickupDate({ date });
                       } catch (e) {
-                        console.log(e);
+                        setState("error");
                       }
                     }}
                     label="Delivery Date"
@@ -191,7 +208,7 @@ export default function PcikupModal() {
                     try {
                       await changePickupNotes({ notes: e.target.value });
                     } catch (e) {
-                      console.log(e);
+                      setState("error");
                     }
                   }}
                   sx={{ width: 285 }}
@@ -238,7 +255,7 @@ export default function PcikupModal() {
                     setDate(null);
                     await clearPickup();
                   } catch (e) {
-                    console.log(e);
+                    setState("error");
                   }
                 }}
                 children="RESET"
@@ -251,7 +268,7 @@ export default function PcikupModal() {
                   try {
                     await submitPickup();
                   } catch (e) {
-                    console.log(e);
+                    setState("error");
                   }
                 }}
                 children="SUBMIT"
@@ -264,7 +281,11 @@ export default function PcikupModal() {
           autoHideDuration={5000}
           onClose={handleSnackbarClose}
         >
-          <Alert onClose={handleSnackbarClose} severity="success">
+          <Alert
+            sx={style.alert}
+            onClose={handleSnackbarClose}
+            severity="success"
+          >
             Success!
           </Alert>
         </Snackbar>
@@ -273,7 +294,11 @@ export default function PcikupModal() {
           open={state === "error"}
           autoHideDuration={5000}
         >
-          <Alert onClose={handleSnackbarClose} severity="error">
+          <Alert
+            sx={style.alert}
+            onClose={handleSnackbarClose}
+            severity="error"
+          >
             Error!
           </Alert>
         </Snackbar>

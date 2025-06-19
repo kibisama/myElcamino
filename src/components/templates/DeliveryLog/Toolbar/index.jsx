@@ -2,8 +2,7 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { Box, TextField } from "@mui/material";
 import CustomDatePicker from "../../../customs/CustomDatePicker";
-// import { asyncGetDailyOrder } from "../../../../reduxjs@toolkit/orderSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { asyncFindDeliveryLog } from "../../../../reduxjs@toolkit/deliverySlice";
 import CustomIconButton from "../../../customs/CustomIconButton";
 import SearchIcon from "@mui/icons-material/Search";
@@ -57,7 +56,7 @@ const Toolbar = () => {
         <div>
           <CustomDatePicker
             sx={{ width: 180, mr: 0.5 }}
-            value={dayjs(deliveryDate, "MM-DD-YYYY")}
+            value={dayjs(deliveryDate)}
             maxDate={today}
             onChange={handleChange}
           />
