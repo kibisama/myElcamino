@@ -23,6 +23,7 @@ import {
 } from "../../../lib/api/client";
 import { io } from "socket.io-client";
 import useScanDetection from "../../../hooks/useScanDetection";
+import { useDebouncedCallback } from "use-debounce";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
@@ -72,8 +73,7 @@ export default function PcikupModal() {
   const [state, setState] = useState("standby");
 
   const onComplete = async (barcode) => {
-    const activeElement = document.activeElement;
-    if (activeElement.tagName !== "INPUT") {
+    if (document.activeElement.tagName !== "INPUT") {
       try {
         await addPickupItems({ item: barcode.match(/\d+/g).join("") });
       } catch (e) {
@@ -127,6 +127,14 @@ export default function PcikupModal() {
       console.log(e);
     }
   };
+
+  const debounced = useDebouncedCallback(async () => {
+    try {
+      await changePickupNotes({ notes });
+    } catch (e) {
+      setState("error");
+    }
+  }, 500);
 
   return (
     <Modal
@@ -204,12 +212,9 @@ export default function PcikupModal() {
                 </Box>
                 <TextField
                   value={notes}
-                  onChange={async (e) => {
-                    try {
-                      await changePickupNotes({ notes: e.target.value });
-                    } catch (e) {
-                      setState("error");
-                    }
+                  onChange={(e) => {
+                    setNotes(e.target.value);
+                    debounced();
                   }}
                   sx={{ width: 285 }}
                   label="Notes"
@@ -266,7 +271,7 @@ export default function PcikupModal() {
                 disabled={disableSubmit}
                 onClick={async () => {
                   try {
-                    await submitPickup();
+                    await submitPickup({ notes });
                   } catch (e) {
                     setState("error");
                   }
