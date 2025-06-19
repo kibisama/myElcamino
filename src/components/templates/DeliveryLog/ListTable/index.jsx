@@ -12,13 +12,13 @@ const cellStyles = {
     return { width: 120 };
   },
   png: () => {
-    return { width: 532 };
+    return { width: 632 };
   },
   relation: () => {
-    return { width: 100 };
+    return { width: 120 };
   },
   action: () => {
-    return { width: 100 };
+    return { width: 120 };
   },
 };
 
