@@ -2,7 +2,15 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import dayjs from "dayjs";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
-import { Alert, Box, Modal, Button, TextField, Snackbar } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Modal,
+  Button,
+  TextField,
+  Snackbar,
+} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -187,7 +195,7 @@ export default function PcikupModal() {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
                     value={date}
-                    onChange={async (date) => {
+                    onAccept={async (date) => {
                       try {
                         setDate(date);
                         await setPickupDate({ date });
@@ -289,7 +297,7 @@ export default function PcikupModal() {
             onClose={handleSnackbarClose}
             severity="success"
           >
-            Success!
+            <AlertTitle>Success</AlertTitle>
           </Alert>
         </Snackbar>
         <Snackbar
@@ -302,7 +310,7 @@ export default function PcikupModal() {
             onClose={handleSnackbarClose}
             severity="error"
           >
-            Error!
+            <AlertTitle>Error</AlertTitle>
           </Alert>
         </Snackbar>
       </ModalBox>

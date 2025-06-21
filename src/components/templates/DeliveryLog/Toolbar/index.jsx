@@ -24,7 +24,6 @@ const Toolbar = () => {
   const [rxNumber, setRxNumber] = useState("");
   const [deliveryDate, setDate] = useState(dayjs());
   const dispatch = useDispatch();
-  const today = dayjs();
   const handleChange = (value) => setDate(dayjs(value));
 
   return (
@@ -57,7 +56,6 @@ const Toolbar = () => {
           <CustomDatePicker
             sx={{ width: 180, mr: 0.5 }}
             value={dayjs(deliveryDate)}
-            maxDate={today}
             onChange={handleChange}
           />
           <CustomIconButton
