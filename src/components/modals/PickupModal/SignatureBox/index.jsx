@@ -1,7 +1,7 @@
 import React from "react";
 import SignatureCanvas from "react-signature-canvas";
 
-export default function SignatureBox({ socket, open, onBegin }) {
+export default function SignatureBox({ socket, onBegin }) {
   const signRef = React.useRef(null);
   const timeout = React.useRef(null);
   React.useEffect(() => {

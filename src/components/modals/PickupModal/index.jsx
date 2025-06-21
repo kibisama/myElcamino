@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import dayjs from "dayjs";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 import { Alert, Box, Modal, Button, TextField, Snackbar } from "@mui/material";
@@ -62,7 +62,6 @@ export default function PcikupModal() {
     socket = io(URL);
   }
   const dispatch = useDispatch();
-  const { apps } = useSelector((state) => state.global);
   const handleClose = () => {
     dispatch(setApps(null));
   };
@@ -118,7 +117,7 @@ export default function PcikupModal() {
       socket.off("notes", onNotes);
       socket.off("date", onDate);
     };
-  }, [apps]);
+  }, []);
   const disableSubmit = state !== "pre-submit";
   const handleSnackbarClose = async () => {
     try {
@@ -143,7 +142,7 @@ export default function PcikupModal() {
         justifyContent: "center",
         alignItems: "center",
       }}
-      open={apps}
+      open={true}
     >
       <ModalBox sx={{ width: 700 }}>
         <ModalHeader handleClose={handleClose} />
@@ -208,7 +207,7 @@ export default function PcikupModal() {
                 }}
               >
                 <Box sx={style.relationBox}>
-                  <RelationBox socket={socket} open={apps} />
+                  <RelationBox socket={socket} />
                 </Box>
                 <TextField
                   value={notes}
@@ -223,7 +222,7 @@ export default function PcikupModal() {
                 />
               </Box>
               <Box sx={style.signatureBox}>
-                <SignatureBox socket={socket} open={apps} />
+                <SignatureBox socket={socket} />
               </Box>
             </Box>
             <Box sx={{ alignSelf: "flex-end" }}>
@@ -234,7 +233,6 @@ export default function PcikupModal() {
                   borderColor: "divider",
                 }}
                 socket={socket}
-                open={apps}
               />
             </Box>
           </Box>

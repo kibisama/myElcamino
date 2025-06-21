@@ -20,3 +20,5 @@ export const setPickupDate = (body) => client.post("apps/pickup/date", body);
 export const preSubmitPickup = () => client.get("apps/pickup/pre-submit");
 export const submitPickup = (body) => client.post("apps/pickup/submit", body);
 export const findDeliveryLog = (body) => client.post("apps/pickup/find", body);
+export const getSettings = () => client.get("apps/settings");
+export const postSettings = (body) => client.post("apps/settings", body);

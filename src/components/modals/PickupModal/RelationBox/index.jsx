@@ -16,7 +16,7 @@ const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
   })
 );
 
-const RelationBox = ({ socket, open, row }) => {
+const RelationBox = ({ socket, row }) => {
   const [value, setValue] = React.useState("self");
   React.useEffect(() => {
     function onRelation(data) {

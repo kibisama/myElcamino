@@ -3,6 +3,7 @@ import Header from "./Header";
 import DailyOrder from "../DailyOrder";
 import ScanModal from "../../modals/ScanModal";
 import PickupModal from "../../modals/PickupModal";
+import SettingsModal from "../../modals/SettingsModal";
 import { useSelector } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { darkTheme, lightTheme } from "../../../lib/mui/theme";
@@ -27,6 +28,7 @@ const Main = () => {
           {screen === "PICKUP" && <DeliveryLog />}
           <ScanModal />
           {apps === "PICKUP" && <PickupModal />}
+          {apps === "SETTINGS" && <SettingsModal />}
         </Box>
       </CssBaseline>
     </ThemeProvider>

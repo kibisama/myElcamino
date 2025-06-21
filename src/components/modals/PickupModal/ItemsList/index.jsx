@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import CustomList from "../../../customs/CustomList";
 import { removePickupItems } from "../../../../lib/api/client";
 
-const ItemsList = ({ socket, open, readOnly = false, sx }) => {
+const ItemsList = ({ socket, readOnly = false, sx }) => {
   const [items, setItems] = React.useState([]);
   React.useEffect(() => {
     function onGet(data) {

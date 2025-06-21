@@ -56,7 +56,9 @@ const AppList = ({ value }) => {
         />
         <CustomLgIconButton
           icon={<SettingsIcon sx={style.appIcon} />}
-          onClick={() => {}}
+          onClick={() => {
+            dispatch(setApps("SETTINGS"));
+          }}
           label="SETTINGS"
         />
       </Box>
