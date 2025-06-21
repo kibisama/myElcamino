@@ -195,10 +195,12 @@ export default function PcikupModal() {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
                     value={date}
-                    onAccept={async (date) => {
+                    onChange={async (date, context) => {
                       try {
-                        setDate(date);
-                        await setPickupDate({ date });
+                        if (!context.validationError) {
+                          setDate(date);
+                          await setPickupDate({ date });
+                        }
                       } catch (e) {
                         setState("error");
                       }
