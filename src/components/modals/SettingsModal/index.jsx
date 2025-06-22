@@ -5,7 +5,6 @@ import { Box, Tabs, Tab, Modal } from "@mui/material";
 import ModalBox from "../ModalBox";
 import ModalHeader from "../ModalHeader";
 import StoreInfo from "./StoreInfo";
-import { getSettings } from "../../../lib/api/client";
 
 const SettingsModal = () => {
   const dispatch = useDispatch();
@@ -13,25 +12,9 @@ const SettingsModal = () => {
     dispatch(setApps(null));
   };
   const [value, setValue] = useState(0);
-  const [settings, setSettings] = useState(null);
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
-  useEffect(() => {
-    async function get() {
-      try {
-        const { data } = await getSettings();
-        if (data) {
-          const { results } = data;
-          setSettings(results);
-        }
-      } catch (e) {
-        setSettings(null);
-        console.log(e);
-      }
-    }
-    get();
-  }, []);
 
   return (
     <Modal
@@ -50,7 +33,7 @@ const SettingsModal = () => {
           </Tabs>
         </Box>
         <Box sx={{ p: 2, display: "flex" }}>
-          <StoreInfo settings={settings} />
+          <StoreInfo />
         </Box>
       </ModalBox>
     </Modal>

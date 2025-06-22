@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { postSettings } from "../../../../lib/api/client";
+import { getSettings } from "../../../../lib/api/client";
 
-const style = {};
+const StoreInfo = () => {
+  const [settings, setSettings] = useState(null);
 
-const StoreInfo = ({ settings }) => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
@@ -15,6 +16,21 @@ const StoreInfo = ({ settings }) => {
   const [email, setEmail] = useState("");
   const [managerLN, setManagerLN] = useState("");
   const [managerFN, setManagerFN] = useState("");
+  async function get() {
+    try {
+      const { data } = await getSettings();
+      if (data) {
+        const { results } = data;
+        setSettings(results);
+      }
+    } catch (e) {
+      setSettings(null);
+      console.log(e);
+    }
+  }
+  useEffect(() => {
+    get();
+  }, []);
   const onGetSettings = () => {
     if (settings) {
       setName(settings.storeName);
@@ -47,8 +63,9 @@ const StoreInfo = ({ settings }) => {
   return (
     <Box
       sx={{
-        px: 2,
-        height: 500,
+        p: 2,
+        height: 540,
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -64,30 +81,35 @@ const StoreInfo = ({ settings }) => {
         value={address}
         label="Store Address"
       />
-      <Box sx={{}}>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <TextField
+          sx={{ width: 355 }}
           onChange={(e) => setCity(e.target.value)}
           value={city}
           label="City"
         />
         <TextField
+          sx={{ width: 150 }}
           onChange={(e) => setState(e.target.value)}
           value={state}
           label="State"
         />
         <TextField
+          sx={{ width: 180 }}
           onChange={(e) => setZip(e.target.value)}
           value={zip}
           label="Zip Code"
         />
       </Box>
-      <Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <TextField
+          sx={{ width: 355 }}
           onChange={(e) => setPhone(e.target.value)}
           value={phone}
           label="Phone"
         />
         <TextField
+          sx={{ width: 355 }}
           onChange={(e) => setFax(e.target.value)}
           value={fax}
           label="Fax"
@@ -98,21 +120,36 @@ const StoreInfo = ({ settings }) => {
         value={email}
         label="E-mail"
       />
-      <Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <TextField
+          sx={{ width: 355 }}
           onChange={(e) => setManagerLN(e.target.value)}
           value={managerLN}
           label="Last Name"
         />
         <TextField
+          sx={{ width: 355 }}
           onChange={(e) => setManagerFN(e.target.value)}
           value={managerFN}
           label="First Name"
         />
       </Box>
-      <Box>
-        <Button variant="outlined" children="RESET" onClick={onGetSettings} />
+      <Box
+        sx={{
+          alignSelf: "flex-end",
+          width: 220,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Button
+          sx={{ width: 100 }}
+          variant="outlined"
+          children="RESET"
+          onClick={onGetSettings}
+        />
+        <Button
+          sx={{ width: 100 }}
           disabled={disableSave}
           variant="outlined"
           children="SAVE"
@@ -130,6 +167,7 @@ const StoreInfo = ({ settings }) => {
                 storeManagerLN: managerLN,
                 storeManagerFN: managerFN,
               });
+              await get();
             } catch (e) {
               console.log(e);
             }

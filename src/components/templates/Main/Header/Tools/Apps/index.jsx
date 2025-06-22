@@ -66,7 +66,7 @@ const AppList = ({ value }) => {
   );
 };
 
-const ContentBox = () => {
+const ContentBox = ({ handleClose }) => {
   const [value, setValue] = React.useState(1);
   const handleChange = (event, newValue) => setValue(newValue);
   return (
@@ -75,13 +75,13 @@ const ContentBox = () => {
         <Tab sx={style.tabs} value={1} label="Screen" />
         <Tab sx={style.tabs} value={2} label="Apps" />
       </Tabs>
-      <AppList value={value} />
-      <Screen value={value} />
+      <AppList value={value} handleClose={handleClose} />
+      <Screen value={value} handleClose={handleClose} />
     </Box>
   );
 };
 
-const Screen = ({ value }) => {
+const Screen = ({ value, handleClose }) => {
   const dispatch = useDispatch();
   return (
     <Box sx={style.screenList} hidden={value !== 1}>
@@ -89,6 +89,7 @@ const Screen = ({ value }) => {
         sx={style.screenName}
         onClick={() => {
           dispatch(setScreen("DAILY_ORDER"));
+          handleClose();
         }}
       >
         Order report
@@ -97,6 +98,7 @@ const Screen = ({ value }) => {
         sx={style.screenName}
         onClick={() => {
           dispatch(setScreen("PICKUP"));
+          handleClose();
         }}
       >
         Delivery log
@@ -166,7 +168,7 @@ const Apps = () => {
           },
         }}
       >
-        <ContentBox />
+        <ContentBox handleClose={handleClose} />
       </Popover>
     </>
   );

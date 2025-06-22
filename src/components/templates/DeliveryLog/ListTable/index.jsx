@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import CustomIconButton from "../../../customs/CustomIconButton";
 import CustomTable from "../../../customs/CustomTable";
 import PrintIcon from "@mui/icons-material/Print";
@@ -51,7 +52,14 @@ const ListTable = ({ rows }) => {
           }
         },
         action: (v) => {
-          return <CustomIconButton children={<PrintIcon />} />;
+          return (
+            <Link
+              to={`/print/deliveryProof/${v._id}/${v.rxNumber}`}
+              target="_blank"
+            >
+              <CustomIconButton children={<PrintIcon />} />
+            </Link>
+          );
         },
       }}
       heads={heads}

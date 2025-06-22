@@ -78,6 +78,7 @@ export default function PcikupModal() {
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
   const [state, setState] = useState("standby");
+  const [error, setError] = useState("");
 
   const onComplete = async (barcode) => {
     if (document.activeElement.tagName !== "INPUT") {
@@ -105,6 +106,9 @@ export default function PcikupModal() {
         setDate(dayjs(data));
       }
     }
+    function onError(data) {
+      setError(data);
+    }
     (async function () {
       try {
         await getPickupData("state");
@@ -120,6 +124,7 @@ export default function PcikupModal() {
     socket.on("state", onState);
     socket.on("notes", onNotes);
     socket.on("date", onDate);
+    socket.on("error", onError);
     return () => {
       socket.off("state", onState);
       socket.off("notes", onNotes);
