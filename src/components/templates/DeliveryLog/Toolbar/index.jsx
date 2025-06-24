@@ -45,7 +45,7 @@ const Toolbar = () => {
             children={<SearchIcon />}
             onClick={async () => {
               try {
-                dispatch(asyncFindDeliveryLog({ rxNumber }));
+                dispatch(asyncFindDeliveryLog({ rxNumber: rxNumber.trim() }));
               } catch (e) {
                 console.log(e);
               }
