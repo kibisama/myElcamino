@@ -17,6 +17,7 @@ const UploadCSV = () => {
   const onAccepted = async ({ data }) => {
     try {
       await checkDRxCSV({ csvHeader: data[0] });
+      setData(data);
       setDisableSubmit(false);
     } catch (e) {
       setDisableSubmit(true);
