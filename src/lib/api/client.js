@@ -21,5 +21,9 @@ export const preSubmitPickup = () => client.get("apps/pickup/pre-submit");
 export const submitPickup = (body) => client.post("apps/pickup/submit", body);
 export const findDeliveryLog = (body) => client.post("apps/pickup/find", body);
 export const getPickupProof = (body) => client.post("apps/pickup/proof", body);
+
 export const getSettings = () => client.get("apps/settings");
 export const postSettings = (body) => client.post("apps/settings", body);
+
+export const checkDRxCSV = (body) =>
+  client.post("apps/upload/checkDRxCSV", body);

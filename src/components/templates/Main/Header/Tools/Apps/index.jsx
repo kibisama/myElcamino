@@ -45,6 +45,9 @@ const AppList = ({ value }) => {
       <Box sx={style.appList}>
         <CustomLgIconButton
           icon={<UploadFileRoundedIcon sx={style.appIcon} />}
+          onClick={() => {
+            dispatch(setApps("UPLOAD_CSV"));
+          }}
           label="UPLOAD CSV"
         />
         <CustomLgIconButton

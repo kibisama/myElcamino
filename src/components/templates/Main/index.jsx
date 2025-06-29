@@ -9,6 +9,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { darkTheme, lightTheme } from "../../../lib/mui/theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import DeliveryLog from "../DeliveryLog";
+import UploadCSV from "../../modals/UploadCSV";
 
 const style = {
   container: {
@@ -27,6 +28,7 @@ const Main = () => {
           {screen === "DAILY_ORDER" && <DailyOrder />}
           {screen === "PICKUP" && <DeliveryLog />}
           <ScanModal />
+          {apps === "UPLOAD_CSV" && <UploadCSV />}
           {apps === "PICKUP" && <PickupModal />}
           {apps === "SETTINGS" && <SettingsModal />}
         </Box>

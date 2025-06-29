@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material";
-import * as React from "react";
-const MedDefault = (props) => {
+
+const MedDefaultSvg = (props) => {
   const { palette } = useTheme();
   return (
     <svg
@@ -56,4 +56,4 @@ const MedDefault = (props) => {
     </svg>
   );
 };
-export default MedDefault;
+export default MedDefaultSvg;
