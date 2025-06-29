@@ -27,3 +27,5 @@ export const postSettings = (body) => client.post("apps/settings", body);
 
 export const checkDRxCSV = (body) =>
   client.post("apps/upload/checkDRxCSV", body);
+export const uploadDRxCSV = (body) =>
+  client.post("apps/upload/uploadDRxCSV", body);

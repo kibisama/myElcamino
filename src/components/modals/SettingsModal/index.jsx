@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setApps } from "../../../reduxjs@toolkit/globalSlice";
 import { Box, Tabs, Tab, Modal } from "@mui/material";
