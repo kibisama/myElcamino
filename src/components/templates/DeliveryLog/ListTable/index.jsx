@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { Box } from "@mui/material";
 import CustomIconButton from "../../../customs/CustomIconButton";
 import CustomTable from "../../../customs/CustomTable";
 import PrintIcon from "@mui/icons-material/Print";
+import EditIcon from "@mui/icons-material/Edit";
 
 const heads = ["Delivery Date", "Rx Number", "", "Relation", "Notes", ""];
 const keys = ["deliveryDate", "rxNumber", "png", "relation", "notes", "action"];
@@ -53,12 +55,21 @@ const ListTable = ({ rows }) => {
         },
         action: (v) => {
           return (
-            <Link
-              to={`/print/deliveryProof/${v._id}/${v.rxNumber}`}
-              target="_blank"
+            <Box
+              sx={{
+                width: 88,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
             >
-              <CustomIconButton children={<PrintIcon />} />
-            </Link>
+              <CustomIconButton children={<EditIcon />} />
+              <Link
+                to={`/print/deliveryProof/${v._id}/${v.rxNumber}`}
+                target="_blank"
+              >
+                <CustomIconButton children={<PrintIcon />} />
+              </Link>
+            </Box>
           );
         },
       }}
