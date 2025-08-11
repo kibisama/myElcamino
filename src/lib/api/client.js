@@ -29,3 +29,5 @@ export const checkDRxCSV = (body) =>
   client.post("apps/upload/checkDRxCSV", body);
 export const uploadDRxCSV = (body) =>
   client.post("apps/upload/uploadDRxCSV", body);
+
+export const getDeliveryGroups = () => client.get("apps/delivery/group");

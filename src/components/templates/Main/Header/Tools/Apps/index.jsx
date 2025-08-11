@@ -91,6 +91,15 @@ const Screen = ({ value, handleClose }) => {
       <Typography
         sx={style.screenName}
         onClick={() => {
+          dispatch(setScreen("DELIVERY"));
+          handleClose();
+        }}
+      >
+        Delivery
+      </Typography>
+      <Typography
+        sx={style.screenName}
+        onClick={() => {
           dispatch(setScreen("DAILY_ORDER"));
           handleClose();
         }}
@@ -104,7 +113,7 @@ const Screen = ({ value, handleClose }) => {
           handleClose();
         }}
       >
-        Delivery log
+        Pickup log
       </Typography>
       <Typography
         sx={style.screenName}

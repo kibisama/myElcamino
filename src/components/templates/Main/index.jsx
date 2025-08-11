@@ -8,13 +8,14 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { darkTheme, lightTheme } from "../../../lib/mui/theme";
 import CssBaseline from "@mui/material/CssBaseline";
-import DeliveryLog from "../DeliveryLog";
+import Delivery from "../Delivery";
+import PickupLog from "../PickupLog";
 import UploadCSV from "../../modals/UploadCSV";
 
 const style = {
   container: {
-    display: "flex",
-    flexDirection: "column",
+    // display: "flex",
+    // flexDirection: "column",
   },
 };
 
@@ -26,7 +27,8 @@ const Main = () => {
         <Box sx={style.container}>
           <Header />
           {screen === "DAILY_ORDER" && <DailyOrder />}
-          {screen === "PICKUP" && <DeliveryLog />}
+          {screen === "PICKUP" && <PickupLog />}
+          {screen === "DELIVERY" && <Delivery />}
           <ScanModal />
           {apps === "UPLOAD_CSV" && <UploadCSV />}
           {apps === "PICKUP" && <PickupModal />}
