@@ -111,22 +111,18 @@ function Sidebar({ expanded = true, setExpanded, container }) {
               width: mini ? MINI_DRAWER_WIDTH : "auto",
             }}
           >
-            <PageItem id="home" title="Home" icon={<HomeIcon />} />
+            <PageItem id="Home" icon={<HomeIcon />} />
             <DividerItem />
             <HeaderItem>Deliveries & Pickups</HeaderItem>
-            <PageItem
-              id="deliveries"
-              title="Deliveries"
-              icon={<LocalShippingIcon />}
-            />
-            <PageItem id="pickups" title="Pickups" icon={<GestureIcon />} />
+            <PageItem id="Deliveries" icon={<LocalShippingIcon />} />
+            <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
             <DividerItem />
             <HeaderItem>Reports</HeaderItem>
             <DividerItem />
-            <PageItem id="settings" title="Settings" icon={<SettingsIcon />} />
-            <PageItem
+            <PageItem id="Settings" icon={<SettingsIcon />} />
+            {/* <PageItem
               id="reports"
               title="Reports"
               icon={<SettingsIcon />}
@@ -150,7 +146,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   />
                 </List>
               }
-            />
+            /> */}
           </List>
         </Paper>
       </React.Fragment>

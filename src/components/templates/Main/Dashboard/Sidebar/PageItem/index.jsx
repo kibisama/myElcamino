@@ -22,7 +22,7 @@ import { setScreen } from "../../../../../../reduxjs@toolkit/mainSlice";
 
 function PageItem({
   id,
-  title,
+  title = id,
   icon,
   action,
   defaultExpanded = false,
