@@ -13,8 +13,8 @@ const style = {
   },
   item: {
     position: "relative",
-    width: 48,
-    height: 48,
+    width: 36,
+    height: 36,
   },
   common: {
     width: "100%",
