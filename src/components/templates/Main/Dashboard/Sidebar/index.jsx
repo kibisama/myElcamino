@@ -1,19 +1,19 @@
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
 import { Paper, Drawer, List, Toolbar, useMediaQuery } from "@mui/material";
-
 import HomeIcon from "@mui/icons-material/Home";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../constants";
+import { DashboardSidebarContext } from "../../context";
+import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import PageItem from "./PageItem";
 import HeaderItem from "./HeaderItem";
 import DividerItem from "./DividerItem";
 import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
-} from "../mixins";
+} from "../../mixins";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
   const theme = useTheme();
@@ -65,7 +65,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
 
   const handlePageItemClick = React.useCallback(
     (itemId, hasNestedNavigation) => {
-      if (hasNestedNavigation && !mini) {
+      if (hasNestedNavigation && expanded) {
         setExpandedItemIds((previousValue) =>
           previousValue.includes(itemId)
             ? previousValue.filter(
@@ -77,7 +77,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         setExpanded(false);
       }
     },
-    [mini, setExpanded, isOverSmViewport]
+    [expanded, setExpanded, isOverSmViewport]
   );
 
   const hasDrawerTransitions = isOverSmViewport && isOverMdViewport;
@@ -113,13 +113,17 @@ function Sidebar({ expanded = true, setExpanded, container }) {
           >
             <PageItem id="home" title="Home" icon={<HomeIcon />} />
             <DividerItem />
-            <HeaderItem>Delivery & Pickup</HeaderItem>
+            <HeaderItem>Deliveries & Pickups</HeaderItem>
             <PageItem
-              id="delivery"
-              title="Delivery"
+              id="deliveries"
+              title="Deliveries"
               icon={<LocalShippingIcon />}
             />
-            <PageItem id="pickup" title="Pickup" icon={<GestureIcon />} />
+            <PageItem id="pickups" title="Pickups" icon={<GestureIcon />} />
+            <DividerItem />
+            <HeaderItem>Inventories</HeaderItem>
+            <DividerItem />
+            <HeaderItem>Reports</HeaderItem>
             <DividerItem />
             <PageItem id="settings" title="Settings" icon={<SettingsIcon />} />
             {/* <DashboardSidebarPageItem
@@ -210,7 +214,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
   ]);
 
   return (
-    <React.Fragment>
+    <DashboardSidebarContext value={sidebarContextValue}>
       <Drawer
         container={container}
         variant="temporary"
@@ -252,7 +256,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       >
         {getDrawerContent("desktop")}
       </Drawer>
-    </React.Fragment>
+    </DashboardSidebarContext>
   );
 }
 

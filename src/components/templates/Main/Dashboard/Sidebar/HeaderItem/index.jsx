@@ -1,14 +1,14 @@
 import * as React from "react";
 import ListSubheader from "@mui/material/ListSubheader";
-import { DRAWER_WIDTH } from "../../constants";
-import { getDrawerSxTransitionMixin } from "../../mixins";
+import { DashboardSidebarContext } from "../../../context";
+import { DRAWER_WIDTH } from "../../../constants";
+import { getDrawerSxTransitionMixin } from "../../../mixins";
 
 function DashboardSidebarHeaderItem({ children }) {
-  const sidebarContext = {};
-  //   const sidebarContext = React.useContext(DashboardSidebarContext);
-  //   if (!sidebarContext) {
-  //     throw new Error("Sidebar context was used without a provider.");
-  //   }
+  const sidebarContext = React.useContext(DashboardSidebarContext);
+  if (!sidebarContext) {
+    throw new Error("Sidebar context was used without a provider.");
+  }
   const {
     mini = false,
     fullyExpanded = true,

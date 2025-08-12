@@ -12,8 +12,8 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-// import DashboardSidebarContext from "../context/DashboardSidebarContext";
-import { MINI_DRAWER_WIDTH } from "../../constants";
+import { DashboardSidebarContext } from "../../../context";
+import { MINI_DRAWER_WIDTH } from "../../../constants";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setScreen } from "../../../../../../reduxjs@toolkit/mainSlice";
@@ -27,10 +27,10 @@ function PageItem({
   expanded = defaultExpanded,
   disabled = false,
   nestedNavigation,
-  onPageItemClick,
 }) {
-  const sidebarContext = {};
+  const sidebarContext = React.useContext(DashboardSidebarContext);
   const {
+    onPageItemClick,
     mini = false,
     fullyExpanded = true,
     fullyCollapsed = false,
@@ -43,10 +43,13 @@ function PageItem({
 
   const dispatch = useDispatch();
   const handleClick = React.useCallback(() => {
+    if (onPageItemClick) {
+      onPageItemClick(id, !!nestedNavigation);
+    }
     if (!nestedNavigation) {
       dispatch(setScreen(id));
     }
-  }, [dispatch, id, nestedNavigation]);
+  }, [dispatch, onPageItemClick, id, nestedNavigation]);
 
   let nestedNavigationCollapseSx = { display: "none" };
   if (mini && fullyCollapsed) {
