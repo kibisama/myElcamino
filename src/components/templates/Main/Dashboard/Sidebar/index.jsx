@@ -126,13 +126,11 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <HeaderItem>Reports</HeaderItem>
             <DividerItem />
             <PageItem id="settings" title="Settings" icon={<SettingsIcon />} />
-            {/* <DashboardSidebarPageItem
+            <PageItem
               id="reports"
               title="Reports"
-              icon={<BarChartIcon />}
-              href="/reports"
-              selected={!!matchPath("/reports", pathname)}
-              defaultExpanded={!!matchPath("/reports", pathname)}
+              icon={<SettingsIcon />}
+              // defaultExpanded={!!matchPath("/reports", pathname)}
               expanded={expandedItemIds.includes("reports")}
               nestedNavigation={
                 <List
@@ -144,30 +142,15 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     minWidth: 240,
                   }}
                 >
-                  <DashboardSidebarPageItem
-                    id="sales"
-                    title="Sales"
-                    icon={<DescriptionIcon />}
-                    href="/reports/sales"
-                    selected={!!matchPath("/reports/sales", pathname)}
-                  />
-                  <DashboardSidebarPageItem
+                  <PageItem id="sales" title="Sales" icon={<SettingsIcon />} />
+                  <PageItem
                     id="traffic"
                     title="Traffic"
-                    icon={<DescriptionIcon />}
-                    href="/reports/traffic"
-                    selected={!!matchPath("/reports/traffic", pathname)}
+                    icon={<SettingsIcon />}
                   />
                 </List>
               }
             />
-            <DashboardSidebarPageItem
-              id="integrations"
-              title="Integrations"
-              icon={<LayersIcon />}
-              href="/integrations"
-              selected={!!matchPath("/integrations", pathname)}
-            /> */}
           </List>
         </Paper>
       </React.Fragment>

@@ -1,15 +1,17 @@
 import * as React from "react";
 
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import Grow from "@mui/material/Grow";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import {
+  Avatar,
+  Box,
+  Collapse,
+  Grow,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Typography,
+} from "@mui/material";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DashboardSidebarContext } from "../../../context";
@@ -117,13 +119,6 @@ function PageItem({
             : {})}
           {...(!nestedNavigation
             ? {
-                // ...(hasExternalHref
-                //   ? {
-                //       target: "_blank",
-                //       rel: "noopener noreferrer",
-                //     }
-                //   : {}),
-                // to: href,
                 onClick: handleClick,
               }
             : {})}
@@ -217,11 +212,11 @@ function PageItem({
                   transform: "translateY(-50px)",
                 }}
               >
-                {/* <DashboardSidebarContext.Provider
+                <DashboardSidebarContext.Provider
                   value={miniNestedNavigationSidebarContextValue}
-                > */}
-                {nestedNavigation}
-                {/* </DashboardSidebarContext.Provider> */}
+                >
+                  {nestedNavigation}
+                </DashboardSidebarContext.Provider>
               </Paper>
             </Box>
           </Grow>
