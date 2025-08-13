@@ -31,16 +31,16 @@ const style = {
 };
 
 const Logo = () => {
-  const { palette, typography } = useTheme();
+  const { vars, palette, typography } = useTheme();
   const frontStyle = {
     color: palette.primary.main,
     border: `1px solid ${palette.primary.main}`,
     fontSize: typography.h4.fontSize,
   };
   const backStyle = {
-    color: palette.background.paper,
+    color: (vars?.palette || palette).background.paper,
     fontSize: typography.h4.fontSize,
-    border: `1px solid ${palette.background.paper}`,
+    border: `1px solid ${palette.primary.main}`,
     backgroundColor: palette.primary.main,
   };
   const [trail, api] = useTrail(frontItems.length, () => ({

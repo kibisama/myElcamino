@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 //   getMany as getEmployees,
 // } from '../data/employees';
 import PageContainer from "../PageContainer";
-import StartButton from "../../apps/StartButton";
+import AppButton from "../AppButton";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -269,9 +269,11 @@ export default function Pickups() {
               </IconButton>
             </div>
           </Tooltip>
-          <StartButton startIcon={<BarcodeReaderIcon />} app="Pickup">
-            SCAN
-          </StartButton>
+          <AppButton
+            icon={<BarcodeReaderIcon />}
+            app="Pickup"
+            children="SCAN"
+          />
           {/* <Button
             variant="contained"
             onClick={() => {

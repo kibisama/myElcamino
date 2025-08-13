@@ -3,8 +3,10 @@ import { Box, Toolbar, useMediaQuery, useTheme } from "@mui/material";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Logo from "./Logo";
+import * as pages from "../pages";
+import { useSelector } from "react-redux";
 
-export default function Dashboard({ children }) {
+export default function Dashboard() {
   const theme = useTheme();
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
@@ -41,6 +43,9 @@ export default function Dashboard({ children }) {
   );
 
   const layoutRef = React.useRef(null);
+
+  const { page } = useSelector((s) => s.main);
+  const Page = pages[page] || "div";
 
   return (
     <Box
@@ -81,7 +86,7 @@ export default function Dashboard({ children }) {
             overflow: "auto",
           }}
         >
-          {children}
+          {page && <Page />}
         </Box>
       </Box>
     </Box>

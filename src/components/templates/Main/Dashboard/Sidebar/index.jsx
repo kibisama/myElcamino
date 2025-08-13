@@ -20,12 +20,8 @@ import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
 } from "../../mixins";
-import { useSelector } from "react-redux";
-import * as apps from "../../apps";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
-  const { app } = useSelector((s) => s.main);
-  const App = apps[app] || "div";
   const theme = useTheme();
 
   const [expandedItemIds, setExpandedItemIds] = React.useState([]);
@@ -245,7 +241,6 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       >
         {getDrawerContent("desktop")}
       </Drawer>
-      {app && <App />}
     </DashboardSidebarContext>
   );
 }

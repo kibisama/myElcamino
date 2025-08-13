@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
 
-export default function StartButton({ app, ...props }) {
+export default function AppButton({ app, icon, children }) {
   const dispatch = useDispatch();
   return (
     <Button
@@ -10,7 +10,9 @@ export default function StartButton({ app, ...props }) {
       onClick={() => {
         dispatch(setApp(app));
       }}
-      {...props}
-    />
+      startIcon={icon}
+    >
+      {children}
+    </Button>
   );
 }
