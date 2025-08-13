@@ -18,6 +18,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 //   getMany as getEmployees,
 // } from '../data/employees';
 import PageContainer from "../PageContainer";
+import { useDispatch, useSelector } from "react-redux";
+import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -250,7 +252,7 @@ export default function Pickups() {
       // handleRowDelete
     ]
   );
-
+  const dispatch = useDispatch();
   return (
     <PageContainer
       title="Pickups"
@@ -269,7 +271,9 @@ export default function Pickups() {
           </Tooltip>
           <Button
             variant="contained"
-            // onClick={handleCreateClick}
+            onClick={() => {
+              dispatch(setApp("Pickup"));
+            }}
             startIcon={<AddIcon />}
           >
             Create

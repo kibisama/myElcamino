@@ -1,6 +1,11 @@
 import * as React from "react";
-import { useTheme, useColorScheme } from "@mui/material/styles";
-import { useMediaQuery, IconButton, Tooltip } from "@mui/material";
+import {
+  useMediaQuery,
+  IconButton,
+  Tooltip,
+  useTheme,
+  useColorScheme,
+} from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 

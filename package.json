@@ -16,6 +16,7 @@
     "dayjs": "^1.11.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-draggable": "^4.5.0",
     "react-number-format": "^5.4.3",
     "react-papaparse": "^4.4.0",
     "react-redux": "^9.2.0",

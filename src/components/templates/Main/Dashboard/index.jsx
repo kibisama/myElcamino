@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useTheme } from "@mui/material/styles";
-import { Box, Toolbar, useMediaQuery } from "@mui/material";
+import { Box, Toolbar, useMediaQuery, useTheme } from "@mui/material";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Logo from "./Logo";

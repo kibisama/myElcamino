@@ -1,6 +1,12 @@
 import * as React from "react";
-import { useTheme } from "@mui/material/styles";
-import { Paper, Drawer, List, Toolbar, useMediaQuery } from "@mui/material";
+import {
+  Paper,
+  Drawer,
+  List,
+  Toolbar,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";

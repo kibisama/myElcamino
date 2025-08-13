@@ -14,7 +14,7 @@
 // import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-// import ModalBox from "../AppContainer";
+import AppContainer from "../AppContainer";
 // import ModalHeader from "../ModalHeader";
 // import NumberInput from "../../customs/NumberInput";
 // import SignatureBox from "./SignatureBox";
@@ -324,3 +324,7 @@
 //     </Modal>
 //   );
 // }
+
+export default function Pickup() {
+  return <AppContainer />;
+}
