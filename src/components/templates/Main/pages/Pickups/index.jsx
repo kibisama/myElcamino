@@ -8,6 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 // import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 // import { useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -18,8 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 //   getMany as getEmployees,
 // } from '../data/employees';
 import PageContainer from "../PageContainer";
-import { useDispatch, useSelector } from "react-redux";
-import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
+import StartButton from "../../apps/StartButton";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -252,7 +252,7 @@ export default function Pickups() {
       // handleRowDelete
     ]
   );
-  const dispatch = useDispatch();
+
   return (
     <PageContainer
       title="Pickups"
@@ -269,7 +269,10 @@ export default function Pickups() {
               </IconButton>
             </div>
           </Tooltip>
-          <Button
+          <StartButton startIcon={<BarcodeReaderIcon />} app="Pickup">
+            SCAN
+          </StartButton>
+          {/* <Button
             variant="contained"
             onClick={() => {
               dispatch(setApp("Pickup"));
@@ -277,7 +280,7 @@ export default function Pickups() {
             startIcon={<AddIcon />}
           >
             Create
-          </Button>
+          </Button> */}
         </Stack>
       }
     >

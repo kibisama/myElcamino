@@ -1,22 +1,52 @@
 import React from "react";
-import { Box, Paper, Zoom, styled } from "@mui/material";
+import Draggable from "react-draggable";
+import { Box, Zoom, styled } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
 import { useDispatch } from "react-redux";
-import Draggable from "react-draggable";
+import { DashboardSidebarContext } from "../../context";
+import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 
-const StyledCloseIcon = styled(CloseIcon)(({ theme }) => ({
+const CloseButton = styled(CloseIcon)(({ theme }) => ({
   cursor: "pointer",
-  // color: theme.palette.grey[500],
-  // ":hover": {
-  //   color: theme.palette.primary.main,
-  // },
-  // fontSize: 36,
+  color: theme.palette.grey[400],
+  ":hover": {
+    color: theme.palette.primary.main,
+  },
 }));
 
-const StyledBox = styled(Box)(({ theme }) => ({
-  border: "1px solid transparent",
-  borderRadius: 10,
+const Titlebar = () => {
+  const dispatch = useDispatch();
+  return (
+    <Box
+      className="titlebar"
+      sx={{
+        height: 32,
+        mb: 1,
+        display: "flex",
+        flexDirection: "row-reverse",
+        alignItems: "center",
+        cursor: "grab",
+      }}
+    >
+      <CloseButton
+        sx={{
+          width: 32,
+          height: "inherit",
+          pr: 1,
+        }}
+        onClick={() => {
+          dispatch(setApp(""));
+        }}
+      />
+    </Box>
+  );
+};
+
+const Container = styled("div")(({ theme }) => ({
+  border: "1px solid",
+  borderColor: theme.palette.divider,
+  borderRadius: 8,
   backgroundColor: theme.palette.background.paper,
   ":hover": {
     borderColor:
@@ -33,53 +63,34 @@ const StyledBox = styled(Box)(({ theme }) => ({
 }));
 
 const AppContainer = ({ children, ...props }) => {
-  const dispatch = useDispatch();
   const nodeRef = React.useRef(null);
+  const sidebarContext = React.useContext(DashboardSidebarContext);
+  if (!sidebarContext) {
+    throw new Error("Sidebar context was used without a provider.");
+  }
+  const { fullyExpanded = true } = sidebarContext;
+  const leftRef = React.useRef(
+    `calc(50% + ${(fullyExpanded ? DRAWER_WIDTH : MINI_DRAWER_WIDTH) / 2}px)`
+  );
   return (
     <Zoom in timeout={500}>
-      <div>
-        <Draggable nodeRef={nodeRef}>
-          <StyledBox ref={nodeRef} sx={{ width: 400, height: 400 }} {...props}>
-            <StyledCloseIcon
-              onClick={() => {
-                dispatch(setApp(""));
-              }}
-            />
-            <Box>{children}</Box>
-          </StyledBox>
+      <Box
+        sx={{
+          top: "calc(50% + 32px)",
+          left: leftRef.current,
+          translate: "-50% -50%",
+          position: "absolute",
+        }}
+      >
+        <Draggable nodeRef={nodeRef} handle=".titlebar">
+          <Container ref={nodeRef}>
+            <Titlebar />
+            <Box {...props}>{children}</Box>
+          </Container>
         </Draggable>
-      </div>
+      </Box>
     </Zoom>
   );
 };
 
 export default AppContainer;
-
-// import React from "react";
-// import { Box, Typography, styled } from "@mui/material";
-
-// const style = {
-//   container: {
-//     width: "100%",
-//     display: "flex",
-//     flexDirection: "row-reverse",
-//     justifyContent: "space-between",
-//     alignItems: "flex-start",
-//   },
-//   title: {
-//     fontSize: "h5.fontSize",
-//     mt: 2,
-//     ml: 4,
-//   },
-// };
-
-// const ModalHeader = ({ title, handleClose }) => {
-//   return (
-//     <Box style={style.container}>
-//       <StyledCloseIcon onClick={handleClose} />
-//       {title && <Typography sx={style.title}>{title}</Typography>}
-//     </Box>
-//   );
-// };
-
-// export default ModalHeader;
