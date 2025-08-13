@@ -18,7 +18,7 @@ import { DashboardSidebarContext } from "../../../context";
 import { MINI_DRAWER_WIDTH } from "../../../constants";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setScreen } from "../../../../../../reduxjs@toolkit/mainSlice";
+import { setPage } from "../../../../../../reduxjs@toolkit/mainSlice";
 
 function PageItem({
   id,
@@ -38,8 +38,8 @@ function PageItem({
     fullyCollapsed = false,
   } = sidebarContext;
 
-  const { screen } = useSelector((s) => s.main);
-  const selected = screen === id;
+  const { page } = useSelector((s) => s.main);
+  const selected = page === id;
 
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -49,7 +49,7 @@ function PageItem({
       onPageItemClick(id, !!nestedNavigation);
     }
     if (!nestedNavigation) {
-      dispatch(setScreen(id));
+      dispatch(setPage(id));
     }
   }, [dispatch, onPageItemClick, id, nestedNavigation]);
 

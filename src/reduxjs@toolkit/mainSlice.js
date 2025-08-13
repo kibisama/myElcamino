@@ -3,18 +3,18 @@ import { createSlice } from "@reduxjs/toolkit";
 const mainSlice = createSlice({
   name: "main",
   initialState: {
-    apps: "",
-    screen: "home",
+    app: "",
+    page: "Home",
   },
   reducers: {
-    setApps: (state, action) => {
-      state.apps = action.payload;
+    setApp: (state, action) => {
+      state.app = action.payload;
     },
-    setScreen: (state, action) => {
-      state.screen = action.payload;
+    setPage: (state, action) => {
+      state.page = action.payload;
     },
   },
 });
 
 export default mainSlice.reducer;
-export const { setScreen, setApps } = mainSlice.actions;
+export const { setPage, setApp } = mainSlice.actions;

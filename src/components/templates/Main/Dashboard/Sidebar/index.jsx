@@ -119,7 +119,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
             <DividerItem />
-            <HeaderItem>Reports</HeaderItem>
+            <HeaderItem>Invoices & Reports</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
             {/* <PageItem

@@ -1,32 +1,19 @@
 import { useSelector } from "react-redux";
-// import DailyOrder from "../DailyOrder";
-// import ScanModal from "../../modals/ScanModal";
-// import PickupModal from "../../modals/PickupModal";
-// import SettingsModal from "../../modals/SettingsModal";
-// import Delivery from "../Delivery";
-// import Pickups from "./Pickups";
-// import UploadCSV from "../../modals/UploadCSV";
-
+import * as pages from "./pages";
+import * as apps from "./apps";
 import AppTheme from "./shared-theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Dashboard from "./Dashboard";
 
-const getScreen = (screen) => {
-  switch (screen) {
-    case "pickup":
-    // return <Pickups />;
-    default:
-      return;
-  }
-};
-
 const Main = () => {
-  const { screen } = useSelector((s) => s.main);
+  const { app, page } = useSelector((s) => s.main);
+  const Page = pages[page] || "div";
+  const App = apps[app] || "div";
   return (
     <AppTheme>
       <CssBaseline>
-        <Dashboard />
-        {/* {getScreen(screen)} */}
+        <Dashboard children={<Page />} />
+        {app && <App />}
       </CssBaseline>
     </AppTheme>
   );
