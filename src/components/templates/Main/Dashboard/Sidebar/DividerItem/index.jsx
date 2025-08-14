@@ -1,14 +1,13 @@
 import * as React from "react";
 import Divider from "@mui/material/Divider";
-import { DashboardSidebarContext } from "../../../context";
 import { getDrawerSxTransitionMixin } from "../../../mixins";
+import { useSelector } from "react-redux";
 
 export default function DividerItem() {
-  const sidebarContext = React.useContext(DashboardSidebarContext);
-  if (!sidebarContext) {
-    throw new Error("Sidebar context was used without a provider.");
-  }
-  const { fullyExpanded = true, hasDrawerTransitions } = sidebarContext;
+  const {
+    isSidebarFullyExpanded: fullyExpanded,
+    sidebarDrawerTransitions: hasDrawerTransitions,
+  } = useSelector((s) => s.main);
 
   return (
     <li>

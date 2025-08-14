@@ -20,47 +20,77 @@ import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
 } from "../../mixins";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setIsSidebarFullyExpanded as setIsFullyExpanded,
+  setIsSidebarFullyCollapsed as setIsFullyCollapsed,
+  setMiniSidebar,
+  setSidebarDrawerTransitions,
+} from "../../../../../reduxjs@toolkit/mainSlice";
 
-function Sidebar({ expanded = true, setExpanded, container }) {
+function Sidebar({
+  expanded = true,
+  setExpanded,
+  disableCollapsibleSidebar = false,
+  container,
+}) {
   const theme = useTheme();
 
-  const [expandedItemIds, setExpandedItemIds] = React.useState([]);
+  const dispatch = useDispatch();
+  const {
+    isSidebarFullyExpanded: isFullyExpanded,
+    isSidebarFullyCollapsed: isFullyCollapsed,
+    miniSidebar: mini,
+    sidebarDrawerTransitions: hasDrawerTransitions,
+  } = useSelector((s) => s.main);
 
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
   const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));
 
-  const [isFullyExpanded, setIsFullyExpanded] = React.useState(expanded);
-  const [isFullyCollapsed, setIsFullyCollapsed] = React.useState(!expanded);
+  React.useEffect(() => {
+    dispatch(setMiniSidebar(!disableCollapsibleSidebar && !expanded));
+    dispatch(
+      setSidebarDrawerTransitions(
+        isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport)
+      )
+    );
+  }, [
+    dispatch,
+    disableCollapsibleSidebar,
+    expanded,
+    isOverSmViewport,
+    isOverMdViewport,
+  ]);
+
+  const [expandedItemIds, setExpandedItemIds] = React.useState([]);
 
   React.useEffect(() => {
     if (expanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
-        setIsFullyExpanded(true);
+        dispatch(setIsFullyExpanded(true));
       }, theme.transitions.duration.enteringScreen);
 
       return () => clearTimeout(drawerWidthTransitionTimeout);
     }
 
-    setIsFullyExpanded(false);
+    dispatch(setIsFullyExpanded(false));
 
     return () => {};
-  }, [expanded, theme.transitions.duration.enteringScreen]);
+  }, [dispatch, expanded, theme.transitions.duration.enteringScreen]);
 
   React.useEffect(() => {
     if (!expanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
-        setIsFullyCollapsed(true);
+        dispatch(setIsFullyCollapsed(true));
       }, theme.transitions.duration.leavingScreen);
 
       return () => clearTimeout(drawerWidthTransitionTimeout);
     }
 
-    setIsFullyCollapsed(false);
+    dispatch(setIsFullyCollapsed(false));
 
     return () => {};
-  }, [expanded, theme.transitions.duration.leavingScreen]);
-
-  const mini = !expanded;
+  }, [dispatch, expanded, theme.transitions.duration.leavingScreen]);
 
   const handleSetSidebarExpanded = React.useCallback(
     (newExpanded) => () => {
@@ -85,8 +115,6 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     },
     [expanded, setExpanded, isOverSmViewport]
   );
-
-  const hasDrawerTransitions = isOverSmViewport && isOverMdViewport;
 
   const getDrawerContent = React.useCallback(
     (viewport) => (
@@ -211,7 +239,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         sx={{
           display: {
             xs: "block",
-            sm: "none",
+            sm: disableCollapsibleSidebar ? "block" : "none",
             md: "none",
           },
           ...getDrawerSharedSx(true),
@@ -224,7 +252,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         sx={{
           display: {
             xs: "none",
-            sm: "block",
+            sm: disableCollapsibleSidebar ? "none" : "block",
             md: "none",
           },
           ...getDrawerSharedSx(false),
