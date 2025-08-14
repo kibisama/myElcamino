@@ -1,4 +1,3 @@
-import * as React from "react";
 import Divider from "@mui/material/Divider";
 import { getDrawerSxTransitionMixin } from "../../../mixins";
 import { useSelector } from "react-redux";

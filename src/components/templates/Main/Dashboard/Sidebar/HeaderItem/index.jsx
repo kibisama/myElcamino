@@ -1,4 +1,3 @@
-import * as React from "react";
 import ListSubheader from "@mui/material/ListSubheader";
 import { DRAWER_WIDTH } from "../../../constants";
 import { getDrawerSxTransitionMixin } from "../../../mixins";
