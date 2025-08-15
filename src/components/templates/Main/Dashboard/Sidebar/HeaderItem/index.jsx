@@ -1,14 +1,18 @@
 import ListSubheader from "@mui/material/ListSubheader";
+import { DashboardSidebarContext } from "../../../context";
 import { DRAWER_WIDTH } from "../../../constants";
 import { getDrawerSxTransitionMixin } from "../../../mixins";
-import { useSelector } from "react-redux";
 
 function DashboardSidebarHeaderItem({ children }) {
+  const sidebarContext = React.useContext(DashboardSidebarContext);
+  if (!sidebarContext) {
+    throw new Error("Sidebar context was used without a provider.");
+  }
   const {
-    miniSidebar: mini,
-    isSidebarFullyExpanded: fullyExpanded,
-    sidebarDrawerTransitions: hasDrawerTransitions,
-  } = useSelector((s) => s.main);
+    mini = false,
+    fullyExpanded = true,
+    hasDrawerTransitions,
+  } = sidebarContext;
 
   return (
     <ListSubheader

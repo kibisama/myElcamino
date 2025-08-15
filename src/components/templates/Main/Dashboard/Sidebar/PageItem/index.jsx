@@ -31,14 +31,14 @@ function PageItem({
   nestedNavigation,
 }) {
   const sidebarContext = React.useContext(DashboardSidebarContext);
-  const { onPageItemClick } = sidebarContext;
-
   const {
-    page,
-    miniSidebar: mini,
-    isSidebarFullyExpanded: fullyExpanded,
-    isSidebarFullyCollapsed: fullyCollapsed,
-  } = useSelector((s) => s.main);
+    onPageItemClick,
+    mini = false,
+    fullyExpanded = true,
+    fullyCollapsed = false,
+  } = sidebarContext;
+
+  const { page } = useSelector((s) => s.main);
   const selected = page === id;
 
   const [isHovered, setIsHovered] = React.useState(false);
