@@ -6,7 +6,7 @@ import {
   RadioGroup,
   styled,
 } from "@mui/material";
-import { setPickupRelation } from "../../../../lib/api/client";
+import { setPickupRelation } from "../../../../../../lib/api/client";
 
 const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
   ({ theme }) => ({

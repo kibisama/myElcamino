@@ -208,20 +208,6 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     hasDrawerTransitions,
   ]);
 
-  // React.useEffect(() => {
-  //   dispatch(
-  //     setSidebar(
-  //       isOverSmViewport
-  //         ? isFullyExpanded
-  //           ? "expanded"
-  //           : "mini"
-  //         : isFullyExpanded
-  //         ? "mobile-expanded"
-  //         : "collapsed"
-  //     )
-  //   );
-  // }, [isFullyExpanded, isOverSmViewport]);
-
   return (
     <DashboardSidebarContext value={sidebarContextValue}>
       <Drawer

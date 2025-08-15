@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import CustomList from "../../../customs/CustomList";
-import { removePickupItems } from "../../../../lib/api/client";
+import CustomList from "../../../../../customs/CustomList";
+import { removePickupItems } from "../../../../../../lib/api/client";
 
 const ItemsList = ({ socket, readOnly = false, sx }) => {
   const [items, setItems] = React.useState([]);

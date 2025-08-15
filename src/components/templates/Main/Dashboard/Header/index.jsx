@@ -1,6 +1,14 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import { Box, IconButton, Toolbar, Tooltip, Stack } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Stack,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import MuiAppBar from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
@@ -27,6 +35,9 @@ function Header({ logo, menuOpen, onToggleMenu }) {
   const handleMenuOpen = React.useCallback(() => {
     onToggleMenu(!menuOpen);
   }, [menuOpen, onToggleMenu]);
+
+  const theme = useTheme();
+  const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
 
   const getMenuIcon = React.useCallback(
     (isExpanded) => {
@@ -72,7 +83,9 @@ function Header({ logo, menuOpen, onToggleMenu }) {
           <Stack direction="row" alignItems="center">
             <Box sx={{ mr: 1 }}>{getMenuIcon(menuOpen)}</Box>
             <Stack direction="row" alignItems="center">
-              {logo ? <LogoContainer>{logo}</LogoContainer> : null}
+              {logo && isOverSmViewport ? (
+                <LogoContainer>{logo}</LogoContainer>
+              ) : null}
             </Stack>
           </Stack>
           <Stack

@@ -41,10 +41,6 @@ const Titlebar = () => {
 };
 
 const Container = styled("div")(({ theme }) => ({
-  //
-  width: 400,
-  height: 400,
-
   cursor: "grab",
   border: "1px solid",
   borderColor: (theme.vars || theme).palette.divider,
@@ -67,6 +63,11 @@ const Container = styled("div")(({ theme }) => ({
 const AppContainer = ({ children, ...props }) => {
   const nodeRef = React.useRef(null);
   const { sidebar } = useSelector((s) => s.main);
+  const topRef = React.useRef(
+    `calc(50% + ${
+      (sidebar === "expanded" || sidebar === "mini" ? 33 : 29) / 2
+    }px)`
+  );
   const leftRef = React.useRef(
     `calc(50% + ${
       (sidebar === "expanded"
@@ -77,19 +78,27 @@ const AppContainer = ({ children, ...props }) => {
     }px)`
   );
 
-  console.log(nodeRef.current?.clientHeight);
   return (
     <Zoom in timeout={500}>
       <Box
         sx={{
-          top: "calc(50% + 33px)",
+          top: topRef.current,
           left: leftRef.current,
           translate: "-50% -50%",
           position: "absolute",
           zIndex: sidebar === "mobile-expanded" ? -1 : null,
         }}
       >
-        <Draggable bounds={{ top: -window.innerHeight / 2 }} nodeRef={nodeRef}>
+        <Draggable
+          bounds={{
+            //
+            top: -window.innerHeight + 400,
+            bottom: window.innerHeight - 400,
+            left: -window.innerWidth / 2,
+            right: window.innerWidth / 2,
+          }}
+          nodeRef={nodeRef}
+        >
           <Container ref={nodeRef}>
             <Titlebar />
             <Box {...props}>{children}</Box>
