@@ -20,8 +20,11 @@ import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
 } from "../../mixins";
+import { useDispatch } from "react-redux";
+import { setSidebar } from "../../../../../reduxjs@toolkit/mainSlice";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
+  const dispatch = useDispatch();
   const theme = useTheme();
 
   const [expandedItemIds, setExpandedItemIds] = React.useState([]);
@@ -50,15 +53,22 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     if (!expanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
         setIsFullyCollapsed(true);
+        dispatch(setSidebar(isOverSmViewport ? "mini" : "collapsed"));
       }, theme.transitions.duration.leavingScreen);
 
       return () => clearTimeout(drawerWidthTransitionTimeout);
     }
 
     setIsFullyCollapsed(false);
+    dispatch(setSidebar(isOverSmViewport ? "expanded" : "mobile-expanded"));
 
     return () => {};
-  }, [expanded, theme.transitions.duration.leavingScreen]);
+  }, [
+    dispatch,
+    expanded,
+    theme.transitions.duration.leavingScreen,
+    isOverSmViewport,
+  ]);
 
   const mini = !expanded;
 
@@ -128,7 +138,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <HeaderItem>Invoices & Reports</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
-            {/* <PageItem
+            <PageItem
               id="reports"
               title="Reports"
               icon={<SettingsIcon />}
@@ -152,7 +162,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   />
                 </List>
               }
-            /> */}
+            />
           </List>
         </Paper>
       </React.Fragment>
@@ -197,6 +207,20 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     isFullyCollapsed,
     hasDrawerTransitions,
   ]);
+
+  // React.useEffect(() => {
+  //   dispatch(
+  //     setSidebar(
+  //       isOverSmViewport
+  //         ? isFullyExpanded
+  //           ? "expanded"
+  //           : "mini"
+  //         : isFullyExpanded
+  //         ? "mobile-expanded"
+  //         : "collapsed"
+  //     )
+  //   );
+  // }, [isFullyExpanded, isOverSmViewport]);
 
   return (
     <DashboardSidebarContext value={sidebarContextValue}>

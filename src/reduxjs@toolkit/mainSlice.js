@@ -5,6 +5,8 @@ const mainSlice = createSlice({
   initialState: {
     app: "",
     page: "Home",
+    /** @type {"expanded"|"mobile-expanded"|"mini"|"collapsed"} */
+    sidebar: "expanded",
   },
   reducers: {
     setApp: (state, action) => {
@@ -13,8 +15,11 @@ const mainSlice = createSlice({
     setPage: (state, action) => {
       state.page = action.payload;
     },
+    setSidebar: (state, action) => {
+      state.sidebar = action.payload;
+    },
   },
 });
 
 export default mainSlice.reducer;
-export const { setPage, setApp } = mainSlice.actions;
+export const { setPage, setApp, setSidebar } = mainSlice.actions;

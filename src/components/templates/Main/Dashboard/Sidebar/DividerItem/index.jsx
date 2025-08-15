@@ -1,3 +1,4 @@
+import * as React from "react";
 import Divider from "@mui/material/Divider";
 import { DashboardSidebarContext } from "../../../context";
 import { getDrawerSxTransitionMixin } from "../../../mixins";
