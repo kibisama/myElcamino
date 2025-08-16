@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import dayjs from "dayjs";
 import {
   Alert,
@@ -30,14 +29,13 @@ import {
 import { io } from "socket.io-client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
-import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
 const style = {
   content: {
-    p: 2,
+    // p: 2,
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
@@ -68,10 +66,6 @@ export default function PcikupModal() {
   if (!socket) {
     socket = io(URL);
   }
-  const dispatch = useDispatch();
-  const handleClose = () => {
-    dispatch(setApp(""));
-  };
 
   const [rxNumber, setRxNumber] = useState("");
   const [date, setDate] = useState(null);
@@ -148,177 +142,164 @@ export default function PcikupModal() {
   }, 500);
 
   return (
-    <Modal
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      open={true}
-    >
-      <AppContainer>
-        <Box sx={style.content}>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+    <AppContainer>
+      <Box sx={style.content}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box
+            sx={{
+              height: 416,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
             <Box
               sx={{
-                height: 416,
+                width: 410,
                 display: "flex",
-                flexDirection: "column",
                 justifyContent: "space-between",
               }}
             >
-              <Box
-                sx={{
-                  width: 410,
-                  display: "flex",
-                  justifyContent: "space-between",
+              <NumberInput
+                autoFocus
+                sx={{ width: 140 }}
+                label="Rx Number"
+                value={rxNumber}
+                onChange={(e) => {
+                  setRxNumber(e.target.value);
                 }}
-              >
-                <NumberInput
-                  autoFocus
-                  sx={{ width: 140 }}
-                  label="Rx Number"
-                  value={rxNumber}
-                  onChange={(e) => {
-                    setRxNumber(e.target.value);
-                  }}
-                  onKeyDown={async (e) => {
-                    if (e.key === "Enter") {
-                      try {
-                        if (rxNumber) {
-                          await addPickupItems({ item: rxNumber });
-                          setRxNumber("");
-                        }
-                      } catch (e) {
-                        setState("error");
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    try {
+                      if (rxNumber) {
+                        await addPickupItems({ item: rxNumber });
+                        setRxNumber("");
                       }
+                    } catch (e) {
+                      setState("error");
+                    }
+                  }
+                }}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  value={date}
+                  onChange={async (date, context) => {
+                    try {
+                      if (!context.validationError) {
+                        setDate(date);
+                        await setPickupDate({ date });
+                      }
+                    } catch (e) {
+                      setState("error");
                     }
                   }}
+                  label="Delivery Date"
                 />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    value={date}
-                    onChange={async (date, context) => {
-                      try {
-                        if (!context.validationError) {
-                          setDate(date);
-                          await setPickupDate({ date });
-                        }
-                      } catch (e) {
-                        setState("error");
-                      }
-                    }}
-                    label="Delivery Date"
-                  />
-                </LocalizationProvider>
-              </Box>
-              <Box
-                sx={{
-                  width: 520,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box sx={style.relationBox}>
-                  <RelationBox socket={socket} />
-                </Box>
-                <TextField
-                  value={notes}
-                  onChange={(e) => {
-                    setNotes(e.target.value);
-                    debounced();
-                  }}
-                  sx={{ width: 285 }}
-                  label="Notes"
-                  multiline
-                  rows={6}
-                />
-              </Box>
-              <Box sx={style.signatureBox}>
-                <SignatureBox socket={socket} />
-              </Box>
+              </LocalizationProvider>
             </Box>
-            <Box sx={{ alignSelf: "flex-end" }}>
-              <ItemsList
-                sx={{
-                  borderRadius: 1,
-                  border: "1px solid",
-                  borderColor: "divider",
-                }}
-                socket={socket}
-              />
-            </Box>
-          </Box>
-          <Box
-            sx={{ mt: 1.25, display: "flex", justifyContent: "space-between" }}
-          >
-            <Clock sx={{ alignSelf: "flex-end" }} />
             <Box
               sx={{
-                width: 220,
-                height: 40,
+                width: 520,
                 display: "flex",
                 justifyContent: "space-between",
               }}
             >
-              <Button
-                sx={{ width: 100 }}
-                variant="outlined"
-                disabled={!disableSubmit}
-                onClick={async () => {
-                  try {
-                    setRxNumber("");
-                    setDate(null);
-                    await clearPickup();
-                  } catch (e) {
-                    setState("error");
-                  }
+              <Box sx={style.relationBox}>
+                <RelationBox socket={socket} />
+              </Box>
+              <TextField
+                value={notes}
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                  debounced();
                 }}
-                children="RESET"
-              />
-              <Button
-                sx={{ width: 100 }}
-                variant="outlined"
-                disabled={disableSubmit}
-                onClick={async () => {
-                  try {
-                    await submitPickup({ notes });
-                  } catch (e) {
-                    setState("error");
-                  }
-                }}
-                children="SUBMIT"
+                sx={{ width: 285 }}
+                label="Notes"
+                multiline
+                rows={6}
               />
             </Box>
+            <Box sx={style.signatureBox}>
+              <SignatureBox socket={socket} />
+            </Box>
+          </Box>
+          <Box sx={{ alignSelf: "flex-end" }}>
+            <ItemsList
+              sx={{
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+              socket={socket}
+            />
           </Box>
         </Box>
-        <Snackbar
-          open={state === "submit"}
-          autoHideDuration={5000}
-          onClose={handleSnackbarClose}
+        <Box
+          sx={{ mt: 1.25, display: "flex", justifyContent: "space-between" }}
         >
-          <Alert
-            sx={style.alert}
-            onClose={handleSnackbarClose}
-            severity="success"
+          <Clock sx={{ alignSelf: "flex-end" }} />
+          <Box
+            sx={{
+              width: 220,
+              height: 40,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
-            <AlertTitle>Success</AlertTitle>
-          </Alert>
-        </Snackbar>
-        <Snackbar
+            <Button
+              sx={{ width: 100 }}
+              variant="outlined"
+              disabled={!disableSubmit}
+              onClick={async () => {
+                try {
+                  setRxNumber("");
+                  setDate(null);
+                  await clearPickup();
+                } catch (e) {
+                  setState("error");
+                }
+              }}
+              children="RESET"
+            />
+            <Button
+              sx={{ width: 100 }}
+              variant="outlined"
+              disabled={disableSubmit}
+              onClick={async () => {
+                try {
+                  await submitPickup({ notes });
+                } catch (e) {
+                  setState("error");
+                }
+              }}
+              children="SUBMIT"
+            />
+          </Box>
+        </Box>
+      </Box>
+      <Snackbar
+        open={state === "submit"}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          sx={style.alert}
           onClose={handleSnackbarClose}
-          open={state === "error"}
-          autoHideDuration={5000}
+          severity="success"
         >
-          <Alert
-            sx={style.alert}
-            onClose={handleSnackbarClose}
-            severity="error"
-          >
-            <AlertTitle>Error</AlertTitle>
-          </Alert>
-        </Snackbar>
-      </AppContainer>
-    </Modal>
+          <AlertTitle>Success</AlertTitle>
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        onClose={handleSnackbarClose}
+        open={state === "error"}
+        autoHideDuration={5000}
+      >
+        <Alert sx={style.alert} onClose={handleSnackbarClose} severity="error">
+          <AlertTitle>Error</AlertTitle>
+        </Alert>
+      </Snackbar>
+    </AppContainer>
   );
 }

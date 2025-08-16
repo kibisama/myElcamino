@@ -20,7 +20,6 @@ const Titlebar = () => {
     <Box
       sx={{
         height: 32,
-        mb: 1,
         display: "flex",
         flexDirection: "row-reverse",
         alignItems: "center",
@@ -60,7 +59,7 @@ const Container = styled("div")(({ theme }) => ({
   // },
 }));
 
-const AppContainer = ({ children, ...props }) => {
+const AppContainer = ({ children }) => {
   const nodeRef = React.useRef(null);
   const { sidebar } = useSelector((s) => s.main);
   const topRef = React.useRef(
@@ -89,19 +88,10 @@ const AppContainer = ({ children, ...props }) => {
           zIndex: sidebar === "mobile-expanded" ? -1 : null,
         }}
       >
-        <Draggable
-          bounds={{
-            //
-            top: -window.innerHeight + 400,
-            bottom: window.innerHeight - 400,
-            left: -window.innerWidth / 2,
-            right: window.innerWidth / 2,
-          }}
-          nodeRef={nodeRef}
-        >
+        <Draggable bounds=".MuiBox-root" nodeRef={nodeRef}>
           <Container ref={nodeRef}>
             <Titlebar />
-            <Box {...props}>{children}</Box>
+            <Box sx={{ p: 1 }}>{children}</Box>
           </Container>
         </Draggable>
       </Box>
