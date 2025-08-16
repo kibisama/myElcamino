@@ -143,7 +143,7 @@ export default function PcikupModal() {
 
   return (
     <AppContainer>
-      <Box sx={style.content}>
+      {/* <Box sx={style.content}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box
             sx={{
@@ -299,7 +299,8 @@ export default function PcikupModal() {
         <Alert sx={style.alert} onClose={handleSnackbarClose} severity="error">
           <AlertTitle>Error</AlertTitle>
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
+      <Box sx={{ width: 640, height: 540 }}>TEST</Box>
     </AppContainer>
   );
 }

@@ -62,36 +62,49 @@ const Container = styled("div")(({ theme }) => ({
 const AppContainer = ({ children }) => {
   const nodeRef = React.useRef(null);
   const { sidebar } = useSelector((s) => s.main);
-  const topRef = React.useRef(
-    `calc(50% + ${
-      (sidebar === "expanded" || sidebar === "mini" ? 33 : 29) / 2
-    }px)`
-  );
-  const leftRef = React.useRef(
-    `calc(50% + ${
-      (sidebar === "expanded"
-        ? DRAWER_WIDTH
-        : sidebar === "mini"
-        ? MINI_DRAWER_WIDTH
-        : 0) / 2
-    }px)`
-  );
+  const top = (sidebar === "expanded" || sidebar === "mini" ? 33 : 29) / 2;
+  const left =
+    (sidebar === "expanded"
+      ? DRAWER_WIDTH
+      : sidebar === "mini"
+      ? MINI_DRAWER_WIDTH
+      : 0) / 2;
+  const topRef = React.useRef(top);
+  const leftRef = React.useRef(left);
+  const padding = 24;
+
+  const get_bound_bottom_base = React.useCallback(() => {});
+
+  const bound_bottom_base = nodeRef.current
+    ? window.innerHeight / 2 + nodeRef.current.clientHeight / 2 - padding
+    : null;
+  const bound_right_base = nodeRef.current
+    ? window.innerWidth / 2 + nodeRef.current.clientWidth / 2 - padding
+    : null;
 
   return (
     <Zoom in timeout={500}>
       <Box
         sx={{
-          top: topRef.current,
-          left: leftRef.current,
+          top: `calc(50% + ${topRef.current}px)`,
+          left: `calc(50% + ${leftRef.current}px)`,
           translate: "-50% -50%",
           position: "absolute",
           zIndex: sidebar === "mobile-expanded" ? -1 : null,
         }}
       >
-        <Draggable bounds=".MuiBox-root" nodeRef={nodeRef}>
+        <Draggable
+          bounds={{
+            top: bound_bottom_base ? -(bound_bottom_base + top) : null,
+            left: bound_right_base ? -(bound_right_base + left) : null,
+            bottom: bound_bottom_base ? bound_bottom_base - top : null,
+            right: bound_right_base ? bound_right_base - left : null,
+          }}
+          nodeRef={nodeRef}
+        >
           <Container ref={nodeRef}>
             <Titlebar />
-            <Box sx={{ p: 1 }}>{children}</Box>
+            <Box sx={{ p: `${padding}px` }}>{children}</Box>
           </Container>
         </Draggable>
       </Box>
