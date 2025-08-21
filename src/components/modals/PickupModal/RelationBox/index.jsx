@@ -6,7 +6,7 @@ import {
   RadioGroup,
   styled,
 } from "@mui/material";
-import { setPickupRelation } from "../../../../lib/api/client";
+import { postPickup } from "../../../../lib/api/client";
 
 const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
   ({ theme }) => ({
@@ -39,7 +39,7 @@ const RelationBox = ({ socket, row }) => {
         value={value}
         onChange={async (e) => {
           try {
-            await setPickupRelation({ relation: e.target.value });
+            await postPickup("relation", e.target.value);
           } catch (e) {
             console.log(e);
           }

@@ -58,7 +58,7 @@ const style = {
     letterSpacing: 0,
   },
   signatureBox: {
-    width: 600,
+    width: 520,
     height: 170,
     borderRight: "1px solid",
     borderColor: "#9e9e9e",

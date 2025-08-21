@@ -4,17 +4,8 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-  styled,
 } from "@mui/material";
-import { setPickupRelation } from "../../../../../../lib/api/client";
-
-const CustomRadio = styled(({ ...props }) => <Radio {...props} />)(
-  ({ theme }) => ({
-    "&.Mui-checked": {
-      color: "#26a69a",
-    },
-  })
-);
+import { postPickup } from "../../../../../../lib/api/client";
 
 const RelationBox = ({ socket, row }) => {
   const [value, setValue] = React.useState("self");
@@ -26,12 +17,15 @@ const RelationBox = ({ socket, row }) => {
     return () => {
       socket.off("relation", onRelation);
     };
-  }, []);
+  }, [socket]);
 
-  const styleLabel = (v) =>
-    v === value
-      ? { typography: { sx: { color: "#26a69a" } } }
-      : { typography: { sx: { color: "text.secondary" } } };
+  const styleLabel = React.useCallback(
+    (v) =>
+      v === value
+        ? { typography: { sx: { color: "#26a69a" } } }
+        : { typography: { sx: { color: "text.secondary" } } },
+    [value]
+  );
   return (
     <FormControl>
       <RadioGroup
@@ -39,34 +33,34 @@ const RelationBox = ({ socket, row }) => {
         value={value}
         onChange={async (e) => {
           try {
-            await setPickupRelation({ relation: e.target.value });
+            await postPickup("relation", e.target.value);
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }}
       >
         <FormControlLabel
           slotProps={styleLabel("self")}
           value="self"
-          control={<CustomRadio />}
+          control={<Radio />}
           label="Self"
         />
         <FormControlLabel
           slotProps={styleLabel("ff")}
           value="ff"
-          control={<CustomRadio />}
+          control={<Radio />}
           label="Family/Friend"
         />
         <FormControlLabel
           slotProps={styleLabel("gc")}
           value="gc"
-          control={<CustomRadio />}
+          control={<Radio />}
           label="Guardian/Caregiver"
         />
         <FormControlLabel
           slotProps={styleLabel("other")}
           value="other"
-          control={<CustomRadio />}
+          control={<Radio />}
           label="Other"
         />
       </RadioGroup>

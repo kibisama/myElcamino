@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import CustomList from "../../../../../customs/CustomList";
 import { removePickupItems } from "../../../../../../lib/api/client";
 
@@ -14,9 +14,9 @@ const ItemsList = ({ socket, readOnly = false, sx }) => {
     return () => {
       socket.off("items", onGet);
     };
-  }, []);
+  }, [socket]);
   return (
-    <Box>
+    <div>
       <Typography sx={{ fontWeight: 600, justifySelf: "center" }}>{`Rx List${
         items.length > 0 ? ` (${items.length})` : ""
       }`}</Typography>
@@ -39,7 +39,7 @@ const ItemsList = ({ socket, readOnly = false, sx }) => {
               }
         }
       />
-    </Box>
+    </div>
   );
 };
 
