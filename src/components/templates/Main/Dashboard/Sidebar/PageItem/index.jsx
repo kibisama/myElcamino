@@ -18,10 +18,14 @@ import { DashboardSidebarContext } from "../../../context";
 import { MINI_DRAWER_WIDTH } from "../../../constants";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setPage } from "../../../../../../reduxjs@toolkit/mainSlice";
+import {
+  setPage,
+  setSection,
+} from "../../../../../../reduxjs@toolkit/mainSlice";
 
 function PageItem({
   id,
+  section,
   title = id,
   icon,
   action,
@@ -50,8 +54,9 @@ function PageItem({
     }
     if (!nestedNavigation) {
       dispatch(setPage(id));
+      dispatch(setSection(section || ""));
     }
-  }, [dispatch, onPageItemClick, id, nestedNavigation]);
+  }, [dispatch, onPageItemClick, id, section, nestedNavigation]);
 
   let nestedNavigationCollapseSx = { display: "none" };
   if (mini && fullyCollapsed) {
@@ -190,7 +195,7 @@ function PageItem({
               }}
             />
           ) : null}
-          {action && !mini && fullyExpanded ? action : null}
+          {/* {action && !mini && fullyExpanded ? action : null} */}
           {nestedNavigation ? (
             <ExpandMoreIcon sx={nestedNavigationCollapseSx} />
           ) : null}

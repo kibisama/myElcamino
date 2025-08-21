@@ -4,9 +4,20 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Logo from "./Logo";
 import * as pages from "../pages";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncGetDeliveryGroups } from "../../../../reduxjs@toolkit/mainSlice";
 
 export default function Dashboard() {
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    (async function getDeliveryGroups() {
+      try {
+        dispatch(asyncGetDeliveryGroups());
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [dispatch]);
   const theme = useTheme();
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
@@ -44,8 +55,10 @@ export default function Dashboard() {
 
   const layoutRef = React.useRef(null);
 
-  const { page } = useSelector((s) => s.main);
+  const { page, section } = useSelector((s) => s.main);
   const Page = pages[page] || "div";
+
+  console.log(page, section);
 
   return (
     <Box

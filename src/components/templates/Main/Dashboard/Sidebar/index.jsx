@@ -11,6 +11,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
+import GroupIcon from "@mui/icons-material/Group";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { DashboardSidebarContext } from "../../context";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import PageItem from "./PageItem";
@@ -20,10 +22,11 @@ import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
 } from "../../mixins";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSidebar } from "../../../../../reduxjs@toolkit/mainSlice";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
+  const { page, deliveryGroups } = useSelector((s) => s.main);
   const dispatch = useDispatch();
   const theme = useTheme();
 
@@ -130,7 +133,38 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Home" icon={<HomeIcon />} />
             <DividerItem />
             <HeaderItem>Deliveries & Pickups</HeaderItem>
-            <PageItem id="Deliveries" icon={<LocalShippingIcon />} />
+            <PageItem
+              id="Deliveries"
+              icon={<LocalShippingIcon />}
+              defaultExpanded={page === "Deliveries"}
+              expanded={expandedItemIds.includes("Deliveries")}
+              nestedNavigation={
+                <List
+                  dense
+                  sx={{
+                    padding: 0,
+                    my: 1,
+                    pl: mini ? 0 : 1,
+                    minWidth: 240,
+                  }}
+                >
+                  {deliveryGroups.map((v) => (
+                    <PageItem
+                      id="Deliveries"
+                      section={`${v}`}
+                      title={`${v}`}
+                      icon={<GroupIcon />}
+                    />
+                  ))}
+                  <PageItem
+                    id="AddDeliveries"
+                    title="Add"
+                    icon={<GroupAddIcon />}
+                  />
+                </List>
+              }
+            />
+
             <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
@@ -138,7 +172,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <HeaderItem>Invoices & Reports</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
-            <PageItem
+            {/* <PageItem
               id="reports"
               title="Reports"
               icon={<SettingsIcon />}
@@ -162,12 +196,19 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   />
                 </List>
               }
-            />
+            /> */}
           </List>
         </Paper>
       </React.Fragment>
     ),
-    [mini, hasDrawerTransitions, isFullyExpanded, expandedItemIds]
+    [
+      mini,
+      hasDrawerTransitions,
+      isFullyExpanded,
+      expandedItemIds,
+      page,
+      deliveryGroups,
+    ]
   );
 
   const getDrawerSharedSx = React.useCallback(
