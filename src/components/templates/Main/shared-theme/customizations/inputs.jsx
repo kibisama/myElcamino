@@ -415,7 +415,7 @@ export const inputsCustomizations = {
               size: "medium",
             },
             style: {
-              height: "2.5rem",
+              height: "3rem",
             },
           },
         ],
