@@ -5,7 +5,6 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { postPickup } from "../../../../../../lib/api/client";
 
 const RelationBox = ({ socket, row }) => {
   const [value, setValue] = React.useState("self");
@@ -31,13 +30,7 @@ const RelationBox = ({ socket, row }) => {
       <RadioGroup
         row={row}
         value={value}
-        onChange={async (e) => {
-          try {
-            await postPickup("relation", e.target.value);
-          } catch (e) {
-            console.error(e);
-          }
-        }}
+        onChange={(e) => socket.emit("relation", e.target.value)}
       >
         <FormControlLabel
           slotProps={styleLabel("self")}

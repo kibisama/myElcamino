@@ -393,20 +393,14 @@ export const inputsCustomizations = {
         color: (theme.vars || theme).palette.text.primary,
         borderRadius: (theme.vars || theme).shape.borderRadius,
         border: `1px solid ${(theme.vars || theme).palette.divider}`,
-        // backgroundColor: (theme.vars || theme).palette.background.default,
         transition: "border 120ms ease-in",
         "&:hover": {
           borderColor: gray[400],
         },
         [`&.${outlinedInputClasses.focused}`]: {
-          outline: `3px solid ${alpha(brand[500], 0.5)}`,
+          // outline: `3px solid ${alpha(brand[500], 0.5)}`,
           borderColor: brand[400],
         },
-        ...theme.applyStyles("dark", {
-          "&:hover": {
-            borderColor: gray[500],
-          },
-        }),
         variants: [
           {
             props: {
@@ -447,8 +441,8 @@ export const inputsCustomizations = {
         typography: theme.typography.caption,
         marginBottom: 8,
         backgroundColor: (theme.vars || theme).palette.background.paper,
-        // paddingLeft: 4,
-        // paddingRight: 4,
+        paddingLeft: 4,
+        paddingRight: 4,
       }),
     },
   },

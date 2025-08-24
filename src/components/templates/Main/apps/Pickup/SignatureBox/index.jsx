@@ -9,16 +9,15 @@ export default function SignatureBox({ socket, onBegin }) {
     function refresh(data) {
       if (data) {
         signRef.current.fromDataURL(data);
+      } else {
+        signRef.current.clear();
       }
     }
-    function clear() {
-      signRef.current.clear();
-    }
     socket.on("canvas", refresh);
-    socket.on("clear-canvas", clear);
+    socket.on("clear_canvas", refresh);
     return () => {
       socket.off("canvas", refresh);
-      socket.off("clear-canvas", clear);
+      socket.off("clear_canvas", refresh);
       clearTimeout(timeout.current);
     };
   }, [socket]);

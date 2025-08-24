@@ -18,12 +18,10 @@ import ItemsList from "./ItemsList";
 import RelationBox from "./RelationBox";
 import Clock from "./Clock";
 import {
-  getPickup,
   getPickupData,
   addPickupItems,
   setPickupDate,
   clearPickup,
-  changePickupNotes,
   submitPickup,
 } from "../../../../../lib/api/client";
 import { io } from "socket.io-client";
@@ -39,14 +37,6 @@ const style = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-  },
-  relationBox: {
-    border: "1px solid",
-    borderRadius: 1,
-    borderColor: "divider",
-    display: "flex",
-    justifyContent: "center",
-    minWidth: 220,
   },
   alert: {
     height: 200,
@@ -65,16 +55,15 @@ export default function PcikupModal() {
   const [state, setState] = useState("standby");
   const [error, setError] = useState("");
 
-  // const onComplete = async (barcode) => {
-  //   if (document.activeElement.tagName !== "INPUT") {
-  //     try {
-  //       await addPickupItems({ item: barcode.match(/\d+/g).join("") });
-  //     } catch (e) {
-  //       setState("error");
-  //     }
-  //   }
-  // };
-  // useScanDetection({ onComplete });
+  const onComplete = async (barcode) => {
+    if (document.activeElement.tagName !== "INPUT") {
+      socket.emit("items", {
+        action: "push",
+        item: barcode.match(/\d+/g).join(""),
+      });
+    }
+  };
+  useScanDetection({ onComplete });
 
   useEffect(() => {
     function onState(data) {
@@ -94,20 +83,7 @@ export default function PcikupModal() {
     function onError(data) {
       setError(data);
     }
-    (async function () {
-      try {
-        await getPickup();
-        // await getPickupData("state");
-        // await getPickupData("notes");
-        // await getPickupData("items");
-        // await getPickupData("canvas");
-        // await getPickupData("relation");
-        // await getPickupData("date");
-      } catch (e) {
-        console.error(e);
-        // setState("error");
-      }
-    })();
+
     socket.on("state", onState);
     socket.on("notes", onNotes);
     socket.on("date", onDate);
@@ -127,18 +103,15 @@ export default function PcikupModal() {
   //   }
   // };
 
-  // const debounced = useDebouncedCallback(async () => {
-  //   try {
-  //     await changePickupNotes({ notes });
-  //   } catch (e) {
-  //     setState("error");
-  //   }
-  // }, 500);
+  const debounced = useDebouncedCallback(
+    () => socket.emit("notes", notes),
+    500
+  );
 
   return (
     <AppContainer>
-      {/* <Box sx={style.content}>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Box sx={{ display: "flex" }}>
+        {/* <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box
             sx={{
               height: 416,
@@ -199,24 +172,42 @@ export default function PcikupModal() {
                 justifyContent: "space-between",
               }}
             > */}
-      <Box sx={style.relationBox}>
-        <RelationBox socket={socket} />
-      </Box>
-      {/* <TextField
-                size=""
-                value={notes}
-                onChange={(e) => {
-                  setNotes(e.target.value);
-                  debounced();
-                }}
-                sx={{ width: 285 }}
-                label="Notes"
-                multiline
-                rows={8}
-              />
-            </Box> */}
-      <Box>
-        <SignatureBox socket={socket} />
+        <Box>
+          <Box
+            sx={{
+              width: 520,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box
+              sx={{
+                border: "1px solid",
+                borderRadius: 1,
+                borderColor: "divider",
+                display: "flex",
+                justifyContent: "center",
+                width: 240,
+              }}
+            >
+              <RelationBox socket={socket} />
+            </Box>
+            <TextField
+              size=""
+              value={notes}
+              onChange={(e) => {
+                setNotes(e.target.value);
+                debounced();
+              }}
+              sx={{ width: 260 }}
+              label="Notes"
+              multiline
+              rows={8}
+            />
+          </Box>
+          <SignatureBox socket={socket} />
+        </Box>
+        <ItemsList socket={socket} />
       </Box>
       {/* </Box>
           <Box sx={{ alignSelf: "flex-end" }}>

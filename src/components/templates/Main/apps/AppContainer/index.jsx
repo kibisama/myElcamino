@@ -101,7 +101,7 @@ const AppContainer = ({ children }) => {
           bounds={{
             top: by ? -(by + topRef.current) : by,
             left: bx ? -(bx + leftRef.current) : bx,
-            bottom: by ? by - topRef.cu : by,
+            bottom: by ? by - topRef.current : by,
             right: bx ? bx - leftRef.current : bx,
           }}
           cancel=".app-content"

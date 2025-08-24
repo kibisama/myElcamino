@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Button, styled, Typography } from "@mui/material";
 import ItemsList from "../../modals/PickupModal/ItemsList";
-import SignatureBox from "../../modals/PickupModal/SignatureBox";
-import RelationBox from "../../modals/PickupModal/RelationBox";
+import SignatureBox from "../Main/apps/Pickup/SignatureBox";
+import RelationBox from "../Main/apps/Pickup/RelationBox";
 import Clock from "../../modals/PickupModal/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -278,7 +278,7 @@ const Pickup = () => {
                       sx={{ color: "error.main" }}
                       onClick={async () => {
                         try {
-                          await clearPickupCanvas();
+                          socket.emit("clear_canvas");
                         } catch (e) {
                           console.log(e);
                         }
