@@ -2,15 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { NumericFormat } from "react-number-format";
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  TextField,
-  Snackbar,
-  IconButton,
-} from "@mui/material";
+import { Box, Button, TextField, IconButton } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -19,30 +11,15 @@ import SignatureBox from "./SignatureBox";
 import ItemsList from "./ItemsList";
 import RelationBox from "./RelationBox";
 import Clock from "./Clock";
-import { submitPickup } from "../../../../../lib/api/client";
+import { postPickup } from "../../../../../lib/api/client";
 import { io } from "socket.io-client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
-
-// import EventIcon from "@mui/icons-material/Event";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CloseIcon from "@mui/icons-material/Close";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
-
-const style = {
-  content: {
-    // p: 2,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  alert: {
-    height: 200,
-    width: 400,
-  },
-};
 
 const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(
   props,
@@ -71,6 +48,8 @@ const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(
 export default function Pickup() {
   if (!socket) {
     socket = io(URL);
+  } else {
+    socket.connect();
   }
 
   const [state, setState] = useState("standby");
@@ -81,10 +60,12 @@ export default function Pickup() {
 
   const onComplete = async (barcode) => {
     if (document.activeElement.tagName !== "INPUT") {
-      socket.emit("items", {
-        action: "push",
-        item: barcode.match(/\d+/g).join(""),
-      });
+      const rxNumber = barcode.match(/\d+/g);
+      rxNumber &&
+        socket.emit("items", {
+          action: "push",
+          item: rxNumber.join(""),
+        });
     }
   };
   useScanDetection({ onComplete });
@@ -102,15 +83,12 @@ export default function Pickup() {
     // function onError(data) {
     //   setError(data);
     // }
-
     socket.on("state", onState);
     socket.on("notes", onNotes);
     socket.on("date", onDate);
     // socket.on("error", onError);
     return () => {
-      socket.off("state", onState);
-      socket.off("notes", onNotes);
-      socket.off("date", onDate);
+      socket.disconnect();
     };
   }, []);
 
@@ -130,133 +108,150 @@ export default function Pickup() {
 
   return (
     <AppContainer>
-      <Box sx={{ height: 424, display: "flex" }}>
+      <Box
+        sx={{
+          height: 476,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
         <Box
           sx={{
+            width: 678,
             display: "flex",
-            flexDirection: "column",
             justifyContent: "space-between",
+            alignItems: "flex-end",
           }}
         >
           <Box
             sx={{
-              width: 444,
+              height: 424,
               display: "flex",
+              flexDirection: "column",
               justifyContent: "space-between",
             }}
           >
-            <TextField
-              sx={{ width: 138 }}
-              label="Rx Number"
-              slotProps={{ input: { inputComponent: NumericFormatCustom } }}
-              autoFocus
-              value={rxNumber}
-              onChange={(e) => setRxNumber(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  if (rxNumber) {
-                    socket.emit("items", { action: "push", item: rxNumber });
-                    setRxNumber("");
-                  }
-                }
-              }}
-            />
             <Box
               sx={{
-                width: 282,
+                width: 464,
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
               }}
             >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
-                  value={date}
-                  onChange={async (date, context) => {
-                    if (!context.validationError) {
-                      socket.emit("date", date);
+              <TextField
+                sx={{ width: 138 }}
+                label="Rx Number"
+                slotProps={{ input: { inputComponent: NumericFormatCustom } }}
+                autoFocus
+                value={rxNumber}
+                onChange={(e) => setRxNumber(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    if (rxNumber) {
+                      socket.emit("items", { action: "push", item: rxNumber });
+                      setRxNumber("");
                     }
-                  }}
-                  label="Delivery Date"
-                  slotProps={{
-                    openPickerButton: {
-                      sx: {
-                        border: "transparent",
+                  }
+                }}
+              />
+              <Box
+                sx={{
+                  width: 304,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    value={date}
+                    sx={{ width: 220 }}
+                    onChange={async (date, context) => {
+                      if (!context.validationError) {
+                        socket.emit("date", date);
+                      }
+                    }}
+                    label="Delivery Date"
+                    slotProps={{
+                      openPickerButton: {
+                        sx: {
+                          border: "transparent",
+                        },
                       },
-                    },
-                  }}
-                />
-              </LocalizationProvider>
-              <IconButton
-                size="small"
-                onClick={() => socket.emit("date", dayjs())}
-              >
-                <RefreshIcon />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => socket.emit("date", null)}
-              >
-                <CloseIcon />
-              </IconButton>
+                      popper: { className: "app-content" },
+                    }}
+                  />
+                </LocalizationProvider>
+                <IconButton
+                  size="small"
+                  onClick={() => socket.emit("date", dayjs())}
+                >
+                  <RefreshIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => socket.emit("date", null)}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
             </Box>
-          </Box>
-          <Box
-            sx={{
-              width: 520,
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
             <Box
               sx={{
-                border: "1px solid",
-                borderRadius: 1,
-                borderColor: "divider",
+                width: 520,
                 display: "flex",
-                justifyContent: "center",
-                width: 238,
+                justifyContent: "space-between",
               }}
             >
-              <RelationBox socket={socket} />
+              <Box
+                sx={{
+                  border: "1px solid",
+                  borderRadius: 1,
+                  borderColor: "divider",
+                  display: "flex",
+                  justifyContent: "center",
+                  width: 236,
+                }}
+              >
+                <RelationBox socket={socket} />
+              </Box>
+              <TextField
+                size=""
+                value={notes}
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                  debounced();
+                }}
+                sx={{ width: 256 }}
+                label="Notes"
+                multiline
+                rows={8}
+              />
             </Box>
-            <TextField
-              size=""
-              value={notes}
-              onChange={(e) => {
-                setNotes(e.target.value);
-                debounced();
-              }}
-              sx={{ width: 258 }}
-              label="Notes"
-              multiline
-              rows={8}
-            />
+            <SignatureBox socket={socket} />
           </Box>
-          <SignatureBox socket={socket} />
-        </Box>
-        <ItemsList socket={socket} />
-      </Box>
-      {/* </Box>
-          <Box sx={{ alignSelf: "flex-end" }}>
-            <ItemsList
-              sx={{
-                borderRadius: 1,
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-              socket={socket}
-            />
-          </Box>
+          <ItemsList
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+            }}
+            height={397}
+            socket={socket}
+          />
         </Box>
         <Box
-          sx={{ mt: 1.25, display: "flex", justifyContent: "space-between" }}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}
         >
-          <Clock sx={{ alignSelf: "flex-end" }} />
+          <Clock />
           <Box
             sx={{
-              width: 220,
-              height: 40,
+              width: 224,
               display: "flex",
               justifyContent: "space-between",
             }}
@@ -265,26 +260,19 @@ export default function Pickup() {
               sx={{ width: 100 }}
               variant="outlined"
               disabled={!disableSubmit}
-              onClick={async () => {
-                try {
-                  setRxNumber("");
-                  setDate(null);
-                  await clearPickup();
-                } catch (e) {
-                  setState("error");
-                }
-              }}
+              onClick={() => socket.emit("reset")}
               children="RESET"
             />
             <Button
-              sx={{ width: 100 }}
+              sx={{ width: 100, color: "primary.main" }}
               variant="outlined"
               disabled={disableSubmit}
               onClick={async () => {
                 try {
-                  await submitPickup({ notes });
+                  await postPickup({ notes });
                 } catch (e) {
-                  setState("error");
+                  console.error(e);
+                  // setState("error");
                 }
               }}
               children="SUBMIT"
@@ -292,7 +280,7 @@ export default function Pickup() {
           </Box>
         </Box>
       </Box>
-      <Snackbar
+      {/* <Snackbar
         open={state === "submit"}
         autoHideDuration={5000}
         onClose={handleSnackbarClose}

@@ -58,8 +58,6 @@ export default function Dashboard() {
   const { page, section } = useSelector((s) => s.main);
   const Page = pages[page] || "div";
 
-  console.log(page, section);
-
   return (
     <Box
       ref={layoutRef}

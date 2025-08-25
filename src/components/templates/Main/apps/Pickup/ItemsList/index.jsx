@@ -1,8 +1,13 @@
 import React from "react";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
-const ItemsList = ({ socket, readOnly = false, sx }) => {
+const style = {
+  listItem: { height: 36 },
+  primary: { justifySelf: "center", letterSpacing: 1.5 },
+};
+
+const ItemsList = ({ socket, readOnly = false, height = 350, sx }) => {
   const [items, setItems] = React.useState([]);
   React.useEffect(() => {
     function onGet(data) {
@@ -16,31 +21,19 @@ const ItemsList = ({ socket, readOnly = false, sx }) => {
   }, [socket]);
   return (
     <div>
-      <Typography sx={{ fontWeight: 600, justifySelf: "center" }}>{`Rx List${
-        items.length > 0 ? ` (${items.length})` : ""
-      }`}</Typography>
-      {/* <Box sx={sx}> */}
-      <List
-      //  sx={{ p: 0, overflow: "auto", maxHeight: height, height: height }}
-      >
-        {items.map((v, i) => (
-          <ListItem sx={style.listItem} key={i}>
-            {readOnly ? (
-              <ListItemText
-                slotProps={{
-                  primary: {
-                    sx: style.primary,
-                  },
-                }}
-                primary={v}
-              />
-            ) : (
-              <ListItemButton
-                onClick={() =>
-                  socket.emit("items", { action: "pull", item: v })
-                }
-                sx={style.listItem}
-              >
+      <Typography
+        sx={{ fontWeight: 600, justifySelf: "center", marginBottom: 0.5 }}
+      >{`Rx List${items.length > 0 ? ` (${items.length})` : ""}`}</Typography>
+      <Box sx={{ width: 132, overflow: "hidden", ...sx }}>
+        <List
+          sx={{
+            overflow: "auto",
+            height,
+          }}
+        >
+          {items.map((v, i) => (
+            <ListItem sx={style.listItem} key={i}>
+              {readOnly ? (
                 <ListItemText
                   slotProps={{
                     primary: {
@@ -49,28 +42,28 @@ const ItemsList = ({ socket, readOnly = false, sx }) => {
                   }}
                   primary={v}
                 />
-              </ListItemButton>
-            )}
-          </ListItem>
-        ))}
-      </List>
-      {/* </Box> */}
-      {/* <CustomList
-        sx={{
-          width: 132,
-          ...sx,
-        }}
-        height={380}
-        items={items}
-        onClickItem={readOnly ? undefined : (v) => socket.emit("items", v)}
-      /> */}
+              ) : (
+                <ListItemButton
+                  onClick={() =>
+                    socket.emit("items", { action: "pull", item: v })
+                  }
+                >
+                  <ListItemText
+                    slotProps={{
+                      primary: {
+                        sx: style.primary,
+                      },
+                    }}
+                    primary={v}
+                  />
+                </ListItemButton>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      </Box>
     </div>
   );
 };
 
 export default ItemsList;
-
-const style = {
-  listItem: { height: 36, width: "100%" },
-  primary: { justifySelf: "center", letterSpacing: 1.5 },
-};

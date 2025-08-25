@@ -1,80 +1,18 @@
 import React from "react";
-import { Box, Button, styled, Typography } from "@mui/material";
-import ItemsList from "../../modals/PickupModal/ItemsList";
+import { Box, Button, Typography, Fade } from "@mui/material";
+import ItemsList from "../Main/apps/Pickup/ItemsList";
 import SignatureBox from "../Main/apps/Pickup/SignatureBox";
 import RelationBox from "../Main/apps/Pickup/RelationBox";
-import Clock from "../../modals/PickupModal/Clock";
+import Clock from "../Main/apps/Pickup/Clock";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
-import LoadingSvg from "../../../svg/Loading";
-import VerifiedSvg from "../../../svg/Verified";
-import WarningSvg from "../../../svg/Warning";
-import {
-  getPickupData,
-  clearPickupCanvas,
-  preSubmitPickup,
-} from "../../../lib/api/client";
+import LoadingSvg from "../../svg/Loading";
+import VerifiedSvg from "../../svg/Verified";
+import WarningSvg from "../../svg/Warning";
 import { io } from "socket.io-client";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
-
-const StyledButton = styled(({ ...props }) => <Button {...props} />)(
-  ({ theme }) => ({
-    width: 120,
-    height: 90,
-    borderRadius: 0,
-  })
-);
-
-const style = {
-  container: {
-    boxSizing: "border-box",
-    width: 800,
-    height: 480,
-    p: 1.5,
-    display: "flex",
-  },
-  background: {
-    position: "absolute",
-    zIndex: -1,
-    width: 800,
-    height: 68,
-    background: "linear-gradient(to right, #ffffff, #cfd8dc)",
-  },
-  logo: {
-    fontWeight: 800,
-    fontSize: 36,
-    color: "#009688",
-    justifySelf: "flex-end",
-    letterSpacing: 1,
-    mb: 1,
-  },
-  clock: {
-    fontWeight: 600,
-    fontSize: 18,
-    color: "#212121",
-    justifySelf: "flex-end",
-    letterSpacing: 0,
-  },
-  signatureBox: {
-    width: 520,
-    height: 170,
-    borderRight: "1px solid",
-    borderColor: "#9e9e9e",
-    backgroundColor: "#bdbdbd",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  relationBox: {
-    borderTop: "1px solid #9e9e9e",
-    borderRight: "1px solid #9e9e9e",
-    display: "flex",
-    justifyContent: "center",
-    width: 519,
-  },
-};
 
 const Pickup = () => {
   const [canvas, setCanvas] = React.useState(false);
@@ -89,6 +27,8 @@ const Pickup = () => {
     function onCanvas(data) {
       if (data) {
         setCanvas(true);
+      } else {
+        setCanvas(false);
       }
     }
     function onItems(data) {
@@ -99,36 +39,22 @@ const Pickup = () => {
       }
     }
     function onState(data) {
-      if (data === "submit" || data === "error") {
+      if (data === "success" || data === "error") {
         timeout.current = setTimeout(() => {
           setState("standby");
         }, 5000);
       }
       setState(data);
     }
-    function onClear() {
-      setCanvas(false);
-    }
-    (async function () {
-      try {
-        await getPickupData("state");
-        await getPickupData("items");
-        await getPickupData("canvas");
-        await getPickupData("relation");
-      } catch (e) {
-        console.log(e);
-      }
-    })();
+
     socket.on("state", onState);
     socket.on("items", onItems);
     socket.on("canvas", onCanvas);
-    socket.on("clear-canvas", onClear);
 
     return () => {
       socket.off("state", onState);
       socket.off("items", onItems);
       socket.off("canvas", onCanvas);
-      socket.off("clear-canvas", onClear);
       clearTimeout(timeout.current);
     };
   }, []);
@@ -136,174 +62,211 @@ const Pickup = () => {
   const disabled = !items || !canvas;
 
   return (
-    <>
-      {state === "error" ? (
-        <Box
+    <Box
+      sx={{
+        position: "absolute",
+        zIndex: -1,
+        width: 800,
+        height: 68,
+        background: "linear-gradient(to right, #ffffff, #cfd8dc)",
+      }}
+    >
+      <Box
+        sx={{
+          boxSizing: "border-box",
+          width: 800,
+          height: 480,
+          p: 1.5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+        }}
+      >
+        <Typography
           sx={{
-            ...style.container,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            fontWeight: 800,
+            fontSize: 36,
+            color: "#00a2a2",
+            letterSpacing: 1,
           }}
         >
-          <WarningSvg width="12.5%" />
-          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
-            Error: Please try again!
-          </Typography>
-        </Box>
-      ) : state === "submit" ? (
-        <Box
-          sx={{
-            ...style.container,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <VerifiedSvg
-            stroke1={50}
-            stroke2={33.3333}
-            color1="#00c853"
-            color2="#424242"
-            width="6.25%"
+          El Camino Pharmacy
+        </Typography>
+        {state === "standby" && (
+          <Clock
+            sx={{
+              top: 72,
+              position: "absolute",
+              fontWeight: 600,
+              fontSize: 18,
+              color: "#212121",
+              justifySelf: "flex-end",
+              letterSpacing: 0,
+            }}
           />
-          <Typography sx={{ fontWeight: 600, fontSize: 24, color: "#212121" }}>
-            Thank you!
-          </Typography>
-        </Box>
-      ) : state === "pre-submit" ? (
-        <Box
-          sx={{
-            ...style.container,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <LoadingSvg stroke={50} width="6.25%" color="#9e9e9e" />
-        </Box>
-      ) : (
-        <div>
-          <Box sx={style.background} />
-          <Box sx={style.container}>
-            <Box sx={{ alignSelf: "flex-end" }}>
+        )}
+        <Box sx={{ display: "flex" }}>
+          {state === "standby" ? (
+            <React.Fragment>
               <ItemsList
                 socket={socket}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "#9e9e9e",
-                }}
+                sx={{ border: "1px solid #9e9e9e" }}
                 readOnly
               />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <Box>
-                <Typography sx={style.logo}>El Camino Pharmacy</Typography>
-                <Clock sx={style.clock} />
-              </Box>
-              <Box>
-                <Box sx={style.relationBox}>
-                  <RelationBox socket={socket} row />
+              <Box sx={{ alignSelf: "flex-end" }}>
+                <Box
+                  sx={{
+                    borderTop: "1px solid #9e9e9e",
+                    borderBottom: "1px solid #9e9e9e",
+                    borderRight: "1px solid #9e9e9e",
+                    display: "flex",
+                    justifyContent: "center",
+                    width: 520,
+                  }}
+                >
+                  <RelationBox
+                    socket={socket}
+                    row
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "#26a69a",
+                      },
+                    }}
+                  />
                 </Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    width: 640,
-                    borderTop: "1px solid",
-                    borderRight: "1px solid",
-                    borderBottom: "1px solid",
-                    borderColor: "#9e9e9e",
-                    height: 170,
+                    borderBottom: "1px solid #9e9e9e",
+                    borderRight: "1px solid #9e9e9e",
                   }}
                 >
-                  <Box sx={style.signatureBox}>
-                    <SignatureBox
-                      socket={socket}
-                      onBegin={() => {
-                        setCanvas(true);
-                      }}
-                    />
-                  </Box>
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <StyledButton
-                      disabled={disabled}
-                      sx={{
-                        color: "#ffffff",
-                        backgroundColor: "#26a69a",
-                        borderBottom: "1px solid",
-                        borderColor: "#9e9e9e",
-                        ":hover": {
-                          backgroundColor: "#4db6ac",
-                        },
-                        "&.Mui-disabled": {
-                          backgroundColor: "background.paper",
-                        },
-                      }}
-                      onClick={async () => {
-                        try {
-                          await preSubmitPickup();
-                        } catch (e) {
-                          console.log(e);
-                        }
-                      }}
-                      children={
-                        <Typography
-                          sx={{
-                            color: "#fafafa",
-                            fontWeight: 600,
-                            fontSize: 14,
-                            ...(disabled ? { color: "#9e9e9e" } : {}),
-                          }}
-                        >
-                          ACCEPT
-                        </Typography>
-                      }
-                      endIcon={
-                        <CheckIcon
-                          sx={
-                            disabled
-                              ? { color: "#9e9e9e" }
-                              : { color: "#fafafa" }
-                          }
-                        />
-                      }
-                    />
-                    <StyledButton
-                      sx={{ color: "error.main" }}
-                      onClick={async () => {
-                        try {
-                          socket.emit("clear_canvas");
-                        } catch (e) {
-                          console.log(e);
-                        }
-                      }}
-                      children={
-                        <Typography
-                          sx={{
-                            color: "#212121",
-                            fontWeight: 600,
-                            fontSize: 14,
-                          }}
-                        >
-                          CLEAR
-                        </Typography>
-                      }
-                      endIcon={<ClearIcon sx={{ color: "error.main" }} />}
-                    />
-                  </Box>
+                  <SignatureBox
+                    socket={socket}
+                    onBegin={() => setCanvas(true)}
+                  />
                 </Box>
               </Box>
+              <Box
+                sx={{
+                  alignSelf: "flex-end",
+                  borderTop: "1px solid #9e9e9e",
+                  borderBottom: "1px solid #9e9e9e",
+                  borderRight: "1px solid #9e9e9e",
+                }}
+              >
+                <Button
+                  disabled={disabled}
+                  sx={{
+                    width: 120,
+                    height: 85,
+                    borderRadius: 0,
+                    color: "#ffffff",
+                    backgroundColor: "#26a69a",
+                    borderBottom: "1px solid #9e9e9e",
+                    ":hover": {
+                      backgroundColor: "#4db6ac",
+                    },
+                    "&.Mui-disabled": {
+                      backgroundColor: "background.paper",
+                    },
+                  }}
+                  onClick={() => socket.emit("state", "pre-submit")}
+                  children={
+                    <Typography
+                      sx={{
+                        color: "#fafafa",
+                        fontWeight: 600,
+                        fontSize: 14,
+                        ...(disabled ? { color: "#9e9e9e" } : {}),
+                      }}
+                    >
+                      ACCEPT
+                    </Typography>
+                  }
+                  endIcon={
+                    <CheckIcon
+                      sx={
+                        disabled ? { color: "#9e9e9e" } : { color: "#fafafa" }
+                      }
+                    />
+                  }
+                />
+                <Button
+                  sx={{
+                    width: 120,
+                    height: 85,
+                    borderRadius: 0,
+                    color: "error.main",
+                  }}
+                  onClick={() => socket.emit("clear_canvas")}
+                  children={
+                    <Typography
+                      sx={{
+                        color: "#212121",
+                        fontWeight: 600,
+                        fontSize: 14,
+                      }}
+                    >
+                      CLEAR
+                    </Typography>
+                  }
+                  endIcon={<ClearIcon sx={{ color: "error.main" }} />}
+                />
+              </Box>
+            </React.Fragment>
+          ) : (
+            <Box
+              sx={{
+                width: 800,
+                height: 412,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {state === "error" ? (
+                <React.Fragment>
+                  <WarningSvg width="12.5%" />
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: 24,
+                      color: "#212121",
+                    }}
+                  >
+                    Error: Please try again!
+                  </Typography>
+                </React.Fragment>
+              ) : state === "success" ? (
+                <React.Fragment>
+                  <VerifiedSvg
+                    stroke1={66.6666}
+                    stroke2={50}
+                    color1="#00d56b"
+                    color2="#424242"
+                    width="6.25%"
+                  />
+                  <Fade in timeout={1500}>
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: 24,
+                        color: "#212121",
+                      }}
+                    >
+                      Thank you!
+                    </Typography>
+                  </Fade>
+                </React.Fragment>
+              ) : (
+                <LoadingSvg stroke={50} width="6.25%" color="#9e9e9e" />
+              )}
             </Box>
-          </Box>
-        </div>
-      )}
-    </>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

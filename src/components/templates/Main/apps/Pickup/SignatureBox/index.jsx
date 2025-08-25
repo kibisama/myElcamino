@@ -14,10 +14,8 @@ export default function SignatureBox({ socket, onBegin }) {
       }
     }
     socket.on("canvas", refresh);
-    socket.on("clear_canvas", refresh);
     return () => {
       socket.off("canvas", refresh);
-      socket.off("clear_canvas", refresh);
       clearTimeout(timeout.current);
     };
   }, [socket]);

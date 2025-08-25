@@ -6,7 +6,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 
-const RelationBox = ({ socket, row }) => {
+const RelationBox = ({ socket, row, sx }) => {
   const [value, setValue] = React.useState("self");
   React.useEffect(() => {
     function onRelation(data) {
@@ -35,25 +35,25 @@ const RelationBox = ({ socket, row }) => {
         <FormControlLabel
           slotProps={styleLabel("self")}
           value="self"
-          control={<Radio />}
+          control={<Radio sx={sx} />}
           label="Self"
         />
         <FormControlLabel
           slotProps={styleLabel("ff")}
           value="ff"
-          control={<Radio />}
+          control={<Radio sx={sx} />}
           label="Family/Friend"
         />
         <FormControlLabel
           slotProps={styleLabel("gc")}
           value="gc"
-          control={<Radio />}
+          control={<Radio sx={sx} />}
           label="Guardian/Caregiver"
         />
         <FormControlLabel
           slotProps={styleLabel("other")}
           value="other"
-          control={<Radio />}
+          control={<Radio sx={sx} />}
           label="Other"
         />
       </RadioGroup>
