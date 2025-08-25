@@ -8,10 +8,6 @@ export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 
 export const postPickup = (body) => client.post("apps/pickup", body);
 
-export const getPickupData = (type) => client.get(`apps/pickup/get/${type}`);
-export const removePickupItems = (body) =>
-  client.post("apps/pickup/remove", body);
-
 export const findDeliveryLog = (body) => client.post("apps/pickup/find", body);
 export const getPickupProof = (body) => client.post("apps/pickup/proof", body);
 //

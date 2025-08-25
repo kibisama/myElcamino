@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
-// import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
@@ -335,6 +335,48 @@ export default function Pickups() {
             }}
           />
         )} */}
+        <DataGrid
+          rows={rowsState.rows}
+          rowCount={rowsState.rowCount}
+          columns={columns}
+          pagination
+          sortingMode="server"
+          filterMode="server"
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationModelChange}
+          sortModel={sortModel}
+          // onSortModelChange={handleSortModelChange}
+          filterModel={filterModel}
+          // onFilterModelChange={handleFilterModelChange}
+          disableRowSelectionOnClick
+          // onRowClick={handleRowClick}
+          loading={isLoading}
+          initialState={initialState}
+          showToolbar
+          pageSizeOptions={[5, INITIAL_PAGE_SIZE, 25]}
+          sx={{
+            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+              outline: "transparent",
+            },
+            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+              {
+                outline: "none",
+              },
+            [`& .${gridClasses.row}:hover`]: {
+              cursor: "pointer",
+            },
+          }}
+          slotProps={{
+            loadingOverlay: {
+              variant: "circular-progress",
+              noRowsVariant: "circular-progress",
+            },
+            baseIconButton: {
+              size: "small",
+            },
+          }}
+        />
       </Box>
     </PageContainer>
   );
