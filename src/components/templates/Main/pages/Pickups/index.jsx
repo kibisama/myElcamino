@@ -6,12 +6,9 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
-import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-// import { useLocation, useNavigate, useSearchParams } from 'react-router';
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 // import useNotifications from '../hooks/useNotifications/useNotifications';
 // import {
@@ -21,13 +18,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 
-const INITIAL_PAGE_SIZE = 10;
+// const INITIAL_PAGE_SIZE = 10;
 
 export default function Pickups() {
-  // const { pathname } = useLocation();
-  // const [searchParams] = useSearchParams();
-  // const navigate = useNavigate();
-
   // const dialogs = useDialogs();
   // const notifications = useNotifications();
 
@@ -199,33 +192,42 @@ export default function Pickups() {
   //   [dialogs, notifications, loadData],
   // );
 
-  const initialState = React.useMemo(
-    () => ({
-      pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
-    }),
-    []
-  );
+  // const initialState = React.useMemo(
+  //   () => ({
+  //     pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
+  //   }),
+  //   []
+  // );
 
   const columns = React.useMemo(
     () => [
-      { field: "id", headerName: "ID" },
-      { field: "name", headerName: "Name", width: 140 },
-      { field: "age", headerName: "Age", type: "number" },
+      { field: "rxNumber", headerName: "Rx Number", width: 140 },
       {
-        field: "joinDate",
-        headerName: "Join date",
+        field: "deliveryDate",
+        headerName: "Delivery Date",
         type: "date",
-        valueGetter: (value) => value && new Date(value),
-        width: 140,
-      },
-      {
-        field: "role",
-        headerName: "Department",
-        type: "singleSelect",
-        valueOptions: ["Market", "Finance", "Development"],
         width: 160,
       },
-      { field: "isFullTime", headerName: "Full-time", type: "boolean" },
+      {
+        field: "signature",
+        headerName: "Signature",
+        width: 280,
+        sortable: false,
+      },
+      {
+        field: "relation",
+        headerName: "Relation",
+        // valueGetter: (v) => v,
+        valueOptions: ["Self"],
+        width: 120,
+        sortable: false,
+      },
+      {
+        field: "notes",
+        headerName: "Notes",
+        width: 180,
+        sortable: false,
+      },
       {
         field: "actions",
         type: "actions",
@@ -269,11 +271,7 @@ export default function Pickups() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton
-            icon={<BarcodeReaderIcon />}
-            app="Pickup"
-            children="SCAN"
-          />
+          <AppButton app="Pickup" children={<BarcodeReaderIcon />} />
           {/* <Button
             variant="contained"
             onClick={() => {
@@ -336,25 +334,27 @@ export default function Pickups() {
           />
         )} */}
         <DataGrid
-          rows={rowsState.rows}
-          rowCount={rowsState.rowCount}
           columns={columns}
-          pagination
-          sortingMode="server"
-          filterMode="server"
-          paginationMode="server"
-          paginationModel={paginationModel}
-          onPaginationModelChange={handlePaginationModelChange}
-          sortModel={sortModel}
+          // rows={rowsState.rows}
+          // rowCount={rowsState.rowCount}
+
+          disableColumnMenu
+          // pagination
+          // sortingMode="server"
+          // filterMode="server"
+          // paginationMode="server"
+          // paginationModel={paginationModel}
+          // onPaginationModelChange={handlePaginationModelChange}
+          // sortModel={sortModel}
           // onSortModelChange={handleSortModelChange}
-          filterModel={filterModel}
+          // filterModel={filterModel}
           // onFilterModelChange={handleFilterModelChange}
-          disableRowSelectionOnClick
+          // disableRowSelectionOnClick
           // onRowClick={handleRowClick}
           loading={isLoading}
-          initialState={initialState}
-          showToolbar
-          pageSizeOptions={[5, INITIAL_PAGE_SIZE, 25]}
+          // initialState={initialState}
+          // showToolbar
+          // pageSizeOptions={[5, INITIAL_PAGE_SIZE, 25]}
           sx={{
             [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
               outline: "transparent",
@@ -365,6 +365,9 @@ export default function Pickups() {
               },
             [`& .${gridClasses.row}:hover`]: {
               cursor: "pointer",
+            },
+            ".MuiDataGrid-sortButton": {
+              ml: 1,
             },
           }}
           slotProps={{

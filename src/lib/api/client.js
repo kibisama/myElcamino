@@ -7,6 +7,8 @@ export const scanInv = (body) => client.post("inv/scan", body);
 export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 
 export const postPickup = (body) => client.post("apps/pickup", body);
+export const searchPickup = (date, rxNumber) =>
+  client.get(`apps/pickup/search?date=${date}&rxNumber=${rxNumber}`);
 
 export const findDeliveryLog = (body) => client.post("apps/pickup/find", body);
 export const getPickupProof = (body) => client.post("apps/pickup/proof", body);
