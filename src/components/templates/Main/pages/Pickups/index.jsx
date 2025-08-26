@@ -354,7 +354,7 @@ export default function Pickups() {
           loading={isLoading}
           // initialState={initialState}
           // showToolbar
-          // pageSizeOptions={[5, INITIAL_PAGE_SIZE, 25]}
+          pageSizeOptions={[10]}
           sx={{
             [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
               outline: "transparent",
