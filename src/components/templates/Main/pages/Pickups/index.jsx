@@ -9,7 +9,6 @@ import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
-import SearchIcon from "@mui/icons-material/Search";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 // import useNotifications from '../hooks/useNotifications/useNotifications';
 // import {
@@ -204,7 +203,7 @@ export default function Pickups() {
 
   const columns = React.useMemo(
     () => [
-      { field: "rxNumber", headerName: "Rx Number", width: 140 },
+      { field: "rxNumber", headerName: "Rx Number", width: 160 },
       {
         field: "deliveryDate",
         headerName: "Delivery Date",
@@ -275,28 +274,13 @@ export default function Pickups() {
   return (
     <PageContainer
       title="Pickups"
-      actions={
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
-            <div>
-              <IconButton
-                size="small"
-                aria-label="refresh"
-                // onClick={handleRefresh}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </div>
-          </Tooltip>
-          <AppButton app="Pickup" children={<BarcodeReaderIcon />} />
-        </Stack>
-      }
+      actions={<AppButton app="Pickup" children={<BarcodeReaderIcon />} />}
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Search placeholder="Search Rx…" onChange={handleChangeRxNumber} />
           <DatePickerSm />
           <IconButton disabled={disableSearchButton} size="small">
-            <SearchIcon />
+            <RefreshIcon />
           </IconButton>
         </Stack>
       }

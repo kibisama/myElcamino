@@ -1,6 +1,7 @@
 import * as React from "react";
 import { alpha } from "@mui/material/styles";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
+import { pickersOutlinedInputClasses } from "@mui/x-date-pickers";
 import { svgIconClasses } from "@mui/material/SvgIcon";
 import { toggleButtonGroupClasses } from "@mui/material/ToggleButtonGroup";
 import { toggleButtonClasses } from "@mui/material/ToggleButton";
@@ -383,6 +384,19 @@ export const inputsCustomizations = {
       },
     },
   },
+  MuiPickersInputBase: {
+    styleOverrides: {
+      root: {
+        border: "none",
+      },
+      input: {
+        "&::placeholder": {
+          opacity: 0.7,
+          color: gray[500],
+        },
+      },
+    },
+  },
   MuiOutlinedInput: {
     styleOverrides: {
       input: {
@@ -398,6 +412,49 @@ export const inputsCustomizations = {
           borderColor: gray[400],
         },
         [`&.${outlinedInputClasses.focused}`]: {
+          // outline: `3px solid ${alpha(brand[500], 0.5)}`,
+          borderColor: brand[400],
+        },
+        variants: [
+          {
+            props: {
+              size: "small",
+            },
+            style: {
+              height: "2.25rem",
+            },
+          },
+          {
+            props: {
+              size: "medium",
+            },
+            style: {
+              height: "3rem",
+            },
+          },
+        ],
+      }),
+      notchedOutline: {
+        border: "none",
+      },
+    },
+  },
+  MuiPickersOutlinedInput: {
+    styleOverrides: {
+      input: {
+        padding: 0,
+      },
+      root: ({ theme }) => ({
+        height: "3rem",
+        padding: "8px 12px",
+        color: (theme.vars || theme).palette.text.primary,
+        borderRadius: (theme.vars || theme).shape.borderRadius,
+        border: `1px solid ${(theme.vars || theme).palette.divider}`,
+        transition: "border 120ms ease-in",
+        "&:hover": {
+          borderColor: gray[400],
+        },
+        [`&.${pickersOutlinedInputClasses.focused}`]: {
           // outline: `3px solid ${alpha(brand[500], 0.5)}`,
           borderColor: brand[400],
         },

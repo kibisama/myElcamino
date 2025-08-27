@@ -16,7 +16,6 @@ import { io } from "socket.io-client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import CloseIcon from "@mui/icons-material/Close";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
@@ -118,7 +117,7 @@ export default function Pickup() {
       >
         <Box
           sx={{
-            width: 678,
+            width: 676,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-end",
@@ -126,7 +125,7 @@ export default function Pickup() {
         >
           <Box
             sx={{
-              height: 424,
+              height: 420,
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -134,7 +133,7 @@ export default function Pickup() {
           >
             <Box
               sx={{
-                width: 464,
+                width: 430,
                 display: "flex",
                 justifyContent: "space-between",
               }}
@@ -157,7 +156,7 @@ export default function Pickup() {
               />
               <Box
                 sx={{
-                  width: 304,
+                  width: 268,
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -177,23 +176,16 @@ export default function Pickup() {
                       openPickerButton: {
                         sx: {
                           border: "transparent",
+                          mr: -1,
                         },
                       },
                       popper: { className: "app-content" },
+                      actionBar: { actions: ["clear", "accept"] },
                     }}
                   />
                 </LocalizationProvider>
-                <IconButton
-                  size="small"
-                  onClick={() => socket.emit("date", dayjs())}
-                >
+                <IconButton size="small" onClick={() => setDate(dayjs())}>
                   <RefreshIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => socket.emit("date", null)}
-                >
-                  <CloseIcon />
                 </IconButton>
               </Box>
             </Box>
@@ -211,7 +203,7 @@ export default function Pickup() {
                   borderColor: "divider",
                   display: "flex",
                   justifyContent: "center",
-                  width: 236,
+                  width: 240,
                 }}
               >
                 <RelationBox socket={socket} />
@@ -237,7 +229,7 @@ export default function Pickup() {
               borderColor: "divider",
               borderRadius: 1,
             }}
-            height={397}
+            height={393}
             socket={socket}
           />
         </Box>
