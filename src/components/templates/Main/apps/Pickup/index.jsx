@@ -166,7 +166,7 @@ export default function Pickup() {
                   <DateTimePicker
                     value={date}
                     sx={{ width: 220 }}
-                    onChange={async (date, context) => {
+                    onChange={(date, context) => {
                       if (!context.validationError) {
                         socket.emit("date", date);
                       }
@@ -175,7 +175,7 @@ export default function Pickup() {
                     slotProps={{
                       openPickerButton: {
                         sx: {
-                          border: "transparent",
+                          border: "none",
                           mr: -1,
                         },
                       },

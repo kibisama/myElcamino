@@ -384,19 +384,19 @@ export const inputsCustomizations = {
       },
     },
   },
-  MuiPickersInputBase: {
-    styleOverrides: {
-      root: {
-        border: "none",
-      },
-      input: {
-        "&::placeholder": {
-          opacity: 0.7,
-          color: gray[500],
-        },
-      },
-    },
-  },
+  // MuiPickersInputBase: {
+  //   styleOverrides: {
+  //     root: {
+  //       border: "none",
+  //     },
+  //     input: {
+  //       "&::placeholder": {
+  //         opacity: 0.7,
+  //         color: gray[500],
+  //       },
+  //     },
+  //   },
+  // },
   MuiOutlinedInput: {
     styleOverrides: {
       input: {
@@ -439,49 +439,49 @@ export const inputsCustomizations = {
       },
     },
   },
-  MuiPickersOutlinedInput: {
-    styleOverrides: {
-      input: {
-        padding: 0,
-      },
-      root: ({ theme }) => ({
-        height: "3rem",
-        padding: "8px 12px",
-        color: (theme.vars || theme).palette.text.primary,
-        borderRadius: (theme.vars || theme).shape.borderRadius,
-        border: `1px solid ${(theme.vars || theme).palette.divider}`,
-        transition: "border 120ms ease-in",
-        "&:hover": {
-          borderColor: gray[400],
-        },
-        [`&.${pickersOutlinedInputClasses.focused}`]: {
-          // outline: `3px solid ${alpha(brand[500], 0.5)}`,
-          borderColor: brand[400],
-        },
-        variants: [
-          {
-            props: {
-              size: "small",
-            },
-            style: {
-              height: "2.25rem",
-            },
-          },
-          {
-            props: {
-              size: "medium",
-            },
-            style: {
-              height: "3rem",
-            },
-          },
-        ],
-      }),
-      notchedOutline: {
-        border: "none",
-      },
-    },
-  },
+  // MuiPickersOutlinedInput: {
+  //   styleOverrides: {
+  //     input: {
+  //       padding: 0,
+  //     },
+  //     root: ({ theme }) => ({
+  //       height: "3rem",
+  //       padding: "8px 12px",
+  //       color: (theme.vars || theme).palette.text.primary,
+  //       borderRadius: (theme.vars || theme).shape.borderRadius,
+  //       border: `1px solid ${(theme.vars || theme).palette.divider}`,
+  //       transition: "border 120ms ease-in",
+  //       "&:hover": {
+  //         borderColor: gray[400],
+  //       },
+  //       [`&.${pickersOutlinedInputClasses.focused}`]: {
+  //         // outline: `3px solid ${alpha(brand[500], 0.5)}`,
+  //         borderColor: brand[400],
+  //       },
+  //       variants: [
+  //         {
+  //           props: {
+  //             size: "small",
+  //           },
+  //           style: {
+  //             height: "2.25rem",
+  //           },
+  //         },
+  //         {
+  //           props: {
+  //             size: "medium",
+  //           },
+  //           style: {
+  //             height: "3rem",
+  //           },
+  //         },
+  //       ],
+  //     }),
+  //     notchedOutline: {
+  //       border: "none",
+  //     },
+  //   },
+  // },
   MuiInputAdornment: {
     styleOverrides: {
       root: ({ theme }) => ({

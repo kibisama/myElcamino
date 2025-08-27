@@ -1,4 +1,5 @@
 import * as React from "react";
+import dayjs from "dayjs";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -7,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from "@mui/icons-material/Search";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
@@ -19,6 +21,7 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import Search from "../../../../inputs/Search";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
+import { searchPickup } from "../../../../../lib/api/client";
 
 // const INITIAL_PAGE_SIZE = 10;
 
@@ -260,27 +263,52 @@ export default function Pickups() {
   const [rxNumber, setRxNumber] = React.useState("");
   const [date, setDate] = React.useState(null);
   const disableSearchButton = !rxNumber && !date;
-  const handleChangeRxNumber = React.useCallback(
+
+  const handleChangeDate = React.useCallback((date, context) => {
+    if (!context.validationError) {
+      setDate(dayjs(date));
+    }
+  }, []);
+  const search = React.useCallback(() => {
+    (async () => {
+      try {
+        const { data } = await searchPickup({ rxNumber, date });
+        console.log(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [date, rxNumber]);
+  const handleChangeRxNumber = React.useCallback((e) => {
+    setRxNumber(e.target.value);
+  }, []);
+  const handleKeyDown = React.useCallback(
     (e) => {
       if (e.key === "Enter" && !disableSearchButton) {
-        //
-      } else {
-        setRxNumber(e.target.value);
+        search();
       }
     },
-    [disableSearchButton]
+    [search, disableSearchButton]
   );
-
   return (
     <PageContainer
       title="Pickups"
       actions={<AppButton app="Pickup" children={<BarcodeReaderIcon />} />}
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Search placeholder="Search Rx…" onChange={handleChangeRxNumber} />
-          <DatePickerSm />
-          <IconButton disabled={disableSearchButton} size="small">
-            <RefreshIcon />
+          <Search
+            placeholder="Search Rx…"
+            width="16ch"
+            onChange={handleChangeRxNumber}
+            onKeyDown={handleKeyDown}
+          />
+          <DatePickerSm value={date} onChange={handleChangeDate} />
+          <IconButton
+            onClick={search}
+            disabled={disableSearchButton}
+            size="small"
+          >
+            <SearchIcon />
           </IconButton>
         </Stack>
       }
