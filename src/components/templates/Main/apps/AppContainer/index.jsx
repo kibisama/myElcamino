@@ -27,6 +27,7 @@ const Titlebar = () => {
       }}
     >
       <CloseButton
+        className="app-content"
         sx={{
           width: 32,
           height: "inherit",

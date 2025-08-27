@@ -36,9 +36,22 @@ const PageHeaderToolbar = styled("div")(({ theme }) => ({
   marginLeft: "auto",
 }));
 
-function PageContainer(props) {
-  const { children, breadcrumbs, title, actions = null } = props;
+const ExtraPageHeaderToolbar = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  gap: theme.spacing(1),
+  // Ensure the toolbar is always on the right side, even after wrapping
+  marginTop: 8,
+  marginRight: "auto",
+}));
 
+function PageContainer({
+  children,
+  breadcrumbs,
+  title,
+  actions = null,
+  extraActions = null,
+}) {
   return (
     <Container sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
@@ -74,6 +87,9 @@ function PageContainer(props) {
             {title ? <Typography variant="h4">{title}</Typography> : null}
             <PageHeaderToolbar>{actions}</PageHeaderToolbar>
           </PageContentHeader>
+          {extraActions && (
+            <ExtraPageHeaderToolbar>{extraActions}</ExtraPageHeaderToolbar>
+          )}
         </Stack>
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {children}

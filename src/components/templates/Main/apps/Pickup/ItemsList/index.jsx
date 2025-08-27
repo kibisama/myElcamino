@@ -20,10 +20,16 @@ const ItemsList = ({ socket, readOnly = false, height = 350, sx }) => {
     };
   }, [socket]);
   return (
-    <div>
-      <Typography
-        sx={{ fontWeight: 600, justifySelf: "center", marginBottom: 0.5 }}
-      >{`Rx List${items.length > 0 ? ` (${items.length})` : ""}`}</Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography sx={{ fontWeight: 600, marginBottom: 0.5 }}>{`Rx List${
+        items.length > 0 ? ` (${items.length})` : ""
+      }`}</Typography>
       <Box sx={{ width: 132, overflow: "hidden", ...sx }}>
         <List
           sx={{
@@ -62,7 +68,7 @@ const ItemsList = ({ socket, readOnly = false, height = 350, sx }) => {
           ))}
         </List>
       </Box>
-    </div>
+    </Box>
   );
 };
 

@@ -9,6 +9,7 @@ import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 // import useNotifications from '../hooks/useNotifications/useNotifications';
 // import {
@@ -17,6 +18,8 @@ import EditIcon from "@mui/icons-material/Edit";
 // } from '../data/employees';
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
+import Search from "../../../../inputs/Search";
+import DatePickerSm from "../../../../inputs/DatePickerSm";
 
 // const INITIAL_PAGE_SIZE = 10;
 
@@ -255,6 +258,20 @@ export default function Pickups() {
     ]
   );
 
+  const [rxNumber, setRxNumber] = React.useState("");
+  const [date, setDate] = React.useState(null);
+  const disableSearchButton = !rxNumber && !date;
+  const handleChangeRxNumber = React.useCallback(
+    (e) => {
+      if (e.key === "Enter" && !disableSearchButton) {
+        //
+      } else {
+        setRxNumber(e.target.value);
+      }
+    },
+    [disableSearchButton]
+  );
+
   return (
     <PageContainer
       title="Pickups"
@@ -272,15 +289,15 @@ export default function Pickups() {
             </div>
           </Tooltip>
           <AppButton app="Pickup" children={<BarcodeReaderIcon />} />
-          {/* <Button
-            variant="contained"
-            onClick={() => {
-              dispatch(setApp("Pickup"));
-            }}
-            startIcon={<AddIcon />}
-          >
-            Create
-          </Button> */}
+        </Stack>
+      }
+      extraActions={
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Search placeholder="Search Rx…" onChange={handleChangeRxNumber} />
+          <DatePickerSm />
+          <IconButton disabled={disableSearchButton} size="small">
+            <SearchIcon />
+          </IconButton>
         </Stack>
       }
     >
