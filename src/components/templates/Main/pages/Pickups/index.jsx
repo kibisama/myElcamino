@@ -2,10 +2,8 @@ import * as React from "react";
 import dayjs from "dayjs";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
@@ -13,62 +11,29 @@ import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 // import useNotifications from '../hooks/useNotifications/useNotifications';
-// import {
-//   deleteOne as deleteEmployee,
-//   getMany as getEmployees,
-// } from '../data/employees';
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import Search from "../../../../inputs/Search";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
 
-// const INITIAL_PAGE_SIZE = 10;
+const INITIAL_PAGE_SIZE = 10;
 
 export default function Pickups() {
   // const dialogs = useDialogs();
   // const notifications = useNotifications();
 
-  const [paginationModel, setPaginationModel] = React.useState({
-    // page: searchParams.get("page") ? Number(searchParams.get("page")) : 0,
-    // pageSize: searchParams.get("pageSize")
-    //   ? Number(searchParams.get("pageSize"))
-    //   : INITIAL_PAGE_SIZE,
-  });
   const [filterModel, setFilterModel] = React
     .useState
     // searchParams.get("filter")
     //   ? JSON.parse(searchParams.get("filter") ?? "")
     //   : { items: [] }
     ();
-  const [sortModel, setSortModel] = React
-    .useState
-    // searchParams.get("sort") ? JSON.parse(searchParams.get("sort") ?? "") : []
-    ();
 
-  const [rowsState, setRowsState] = React.useState({
-    rows: [],
-    rowCount: 0,
-  });
+  const [rows, setRows] = React.useState([]);
 
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-
-  const handlePaginationModelChange = React.useCallback(
-    (model) => {
-      setPaginationModel(model);
-
-      // searchParams.set("page", String(model.page));
-      // searchParams.set("pageSize", String(model.pageSize));
-
-      // const newSearchParamsString = searchParams.toString();
-
-      // navigate(
-      //   `${pathname}${newSearchParamsString ? "?" : ""}${newSearchParamsString}`
-      // );
-    }
-    // [navigate, pathname, searchParams]
-  );
 
   // const handleFilterModelChange = React.useCallback(
   //   (model) => {
@@ -81,25 +46,6 @@ export default function Pickups() {
   //       searchParams.set("filter", JSON.stringify(model));
   //     } else {
   //       searchParams.delete("filter");
-  //     }
-
-  //     const newSearchParamsString = searchParams.toString();
-
-  //     navigate(
-  //       `${pathname}${newSearchParamsString ? "?" : ""}${newSearchParamsString}`
-  //     );
-  //   },
-  //   [navigate, pathname, searchParams]
-  // );
-
-  // const handleSortModelChange = React.useCallback(
-  //   (model) => {
-  //     setSortModel(model);
-
-  //     if (model.length > 0) {
-  //       searchParams.set("sort", JSON.stringify(model));
-  //     } else {
-  //       searchParams.delete("sort");
   //     }
 
   //     const newSearchParamsString = searchParams.toString();
@@ -141,17 +87,6 @@ export default function Pickups() {
   //     loadData();
   //   }
   // }, [isLoading, loadData]);
-
-  // const handleRowClick = React.useCallback(
-  //   ({ row }) => {
-  //     navigate(`/employees/${row.id}`);
-  //   },
-  //   [navigate]
-  // );
-
-  // const handleCreateClick = React.useCallback(() => {
-  //   navigate("/employees/new");
-  // }, [navigate]);
 
   // const handleRowEdit = React.useCallback(
   //   (employee) => () => {
@@ -197,41 +132,66 @@ export default function Pickups() {
   //   [dialogs, notifications, loadData],
   // );
 
-  // const initialState = React.useMemo(
-  //   () => ({
-  //     pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
-  //   }),
-  //   []
-  // );
+  const initialState = React.useMemo(
+    () => ({
+      pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
+    }),
+    []
+  );
 
   const columns = React.useMemo(
     () => [
-      { field: "rxNumber", headerName: "Rx Number", width: 160 },
+      {
+        field: "rxNumber",
+        headerName: "Rx Number",
+        type: "number",
+        width: 160,
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        rowSpanValueGetter: () => null,
+      },
       {
         field: "deliveryDate",
         headerName: "Delivery Date",
         type: "date",
         width: 160,
+        valueGetter: (v) => new Date(v),
+        valueFormatter: (v) => dayjs(v).format("M. D. YYYY HH:mm"),
+        rowSpanValueGetter: (v, r) => r._id,
       },
       {
-        field: "signature",
+        field: "_id",
         headerName: "Signature",
-        width: 280,
+        width: 188,
         sortable: false,
+        renderCell: (params) => (
+          <Box sx={{ display: "flex", height: "50px", alignItems: "center" }}>
+            <img
+              style={{ borderRadius: "4px", height: "48px" }}
+              src={
+                process.env.REACT_APP_CLIENT_API_ADDRESS +
+                `/apps/pickup/png/${params.value}`
+              }
+            />
+          </Box>
+        ),
+        // resizable: false,
+        rowSpanValueGetter: (v, r) => r._id,
       },
       {
         field: "relation",
         headerName: "Relation",
-        // valueGetter: (v) => v,
-        valueOptions: ["Self"],
-        width: 120,
+        width: 160,
         sortable: false,
+        rowSpanValueGetter: (v, r) => r._id,
       },
       {
         field: "notes",
         headerName: "Notes",
         width: 180,
         sortable: false,
+        rowSpanValueGetter: (v, r) => r._id,
       },
       {
         field: "actions",
@@ -252,6 +212,7 @@ export default function Pickups() {
           //   // onClick={handleRowDelete(row)}
           // />,
         ],
+        rowSpanValueGetter: (v, r) => r._id,
       },
     ],
     [
@@ -259,23 +220,44 @@ export default function Pickups() {
       // handleRowDelete
     ]
   );
-
   const [rxNumber, setRxNumber] = React.useState("");
   const [date, setDate] = React.useState(null);
+  const [lastState, setLastState] = React.useState({
+    rxNumber: "",
+    date: null,
+  });
   const disableSearchButton = !rxNumber && !date;
-
   const handleChangeDate = React.useCallback((date, context) => {
     if (!context.validationError) {
-      setDate(dayjs(date));
+      if (date) {
+        setDate(dayjs(date));
+      } else {
+        setDate(null);
+      }
     }
   }, []);
   const search = React.useCallback(() => {
+    setError(null);
+    setIsLoading(true);
     (async () => {
       try {
-        const { data } = await searchPickup({ rxNumber, date });
-        console.log(data);
+        const { data } = await searchPickup({
+          rxNumber: rxNumber.trim(),
+          date,
+        });
+        const rows = data.data;
+        rows.forEach((v, i) => (v.id = i + 1));
+        setRows(rows);
+        setIsLoading(false);
       } catch (e) {
-        console.error(e);
+        const { status } = e;
+        if (status === 404) {
+          //
+        } else {
+          setError(e);
+        }
+        setRows([]);
+        setIsLoading(false);
       }
     })();
   }, [date, rxNumber]);
@@ -290,6 +272,7 @@ export default function Pickups() {
     },
     [search, disableSearchButton]
   );
+
   return (
     <PageContainer
       title="Pickups"
@@ -298,7 +281,7 @@ export default function Pickups() {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Search
             placeholder="Search Rx…"
-            width="16ch"
+            width="18ch"
             onChange={handleChangeRxNumber}
             onKeyDown={handleKeyDown}
           />
@@ -314,76 +297,22 @@ export default function Pickups() {
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
-        {/* {error ? (
-          <Box sx={{ flexGrow: 1 }}>
-            <Alert severity="error">{error.message}</Alert>
-          </Box>
-        ) : (
-          <DataGrid
-            rows={rowsState.rows}
-            rowCount={rowsState.rowCount}
-            columns={columns}
-            pagination
-            sortingMode="server"
-            filterMode="server"
-            paginationMode="server"
-            paginationModel={paginationModel}
-            onPaginationModelChange={handlePaginationModelChange}
-            sortModel={sortModel}
-            // onSortModelChange={handleSortModelChange}
-            filterModel={filterModel}
-            // onFilterModelChange={handleFilterModelChange}
-            disableRowSelectionOnClick
-            // onRowClick={handleRowClick}
-            loading={isLoading}
-            initialState={initialState}
-            showToolbar
-            pageSizeOptions={[5, INITIAL_PAGE_SIZE, 25]}
-            sx={{
-              [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-                outline: "transparent",
-              },
-              [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-                {
-                  outline: "none",
-                },
-              [`& .${gridClasses.row}:hover`]: {
-                cursor: "pointer",
-              },
-            }}
-            slotProps={{
-              loadingOverlay: {
-                variant: "circular-progress",
-                noRowsVariant: "circular-progress",
-              },
-              baseIconButton: {
-                size: "small",
-              },
-            }}
-          />
-        )} */}
         <DataGrid
+          autoPageSize
           columns={columns}
-          // rows={rowsState.rows}
-          // rowCount={rowsState.rowCount}
-
+          rows={rows}
+          rowCount={rows.length}
+          rowSpanning
+          showCellVerticalBorder
           disableColumnMenu
-          // pagination
-          // sortingMode="server"
+          disableRowSelectionOnClick
           // filterMode="server"
-          // paginationMode="server"
-          // paginationModel={paginationModel}
-          // onPaginationModelChange={handlePaginationModelChange}
-          // sortModel={sortModel}
-          // onSortModelChange={handleSortModelChange}
           // filterModel={filterModel}
           // onFilterModelChange={handleFilterModelChange}
-          // disableRowSelectionOnClick
-          // onRowClick={handleRowClick}
           loading={isLoading}
-          // initialState={initialState}
-          // showToolbar
-          pageSizeOptions={[10]}
+          initialState={initialState}
+          showToolbar
+          pageSizeOptions={[]}
           sx={{
             [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
               outline: "transparent",
