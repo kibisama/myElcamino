@@ -1,13 +1,12 @@
 import * as React from "react";
 import dayjs from "dayjs";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
+import { Box, IconButton, Stack, ToggleButton } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import FilterList from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
+import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 // import useNotifications from '../hooks/useNotifications/useNotifications';
@@ -23,114 +22,10 @@ export default function Pickups() {
   // const dialogs = useDialogs();
   // const notifications = useNotifications();
 
-  const [filterModel, setFilterModel] = React
-    .useState
-    // searchParams.get("filter")
-    //   ? JSON.parse(searchParams.get("filter") ?? "")
-    //   : { items: [] }
-    ();
-
-  const [rows, setRows] = React.useState([]);
+  const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-
-  // const handleFilterModelChange = React.useCallback(
-  //   (model) => {
-  //     setFilterModel(model);
-
-  //     if (
-  //       model.items.length > 0 ||
-  //       (model.quickFilterValues && model.quickFilterValues.length > 0)
-  //     ) {
-  //       searchParams.set("filter", JSON.stringify(model));
-  //     } else {
-  //       searchParams.delete("filter");
-  //     }
-
-  //     const newSearchParamsString = searchParams.toString();
-
-  //     navigate(
-  //       `${pathname}${newSearchParamsString ? "?" : ""}${newSearchParamsString}`
-  //     );
-  //   },
-  //   [navigate, pathname, searchParams]
-  // );
-
-  // const loadData = React.useCallback(async () => {
-  //   setError(null);
-  //   setIsLoading(true);
-
-  //   try {
-  //     // const listData = await getEmployees({
-  //     //   paginationModel,
-  //     //   sortModel,
-  //     //   filterModel,
-  //     // });
-  //     // setRowsState({
-  //     //   rows: listData.items,
-  //     //   rowCount: listData.itemCount,
-  //     // });
-  //   } catch (listDataError) {
-  //     setError(listDataError);
-  //   }
-
-  //   setIsLoading(false);
-  // }, [paginationModel, sortModel, filterModel]);
-
-  // React.useEffect(() => {
-  //   loadData();
-  // }, [loadData]);
-
-  // const handleRefresh = React.useCallback(() => {
-  //   if (!isLoading) {
-  //     loadData();
-  //   }
-  // }, [isLoading, loadData]);
-
-  // const handleRowEdit = React.useCallback(
-  //   (employee) => () => {
-  //     navigate(`/employees/${employee.id}/edit`);
-  //   },
-  //   [navigate]
-  // );
-
-  // const handleRowDelete = React.useCallback(
-  //   (employee) => async () => {
-  //     const confirmed = await dialogs.confirm(
-  //       `Do you wish to delete ${employee.name}?`,
-  //       {
-  //         title: `Delete employee?`,
-  //         severity: 'error',
-  //         okText: 'Delete',
-  //         cancelText: 'Cancel',
-  //       },
-  //     );
-
-  //     if (confirmed) {
-  //       setIsLoading(true);
-  //       try {
-  //         await deleteEmployee(Number(employee.id));
-
-  //         notifications.show('Employee deleted successfully.', {
-  //           severity: 'success',
-  //           autoHideDuration: 3000,
-  //         });
-  //         loadData();
-  //       } catch (deleteError) {
-  //         notifications.show(
-  //           `Failed to delete employee. Reason:' ${deleteError.message}`,
-  //           {
-  //             severity: 'error',
-  //             autoHideDuration: 3000,
-  //           },
-  //         );
-  //       }
-  //       setIsLoading(false);
-  //     }
-  //   },
-  //   [dialogs, notifications, loadData],
-  // );
 
   const initialState = React.useMemo(
     () => ({
@@ -138,14 +33,27 @@ export default function Pickups() {
     }),
     []
   );
-
+  const [rxNumber, setRxNumber] = React.useState("");
+  const [date, setDate] = React.useState(null);
+  const [filtered, setFiltered] = React.useState(false);
+  const disableSearchButton = !rxNumber && !date;
+  const actionMode = filtered && rowState.rows !== rowState.filtered;
+  const handleChangeDate = React.useCallback((date, context) => {
+    if (!context.validationError) {
+      if (date) {
+        setDate(dayjs(date));
+      } else {
+        setDate(null);
+      }
+    }
+  }, []);
   const columns = React.useMemo(
     () => [
       {
         field: "rxNumber",
         headerName: "Rx Number",
         type: "number",
-        width: 160,
+        width: 120,
         headerAlign: "center",
         align: "center",
         sortable: false,
@@ -156,6 +64,8 @@ export default function Pickups() {
         headerName: "Delivery Date",
         type: "date",
         width: 160,
+        headerAlign: "center",
+        align: "center",
         valueGetter: (v) => new Date(v),
         valueFormatter: (v) => dayjs(v).format("M. D. YYYY HH:mm"),
         rowSpanValueGetter: (v, r) => r._id,
@@ -164,10 +74,13 @@ export default function Pickups() {
         field: "_id",
         headerName: "Signature",
         width: 188,
+        headerAlign: "center",
+        align: "center",
         sortable: false,
         renderCell: (params) => (
           <Box sx={{ display: "flex", height: "50px", alignItems: "center" }}>
             <img
+              alt={`${params.value}.png`}
               style={{ borderRadius: "4px", height: "48px" }}
               src={
                 process.env.REACT_APP_CLIENT_API_ADDRESS +
@@ -183,59 +96,45 @@ export default function Pickups() {
         field: "relation",
         headerName: "Relation",
         width: 160,
+        headerAlign: "center",
+        align: "center",
         sortable: false,
         rowSpanValueGetter: (v, r) => r._id,
       },
       {
         field: "notes",
         headerName: "Notes",
-        width: 180,
+        flex: 1,
         sortable: false,
         rowSpanValueGetter: (v, r) => r._id,
       },
       {
         field: "actions",
         type: "actions",
-        flex: 1,
-        align: "right",
+        width: 80,
+        align: "center",
         getActions: ({ row }) => [
-          // <GridActionsCellItem
-          //   key="edit-item"
-          //   icon={<EditIcon />}
-          //   label="Edit"
-          //   // onClick={handleRowEdit(row)}
-          // />,
-          // <GridActionsCellItem
-          //   key="delete-item"
-          //   icon={<DeleteIcon />}
-          //   label="Delete"
-          //   // onClick={handleRowDelete(row)}
-          // />,
+          <GridActionsCellItem
+            key={actionMode ? "print-item" : "edit-item"}
+            icon={actionMode ? <PrintIcon /> : <EditIcon />}
+            label={actionMode ? "Print" : "Edit"}
+            onClick={
+              actionMode
+                ? () =>
+                    window.open(
+                      `/print/pickups/${row._id}/${row.rxNumber}`,
+                      "_blank"
+                    )
+                : //
+                  undefined
+            }
+          />,
         ],
         rowSpanValueGetter: (v, r) => r._id,
       },
     ],
-    [
-      // handleRowEdit,
-      // handleRowDelete
-    ]
+    [actionMode]
   );
-  const [rxNumber, setRxNumber] = React.useState("");
-  const [date, setDate] = React.useState(null);
-  const [lastState, setLastState] = React.useState({
-    rxNumber: "",
-    date: null,
-  });
-  const disableSearchButton = !rxNumber && !date;
-  const handleChangeDate = React.useCallback((date, context) => {
-    if (!context.validationError) {
-      if (date) {
-        setDate(dayjs(date));
-      } else {
-        setDate(null);
-      }
-    }
-  }, []);
   const search = React.useCallback(() => {
     setError(null);
     setIsLoading(true);
@@ -246,19 +145,20 @@ export default function Pickups() {
           date,
         });
         const rows = data.data;
-        rows.forEach((v, i) => (v.id = i + 1));
-        setRows(rows);
-        setIsLoading(false);
+        setRowState({
+          rows,
+          filtered: rxNumber
+            ? rows.filter((v) => v.rxNumber === rxNumber)
+            : rows,
+        });
       } catch (e) {
         const { status } = e;
-        if (status === 404) {
-          //
-        } else {
+        if (status !== 404) {
           setError(e);
         }
-        setRows([]);
-        setIsLoading(false);
+        setRowState({ rows: [], filtered: [] });
       }
+      setIsLoading(false);
     })();
   }, [date, rxNumber]);
   const handleChangeRxNumber = React.useCallback((e) => {
@@ -286,6 +186,20 @@ export default function Pickups() {
             onKeyDown={handleKeyDown}
           />
           <DatePickerSm value={date} onChange={handleChangeDate} />
+          <ToggleButton
+            sx={{
+              borderRadius: 1,
+              width: "2.25rem",
+              height: "2.25rem",
+              padding: "0.25rem",
+            }}
+            selected={filtered}
+            onChange={() => {
+              setFiltered((prev) => !prev);
+            }}
+          >
+            <FilterList />
+          </ToggleButton>
           <IconButton
             onClick={search}
             disabled={disableSearchButton}
@@ -300,20 +214,19 @@ export default function Pickups() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={rows}
-          rowCount={rows.length}
-          rowSpanning
+          rows={filtered ? rowState.filtered : rowState.rows}
+          rowSpanning={!actionMode}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
-          // filterMode="server"
-          // filterModel={filterModel}
-          // onFilterModelChange={handleFilterModelChange}
           loading={isLoading}
-          initialState={initialState}
-          showToolbar
+          // initialState={initialState}
           pageSizeOptions={[]}
           sx={{
+            [`& .${gridClasses.cell}`]: {
+              display: "flex",
+              alignItems: "center",
+            },
             [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
               outline: "transparent",
             },
@@ -322,7 +235,7 @@ export default function Pickups() {
                 outline: "none",
               },
             [`& .${gridClasses.row}:hover`]: {
-              cursor: "pointer",
+              backgroundColor: "inherit",
             },
             ".MuiDataGrid-sortButton": {
               ml: 1,

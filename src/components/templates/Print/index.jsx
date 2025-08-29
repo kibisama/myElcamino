@@ -4,7 +4,7 @@ import DeliveryProof from "./DeliveryProof";
 export default function Prints() {
   return (
     <Routes>
-      <Route path="/deliveryProof/:_id/:rxNumber" element={<DeliveryProof />} />
+      <Route path="/pickups/:_id/:rxNumber" element={<DeliveryProof />} />
     </Routes>
   );
 }

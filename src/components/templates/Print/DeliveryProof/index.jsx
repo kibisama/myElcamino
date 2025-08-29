@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import StoreInfoHeader from "../StoreInfoHeader";
-import { getPickupProof } from "../../../lib/api/client";
+import { getPickupReport } from "../../../../lib/api/client";
 
 const style = {
   container: {
@@ -38,29 +38,14 @@ const style = {
   },
 };
 
-const getRelation = (data) => {
-  switch (data) {
-    case "self":
-      return "Self";
-    case "ff":
-      return "Family/Friend";
-    case "gc":
-      return "Guardian/Caregiver";
-    case "other":
-      return "Other";
-    default:
-      return data;
-  }
-};
-
 export default function DeliveryProof() {
   const { _id, rxNumber } = useParams();
   const [data, setData] = useState(null);
   useEffect(() => {
     async function get() {
       try {
-        const { data } = await getPickupProof({ _id, rxNumber });
-        setData(data);
+        const { data } = await getPickupReport({ _id, rxNumber });
+        setData(data.data);
       } catch (e) {
         console.log(e);
       }
@@ -71,6 +56,7 @@ export default function DeliveryProof() {
   if (!data) {
     return;
   }
+
   return (
     <Box sx={style.container}>
       <StoreInfoHeader />
@@ -104,7 +90,7 @@ export default function DeliveryProof() {
         </Box>
         <Box>
           <Box sx={{ ml: "180px" }}>
-            <Typography>Relation: {getRelation(data.relation)}</Typography>
+            <Typography>Relation: {data.relation}</Typography>
             <Typography>Note: {data.notes}</Typography>
           </Box>
         </Box>

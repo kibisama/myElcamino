@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Main from "./components/templates/Main";
 import Pickup from "./components/templates/Pickup";
-import Prints from "./components/prints";
+import Prints from "./components/templates/Print";
 
 function App() {
   return (
