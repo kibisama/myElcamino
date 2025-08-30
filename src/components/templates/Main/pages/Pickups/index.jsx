@@ -141,16 +141,21 @@ export default function Pickups() {
     [actionMode]
   );
   const search = React.useCallback(
-    (__rxNumber, __date) => {
+    (lastRxNumber, lastDate) => {
       setError(null);
       setIsLoading(true);
-      /////////////////////////////////////////////////////////////////
+
+      const _rxNumber = (lastRxNumber || rxNumber).trim();
+      const _date = lastDate || date;
+      setLastQuery({
+        rxNumber: _rxNumber,
+        date: _date,
+      });
       (async () => {
-        const _rxNumber = (__rxNumber || rxNumber).trim();
         try {
           const { data } = await searchPickup({
-            rxNumber,
-            date,
+            rxNumber: _rxNumber,
+            date: _date,
           });
           const rows = data.data;
           setRowState({
@@ -158,10 +163,6 @@ export default function Pickups() {
             filtered: rxNumber
               ? rows.filter((v) => v.rxNumber === rxNumber)
               : rows,
-          });
-          setLastQuery({
-            rxNumber,
-            date,
           });
         } catch (e) {
           const { status } = e;
@@ -186,6 +187,11 @@ export default function Pickups() {
     },
     [search, disableSearchButton]
   );
+  const handleRefresh = React.useCallback(() => {
+    if (!isLoading) {
+      search(lastQuery.rxNumber, lastQuery.date);
+    }
+  }, [isLoading, lastQuery, search]);
 
   return (
     <PageContainer
@@ -197,7 +203,7 @@ export default function Pickups() {
               <IconButton
                 size="small"
                 aria-label="refresh"
-                // onClick={handleRefresh}
+                onClick={handleRefresh}
               >
                 <RefreshIcon />
               </IconButton>
@@ -230,7 +236,7 @@ export default function Pickups() {
             <FilterList />
           </ToggleButton>
           <IconButton
-            onClick={search}
+            onClick={(e) => search()}
             disabled={disableSearchButton}
             size="small"
           >
