@@ -144,6 +144,7 @@ export default function Pickups() {
     (__rxNumber, __date) => {
       setError(null);
       setIsLoading(true);
+      /////////////////////////////////////////////////////////////////
       (async () => {
         const _rxNumber = (__rxNumber || rxNumber).trim();
         try {
