@@ -10,7 +10,7 @@ export default function DatePickerSm({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        sx={{ width: 140 }}
+        sx={{ width: 148 }}
         value={value}
         onChange={onChange}
         slotProps={{

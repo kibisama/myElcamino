@@ -1,10 +1,11 @@
 import * as React from "react";
 import dayjs from "dayjs";
 import Alert from "@mui/material/Alert";
-import { Box, IconButton, Stack, ToggleButton } from "@mui/material";
+import { Box, IconButton, Stack, ToggleButton, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import FilterList from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
@@ -36,6 +37,10 @@ export default function Pickups() {
   const [rxNumber, setRxNumber] = React.useState("");
   const [date, setDate] = React.useState(null);
   const [filtered, setFiltered] = React.useState(false);
+  const [lastQuery, setLastQuery] = React.useState({
+    rxNumber: "",
+    date: null,
+  });
   const disableSearchButton = !rxNumber && !date;
   const actionMode = filtered && rowState.rows !== rowState.filtered;
   const handleChangeDate = React.useCallback((date, context) => {
@@ -135,32 +140,40 @@ export default function Pickups() {
     ],
     [actionMode]
   );
-  const search = React.useCallback(() => {
-    setError(null);
-    setIsLoading(true);
-    (async () => {
-      try {
-        const { data } = await searchPickup({
-          rxNumber: rxNumber.trim(),
-          date,
-        });
-        const rows = data.data;
-        setRowState({
-          rows,
-          filtered: rxNumber
-            ? rows.filter((v) => v.rxNumber === rxNumber)
-            : rows,
-        });
-      } catch (e) {
-        const { status } = e;
-        if (status !== 404) {
-          setError(e);
+  const search = React.useCallback(
+    (__rxNumber, __date) => {
+      setError(null);
+      setIsLoading(true);
+      (async () => {
+        const _rxNumber = (__rxNumber || rxNumber).trim();
+        try {
+          const { data } = await searchPickup({
+            rxNumber,
+            date,
+          });
+          const rows = data.data;
+          setRowState({
+            rows,
+            filtered: rxNumber
+              ? rows.filter((v) => v.rxNumber === rxNumber)
+              : rows,
+          });
+          setLastQuery({
+            rxNumber,
+            date,
+          });
+        } catch (e) {
+          const { status } = e;
+          if (status !== 404) {
+            setError(e);
+          }
+          setRowState({ rows: [], filtered: [] });
         }
-        setRowState({ rows: [], filtered: [] });
-      }
-      setIsLoading(false);
-    })();
-  }, [date, rxNumber]);
+        setIsLoading(false);
+      })();
+    },
+    [date, rxNumber]
+  );
   const handleChangeRxNumber = React.useCallback((e) => {
     setRxNumber(e.target.value);
   }, []);
@@ -176,7 +189,22 @@ export default function Pickups() {
   return (
     <PageContainer
       title="Pickups"
-      actions={<AppButton app="Pickup" children={<BarcodeReaderIcon />} />}
+      actions={
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+            <div>
+              <IconButton
+                size="small"
+                aria-label="refresh"
+                // onClick={handleRefresh}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </div>
+          </Tooltip>
+          <AppButton app="Pickup" children={<BarcodeReaderIcon />} />
+        </Stack>
+      }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Search

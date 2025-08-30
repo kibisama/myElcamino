@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import DeliveryProof from "./DeliveryProof";
+import PickupReport from "./PickupReport";
 
 export default function Prints() {
   return (
     <Routes>
-      <Route path="/pickups/:_id/:rxNumber" element={<DeliveryProof />} />
+      <Route path="/pickups/:_id/:rxNumber" element={<PickupReport />} />
     </Routes>
   );
 }

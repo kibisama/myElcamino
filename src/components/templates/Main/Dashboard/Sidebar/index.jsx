@@ -13,6 +13,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupIcon from "@mui/icons-material/Group";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import MedicationIcon from "@mui/icons-material/Medication";
 import { DashboardSidebarContext } from "../../context";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import PageItem from "./PageItem";
@@ -157,8 +158,8 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     />
                   ))}
                   <PageItem
-                    id="AddDeliveries"
-                    title="Add"
+                    id="ManageDeliveryGroups"
+                    title="Manage Groups"
                     icon={<GroupAddIcon />}
                   />
                 </List>
@@ -168,35 +169,11 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
+            <PageItem id="Drugs" icon={<MedicationIcon />} />
             <DividerItem />
             <HeaderItem>Invoices & Reports</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
-            {/* <PageItem
-              id="reports"
-              title="Reports"
-              icon={<SettingsIcon />}
-              // defaultExpanded={!!matchPath("/reports", pathname)}
-              expanded={expandedItemIds.includes("reports")}
-              nestedNavigation={
-                <List
-                  dense
-                  sx={{
-                    padding: 0,
-                    my: 1,
-                    pl: mini ? 0 : 1,
-                    minWidth: 240,
-                  }}
-                >
-                  <PageItem id="sales" title="Sales" icon={<SettingsIcon />} />
-                  <PageItem
-                    id="traffic"
-                    title="Traffic"
-                    icon={<SettingsIcon />}
-                  />
-                </List>
-              }
-            /> */}
           </List>
         </Paper>
       </React.Fragment>

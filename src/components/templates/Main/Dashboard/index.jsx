@@ -97,7 +97,7 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          {page && <Page />}
+          {page && <Page section={section ? section : undefined} />}
         </Box>
       </Box>
     </Box>

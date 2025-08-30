@@ -1,37 +1,38 @@
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import { Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { getSettings } from "../../../../lib/api/client";
 
-export default function StoreInfoHeader() {
+export default function StoreInfoHeader({
+  styles = {},
+  noFax = false,
+  noEmail = false,
+}) {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
-    async function get() {
+    (async () => {
       try {
         const { data } = await getSettings();
-        if (data) {
-          const { results } = data;
-          setSettings(results);
-        }
+        setSettings(data.data);
       } catch (e) {
-        setSettings({});
-        console.log(e);
+        setSettings(null);
+        console.error(e);
       }
-    }
-    get();
+    })();
   }, []);
+  const _styles = {
+    name: {
+      fontSize: 18,
+      fontWeight: 600,
+      ...styles.name,
+    },
+  };
 
   return (
-    <Box>
+    <div>
       {settings ? (
-        <Box sx={{ pt: 2, pl: 2 }}>
-          <Typography
-            sx={{
-              fontSize: 18,
-              fontWeight: 600,
-            }}
-          >
-            {settings.storeName}
-          </Typography>
+        <React.Fragment>
+          <Typography sx={_styles.name}>{settings.storeName}</Typography>
           <Typography>{settings.storeAddress}</Typography>
           <Typography>
             {settings.storeCity +
@@ -40,11 +41,17 @@ export default function StoreInfoHeader() {
               " " +
               settings.storeZip}
           </Typography>
-          <Typography>{"Phone " + settings.storePhone}</Typography>
-          <Typography>{"Fax " + settings.storeFax}</Typography>
-          <Typography>{settings.storeEmail}</Typography>
-        </Box>
+          <Typography>
+            {noFax || !settings.storeFax ? "Phone " : "" + settings.storePhone}
+          </Typography>
+          {!noFax && settings.storeFax && (
+            <Typography>{"Fax " + settings.storeFax}</Typography>
+          )}
+          {!noEmail && settings.storeEmail && (
+            <Typography>{settings.storeEmail}</Typography>
+          )}
+        </React.Fragment>
       ) : null}
-    </Box>
+    </div>
   );
 }

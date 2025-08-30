@@ -42,8 +42,8 @@ function PageItem({
     fullyCollapsed = false,
   } = sidebarContext;
 
-  const { page } = useSelector((s) => s.main);
-  const selected = page === id;
+  const { page, section: _section } = useSelector((s) => s.main);
+  const selected = page === id && (section ? section === _section : true);
 
   const [isHovered, setIsHovered] = React.useState(false);
 
