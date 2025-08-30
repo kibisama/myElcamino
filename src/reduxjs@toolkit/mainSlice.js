@@ -39,9 +39,8 @@ const mainSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(asyncGetDeliveryGroups.fulfilled, (state, action) => {
-      console.log(action.payload);
-      const { results } = action.payload;
-      state.deliveryGroups = results;
+      const { data } = action.payload;
+      state.deliveryGroups = data;
     });
     builder.addCase(asyncGetDeliveryGroups.rejected, (state, action) => {});
   },

@@ -11,6 +11,9 @@ const generateQuery = (q) =>
 export const scanInv = (body) => client.post("inv/scan", body);
 export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 
+/** APPS_DELIVERY **/
+export const getDeliveryGroups = () => client.get("apps/delivery");
+
 export const postPickup = (body) => client.post("apps/pickup", body);
 export const searchPickup = (q) =>
   client.get(`apps/pickup/search?${generateQuery(q)}`);
@@ -19,11 +22,10 @@ export const getPickupReport = ({ _id, rxNumber }) =>
 //
 export const getSettings = () => client.get("apps/settings");
 
+//
 export const postSettings = (body) => client.post("apps/settings", body);
 
 export const checkDRxCSV = (body) =>
   client.post("apps/upload/checkDRxCSV", body);
 export const uploadDRxCSV = (body) =>
   client.post("apps/upload/uploadDRxCSV", body);
-
-export const getDeliveryGroups = () => client.get("apps/delivery/group");

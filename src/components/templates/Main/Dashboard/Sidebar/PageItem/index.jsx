@@ -43,7 +43,8 @@ function PageItem({
   } = sidebarContext;
 
   const { page, section: _section } = useSelector((s) => s.main);
-  const selected = page === id && (section ? section === _section : true);
+  const selected =
+    !nestedNavigation && page === id && (section ? section === _section : true);
 
   const [isHovered, setIsHovered] = React.useState(false);
 

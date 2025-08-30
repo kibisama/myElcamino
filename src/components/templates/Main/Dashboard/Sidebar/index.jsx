@@ -149,16 +149,17 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     minWidth: 240,
                   }}
                 >
-                  {deliveryGroups.map((v) => (
+                  {deliveryGroups.map((v, i) => (
                     <PageItem
                       id="Deliveries"
+                      key={i}
                       section={`${v}`}
                       title={`${v}`}
                       icon={<GroupIcon />}
                     />
                   ))}
                   <PageItem
-                    id="ManageDeliveryGroups"
+                    id="DeliveryGroups"
                     title="Manage Groups"
                     icon={<GroupAddIcon />}
                   />
@@ -171,7 +172,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <HeaderItem>Inventories</HeaderItem>
             <PageItem id="Drugs" icon={<MedicationIcon />} />
             <DividerItem />
-            <HeaderItem>Invoices & Reports</HeaderItem>
+            <HeaderItem>Invoices & Reconciliation</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
           </List>

@@ -15,6 +15,7 @@ export default function Dashboard() {
         dispatch(asyncGetDeliveryGroups());
       } catch (e) {
         console.error(e);
+        //
       }
     })();
   }, [dispatch]);
