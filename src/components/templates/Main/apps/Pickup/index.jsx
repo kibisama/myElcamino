@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { NumericFormat } from "react-number-format";
 import { Box, Button, TextField, IconButton } from "@mui/material";
@@ -56,7 +56,6 @@ export default function Pickup() {
   const [rxNumber, setRxNumber] = useState("");
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
-  const [errors, setErrors] = useState([]);
   const onComplete = async (barcode) => {
     if (document.activeElement.tagName !== "INPUT") {
       const rxNumber = barcode.match(/\d+/g);
@@ -79,34 +78,35 @@ export default function Pickup() {
     function onDate(data) {
       setDate(data && dayjs(data));
     }
-    let key = null;
+    const key = "APPS_PICKUP_CONNECT_ERROR";
     socket.on("connect_error", (e) => {
-      if (!key) {
-        key = enqueueSnackbar("Unable to connect to the server.", {
-          persist: true,
-          variant: "error",
-          preventDuplicate: true,
-        });
-        setErrors((prev) => [...prev, key]);
-      }
+      enqueueSnackbar("Unable to connect to the server.", {
+        persist: true,
+        variant: "error",
+        key,
+        preventDuplicate: true,
+      });
     });
     socket.on("connect", () => {
-      if (key) {
-        closeSnackbar(key);
-        setErrors((prev) => prev.filter((v) => v !== key));
-        key = null;
-      }
+      closeSnackbar(key);
     });
-    socket.on("disconnect", (e) => console.log(e));
     socket.on("state", onState);
     socket.on("notes", onNotes);
     socket.on("date", onDate);
+
     return () => {
       socket.disconnect();
+      closeSnackbar(key);
     };
   }, []);
 
-  useEffect(() => () => errors.forEach((key) => closeSnackbar(key)), [errors]);
+  const errorKeys = useRef([]);
+  useEffect(
+    () => () => {
+      errorKeys.current.forEach((key) => closeSnackbar(key));
+    },
+    []
+  );
 
   const disableSubmit = state !== "pre-submit";
 
@@ -114,8 +114,6 @@ export default function Pickup() {
     () => socket.emit("notes", notes),
     500
   );
-
-  console.log(errors);
 
   return (
     <AppContainer>
@@ -284,9 +282,14 @@ export default function Pickup() {
                     e.response?.data.message || e.message,
                     {
                       variant: "error",
+                      onEnter: () =>
+                        (errorKeys.current = [...errorKeys.current, key]),
+                      onClose: () =>
+                        (errorKeys.current = errorKeys.current.filter(
+                          (v) => v !== key
+                        )),
                     }
                   );
-                  setErrors((prev) => [...prev, key]);
                 }
               }}
               children="SUBMIT"

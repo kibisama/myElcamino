@@ -171,7 +171,9 @@ const Pickup = () => {
                       backgroundColor: "background.paper",
                     },
                   }}
-                  onClick={() => socket.emit("state", "pre-submit")}
+                  onClick={() =>
+                    socket.connected && socket.emit("state", "pre-submit")
+                  }
                   children={
                     <Typography
                       sx={{

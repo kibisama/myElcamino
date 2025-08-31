@@ -8,7 +8,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
-// import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import Search from "../../../../inputs/Search";
@@ -19,8 +18,6 @@ import { enqueueSnackbar } from "notistack";
 const INITIAL_PAGE_SIZE = 10;
 
 export default function Pickups() {
-  // const dialogs = useDialogs();
-
   const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
 
   const [isLoading, setIsLoading] = React.useState(false);
