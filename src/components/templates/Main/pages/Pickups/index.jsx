@@ -9,23 +9,21 @@ import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
-// import useNotifications from '../hooks/useNotifications/useNotifications';
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import Search from "../../../../inputs/Search";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
+import { enqueueSnackbar } from "notistack";
 
 const INITIAL_PAGE_SIZE = 10;
 
 export default function Pickups() {
   // const dialogs = useDialogs();
-  // const notifications = useNotifications();
 
   const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
 
   const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
 
   const initialState = React.useMemo(
     () => ({
@@ -84,7 +82,6 @@ export default function Pickups() {
         renderCell: (params) => (
           <Box sx={{ display: "flex", height: "50px", alignItems: "center" }}>
             <img
-              alt={`${params.value}.png`}
               style={{ borderRadius: "4px", height: "48px" }}
               src={
                 process.env.REACT_APP_CLIENT_API_ADDRESS +
@@ -141,7 +138,6 @@ export default function Pickups() {
   );
   const search = React.useCallback(
     (lastRxNumber, lastDate) => {
-      setError(null);
       setIsLoading(true);
 
       const _rxNumber = (lastRxNumber || rxNumber).trim();
@@ -166,7 +162,9 @@ export default function Pickups() {
         } catch (e) {
           const { status } = e;
           if (status !== 404) {
-            setError(e);
+            enqueueSnackbar(e.response?.data.message || e.message, {
+              variant: "error",
+            });
           }
           setRowState({ rows: [], filtered: [] });
         }

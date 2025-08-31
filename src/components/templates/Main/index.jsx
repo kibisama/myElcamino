@@ -3,6 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Dashboard from "./Dashboard";
 import * as apps from "./apps";
 import { useSelector } from "react-redux";
+import { SnackbarProvider } from "notistack";
 
 const Main = () => {
   const { app } = useSelector((s) => s.main);
@@ -10,8 +11,10 @@ const Main = () => {
   return (
     <AppTheme>
       <CssBaseline>
-        <Dashboard />
-        {app && <App />}
+        <SnackbarProvider>
+          <Dashboard />
+          {app && <App />}
+        </SnackbarProvider>
       </CssBaseline>
     </AppTheme>
   );

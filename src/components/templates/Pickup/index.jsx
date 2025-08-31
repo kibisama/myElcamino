@@ -42,6 +42,7 @@ const Pickup = () => {
       if (data === "success" || data === "error") {
         timeout.current = setTimeout(() => {
           setState("standby");
+          socket.emit("refresh");
         }, 5000);
       }
       setState(data);

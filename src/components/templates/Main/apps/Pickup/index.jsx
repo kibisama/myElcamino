@@ -16,6 +16,7 @@ import { io } from "socket.io-client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { enqueueSnackbar, closeSnackbar } from "notistack";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
@@ -55,8 +56,7 @@ export default function Pickup() {
   const [rxNumber, setRxNumber] = useState("");
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
-  // const [error, setError] = useState("");
-
+  const [errors, setErrors] = useState([]);
   const onComplete = async (barcode) => {
     if (document.activeElement.tagName !== "INPUT") {
       const rxNumber = barcode.match(/\d+/g);
@@ -79,31 +79,43 @@ export default function Pickup() {
     function onDate(data) {
       setDate(data && dayjs(data));
     }
-    // function onError(data) {
-    //   setError(data);
-    // }
+    let key = null;
+    socket.on("connect_error", (e) => {
+      if (!key) {
+        key = enqueueSnackbar("Unable to connect to the server.", {
+          persist: true,
+          variant: "error",
+          preventDuplicate: true,
+        });
+        setErrors((prev) => [...prev, key]);
+      }
+    });
+    socket.on("connect", () => {
+      if (key) {
+        closeSnackbar(key);
+        setErrors((prev) => prev.filter((v) => v !== key));
+        key = null;
+      }
+    });
+    socket.on("disconnect", (e) => console.log(e));
     socket.on("state", onState);
     socket.on("notes", onNotes);
     socket.on("date", onDate);
-    // socket.on("error", onError);
     return () => {
       socket.disconnect();
     };
   }, []);
 
+  useEffect(() => () => errors.forEach((key) => closeSnackbar(key)), [errors]);
+
   const disableSubmit = state !== "pre-submit";
-  // const handleSnackbarClose = async () => {
-  //   try {
-  //     await getPickupData("state");
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
 
   const debounced = useDebouncedCallback(
     () => socket.emit("notes", notes),
     500
   );
+
+  console.log(errors);
 
   return (
     <AppContainer>
@@ -184,7 +196,10 @@ export default function Pickup() {
                     }}
                   />
                 </LocalizationProvider>
-                <IconButton size="small" onClick={() => setDate(dayjs())}>
+                <IconButton
+                  size="small"
+                  onClick={() => socket.emit("date", dayjs())}
+                >
                   <RefreshIcon />
                 </IconButton>
               </Box>
@@ -261,10 +276,17 @@ export default function Pickup() {
               disabled={disableSubmit}
               onClick={async () => {
                 try {
-                  await postPickup({ notes });
+                  const { data } = await postPickup({ notes });
+                  enqueueSnackbar(data.message, { variant: "success" });
                 } catch (e) {
                   console.error(e);
-                  // setState("error");
+                  const key = enqueueSnackbar(
+                    e.response?.data.message || e.message,
+                    {
+                      variant: "error",
+                    }
+                  );
+                  setErrors((prev) => [...prev, key]);
                 }
               }}
               children="SUBMIT"
@@ -272,28 +294,6 @@ export default function Pickup() {
           </Box>
         </Box>
       </Box>
-      {/* <Snackbar
-        open={state === "submit"}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          sx={style.alert}
-          onClose={handleSnackbarClose}
-          severity="success"
-        >
-          <AlertTitle>Success</AlertTitle>
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        onClose={handleSnackbarClose}
-        open={state === "error"}
-        autoHideDuration={5000}
-      >
-        <Alert sx={style.alert} onClose={handleSnackbarClose} severity="error">
-          <AlertTitle>Error</AlertTitle>
-        </Alert>
-      </Snackbar> */}
     </AppContainer>
   );
 }
