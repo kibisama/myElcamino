@@ -12,7 +12,7 @@ import {
 } from "../../../../reduxjs@toolkit/scanSlice";
 import CustomToggleButtonGroup from "../../../customs/CustomToggleButtonGroup";
 import CurrencyInput from "../../../customs/CurrencyInput";
-import ScanStatusDiagram from "./ScanStatusDiagram";
+// import ScanStatusDiagram from "./ScanStatusDiagram";
 import useScanDetection from "../../../../hooks/useScanDetection";
 import lasolisa from "../../../../wav/lasolisa.wav";
 
@@ -133,7 +133,7 @@ const ScanInputForm = ({ state }) => {
           exclusive
         />
       </Box>
-      <ScanStatusDiagram status={state} />
+      {/* <ScanStatusDiagram status={state} /> */}
       <Box sx={style.bottom}>
         <CustomToggleButtonGroup
           sx={{ width: 240 }}

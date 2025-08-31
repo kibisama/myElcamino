@@ -17,6 +17,7 @@ const mainSlice = createSlice({
   name: "main",
   initialState: {
     app: "",
+    activeApp: "",
     page: "Home",
     section: "",
     /** @type {"expanded"|"mobile-expanded"|"mini"|"collapsed"} */

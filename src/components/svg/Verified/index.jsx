@@ -2,7 +2,8 @@ import { useTheme } from "@mui/material";
 import { animated, useSpring } from "@react-spring/web";
 
 const VerifiedSvg = ({ color1, color2, stroke1, stroke2, ...props }) => {
-  const { palette } = useTheme();
+  const theme = useTheme();
+  const palette = (theme.vars || theme).palette;
 
   const checkSpring = useSpring({
     from: {

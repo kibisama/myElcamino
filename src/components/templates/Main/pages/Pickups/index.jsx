@@ -216,6 +216,7 @@ export default function Pickups() {
           />
           <DatePickerSm value={date} onChange={handleChangeDate} />
           <ToggleButton
+            color="primary"
             sx={{
               borderRadius: 1,
               width: "2.25rem",

@@ -13,7 +13,8 @@ const paths = [
 ];
 
 const LoadingSvg = ({ color, stroke, ...props }) => {
-  const { palette } = useTheme();
+  const theme = useTheme();
+  const palette = (theme.vars || theme).palette;
   const trails = useTrail(paths.length, {
     loop: { reverse: true },
     from: { opacity: 0 },

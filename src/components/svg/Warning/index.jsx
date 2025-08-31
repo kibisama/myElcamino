@@ -1,8 +1,9 @@
-import { useTheme } from '@mui/material';
-import { animated, useSpring, to } from '@react-spring/web';
+import { useTheme } from "@mui/material";
+import { animated, useSpring, to } from "@react-spring/web";
 
 const WarningSvg = (props) => {
-  const { palette } = useTheme();
+  const theme = useTheme();
+  const palette = (theme.vars || theme).palette;
   const outerSpring = useSpring({
     from: { x: 0 },
     to: [{ x: 35 }, { x: -35 }, { x: 10 }, { x: -10 }, { x: 0 }],
@@ -31,7 +32,7 @@ const WarningSvg = (props) => {
       <animated.g
         style={{
           scale: 0.75,
-          transformOrigin: '50% 50%',
+          transformOrigin: "50% 50%",
           transform: to(outerSpring.x, (x) => `rotateZ(${x}deg)`),
         }}
       >
@@ -46,7 +47,7 @@ const WarningSvg = (props) => {
       <animated.g
         style={{
           scale: 0.75,
-          transformOrigin: '50% 50%',
+          transformOrigin: "50% 50%",
           transform: to(innerSpring.x, (x) => `rotateZ(${x}deg)`),
         }}
       >
