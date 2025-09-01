@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { forwardRef, useCallback, useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { NumericFormat } from "react-number-format";
 import { Box, Button, TextField, IconButton } from "@mui/material";
@@ -21,7 +20,7 @@ import { enqueueSnackbar, closeSnackbar } from "notistack";
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
-const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(
+const NumericFormatCustom = forwardRef(function NumericFormatCustom(
   props,
   ref
 ) {
@@ -56,7 +55,7 @@ export default function Pickup() {
   const [rxNumber, setRxNumber] = useState("");
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
-  const onComplete = async (barcode) => {
+  const onComplete = useCallback((barcode) => {
     if (document.activeElement.tagName !== "INPUT") {
       const rxNumber = barcode.match(/\d+/g);
       rxNumber &&
@@ -65,7 +64,7 @@ export default function Pickup() {
           item: rxNumber.join(""),
         });
     }
-  };
+  }, []);
   useScanDetection({ onComplete });
 
   useEffect(() => {
@@ -102,9 +101,7 @@ export default function Pickup() {
 
   const errorKeys = useRef([]);
   useEffect(
-    () => () => {
-      errorKeys.current.forEach((key) => closeSnackbar(key));
-    },
+    () => () => errorKeys.current.forEach((key) => closeSnackbar(key)),
     []
   );
 
@@ -282,12 +279,12 @@ export default function Pickup() {
                     e.response?.data.message || e.message,
                     {
                       variant: "error",
-                      onEnter: () =>
-                        (errorKeys.current = [...errorKeys.current, key]),
-                      onClose: () =>
-                        (errorKeys.current = errorKeys.current.filter(
-                          (v) => v !== key
-                        )),
+                      onEnter: () => errorKeys.current.push(key),
+                      onExited: () =>
+                        errorKeys.current.splice(
+                          errorKeys.current.indexOf(key),
+                          1
+                        ),
                     }
                   );
                 }

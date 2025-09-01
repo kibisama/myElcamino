@@ -8,12 +8,17 @@ const generateQuery = (q) =>
     .map((v) => q[v] && `${v}=${q[v]}`)
     .join("&");
 
-export const scanInv = (body) => client.post("inv/scan", body);
+//
 export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 
+//
 /** APPS_DELIVERY **/
 export const getDeliveryGroups = () => client.get("apps/delivery");
+//
 
+/** APPS_SANINV **/
+export const postScanInv = (body) => client.post("apps/scanInv", body);
+/** APPS_PICKUP **/
 export const postPickup = (body) => client.post("apps/pickup", body);
 export const searchPickup = (q) =>
   client.get(`apps/pickup/search?${generateQuery(q)}`);

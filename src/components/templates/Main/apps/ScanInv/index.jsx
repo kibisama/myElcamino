@@ -1,17 +1,26 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { NumericFormat } from "react-number-format";
 import { Box, TextField, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import AppContainer from "../AppContainer";
-import { postPickup } from "../../../../../lib/api/client";
+import { postScanInv } from "../../../../../lib/api/client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
-import { enqueueSnackbar, closeSnackbar } from "notistack";
+import { enqueueSnackbar as _enqueueSnackbar, closeSnackbar } from "notistack";
 
 import QrCodeSvg from "../../../../svg/QrCode";
 import LoadingSvg from "../../../../svg/Loading";
 import WarningSvg from "../../../../svg/Warning";
 import VerifiedSvg from "../../../../svg/Verified";
+import lasolisa from "../../../../../wav/lasolisa.wav"; // for duplication
+import lasomarie from "../../../../../wav/lasomarie.wav"; // for error
+
+const parseDataMatrix = (dataMatrix) => {
+  const gtin = dataMatrix.match(/(?<=\(01\))\d{14}/)?.[0];
+  const lot = dataMatrix.match(/(?<=\(10\))([^(]{1,20})/)?.[0];
+  const exp = dataMatrix.match(/(?<=\(17\))\d{6}/)?.[0];
+  const sn = dataMatrix.match(/(?<=\(21\))([^(]{1,20})/)?.[0];
+  return { gtin, lot, exp, sn };
+};
 
 const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(
   props,
@@ -55,61 +64,78 @@ const StateSvg = React.memo(({ state }) => {
   );
 });
 
-export default function InventoryScan() {
-  const [mode, setMode] = useState("FILL");
-  const [state, setState] = useState("standby");
-  const [source, setSource] = useState("CARDINAL");
-  const [cost, setCost] = useState(undefined);
-  const onComplete = async (barcode) => {
-    // if (document.activeElement.tagName !== "INPUT") {
-    //   const rxNumber = barcode.match(/\d+/g);
-    //   rxNumber &&
-    //     socket.emit("items", {
-    //       action: "push",
-    //       item: rxNumber.join(""),
-    //     });
-    // }
-  };
-  useScanDetection({ onComplete });
+export default function ScanInv() {
+  const [mode, setMode] = React.useState("FILL");
+  const [state, setState] = React.useState("standby");
+  const [source, setSource] = React.useState("CARDINAL");
+  const [cost, setCost] = React.useState(undefined);
+  const [refresh, setRefresh] = React.useState(false);
+  const disabled = mode !== "RECEIVE";
 
-  useEffect(() => {
-    // function onState(data) {
-    //   setState(data);
-    // }
-    // function onNotes(data) {
-    //   setNotes(data);
-    // }
-    // function onDate(data) {
-    //   setDate(data && dayjs(data));
-    // }
-    // const key = "APPS_PICKUP_CONNECT_ERROR";
-    // socket.on("connect_error", (e) => {
-    //   enqueueSnackbar("Unable to connect to the server.", {
-    //     persist: true,
-    //     variant: "error",
-    //     key,
-    //     preventDuplicate: true,
-    //   });
-    // });
-    // socket.on("connect", () => {
-    //   closeSnackbar(key);
-    // });
-    // socket.on("state", onState);
-    // socket.on("notes", onNotes);
-    // socket.on("date", onDate);
-    // return () => {
-    //   socket.disconnect();
-    //   closeSnackbar(key);
-    // };
+  const timeout = React.useRef(null);
+  const errorKeysRef = React.useRef([]);
+
+  const enqueueSnackbar = React.useCallback((arg1, arg2) => {
+    const errorKeysArray = errorKeysRef.current;
+    const key = _enqueueSnackbar(arg1, {
+      ...arg2,
+      onEnter: () => {
+        arg2?.onEntered && arg2.onEntered();
+        errorKeysArray.push(key);
+      },
+      onExited: () => {
+        arg2?.onExited && arg2.onExited();
+        errorKeysArray.splice(errorKeysArray.indexOf(key), 1);
+      },
+    });
   }, []);
 
-  //   const errorKeys = useRef([]);
-  //   useEffect(
-  //     () => () => {
-  //       errorKeys.current.forEach((key) => closeSnackbar(key));
-  //     },
-  //     []
-  //   );
+  const onComplete = React.useCallback(
+    (barcode) => {
+      if (document.activeElement === document.querySelector("input").current) {
+        return;
+      }
+      setState("updating");
+      setRefresh((prev) => !prev);
+      clearTimeout(timeout.current);
+      const { gtin, lot, exp, sn } = parseDataMatrix(barcode);
+      if (!(gtin && lot && exp && sn)) {
+        setState("error");
+        new Audio(lasomarie).play();
+        return enqueueSnackbar("An invalid code scanned. Please try again.", {
+          variant: "error",
+        });
+      }
+      (async () => {
+        try {
+          const { data } = await postScanInv({
+            mode,
+            gtin,
+            lot,
+            exp,
+            sn,
+            source,
+            cost,
+          });
+          if (data.code === 208) {
+            new Audio(lasolisa).play();
+          }
+          setState("updated");
+        } catch (e) {
+          console.error(e);
+          setState("error");
+          new Audio(lasomarie).play();
+          if (!e.response) {
+            return enqueueSnackbar("Failed to connect to the server.", {
+              variant: "error",
+            });
+          }
+        }
+      })();
+    },
+    [enqueueSnackbar, cost, mode, source]
+  );
+  useScanDetection({ onComplete });
 
   const handleModeChange = React.useCallback(
     (e) => setMode(e.target.value),
@@ -134,11 +160,16 @@ export default function InventoryScan() {
     },
     [handleFocus]
   );
-
-  useEffect(
-    () => () => {
-      clearTimeout(inputTimeout.current);
-    },
+  React.useEffect(() => {
+    if (state === "updated") {
+      timeout.current = setTimeout(() => {
+        setState("standby");
+      }, 3000);
+    }
+    return () => clearTimeout(timeout.current);
+  }, [state]);
+  React.useEffect(
+    () => () => errorKeysRef.current.forEach((key) => closeSnackbar(key)),
     []
   );
 
@@ -172,10 +203,11 @@ export default function InventoryScan() {
             alignItems: "center",
           }}
         >
-          <StateSvg state={state} />
+          <StateSvg key={refresh} state={state} />
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <ToggleButtonGroup
+            disabled={disabled}
             color="primary"
             onChange={handleSourceChange}
             value={source}
@@ -188,6 +220,7 @@ export default function InventoryScan() {
             </ToggleButton>
           </ToggleButtonGroup>
           <TextField
+            disabled={disabled}
             placeholder="Cost"
             onChange={handleCostChange}
             sx={{ width: 140 }}

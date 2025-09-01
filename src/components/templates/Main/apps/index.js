@@ -1,2 +1,2 @@
 export { default as Pickup } from "./Pickup";
-export { default as InventoryScan } from "./InventoryScan";
+export { default as ScanInv } from "./ScanInv";

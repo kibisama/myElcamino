@@ -84,7 +84,7 @@ export default function Drugs() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton app={"InventoryScan"}>
+          <AppButton app={"ScanInv"}>
             <BarcodeReaderIcon />
           </AppButton>
         </Stack>
