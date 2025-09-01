@@ -11,7 +11,8 @@ import QrCodeSvg from "../../../../svg/QrCode";
 import LoadingSvg from "../../../../svg/Loading";
 import WarningSvg from "../../../../svg/Warning";
 import VerifiedSvg from "../../../../svg/Verified";
-import lasolisa from "../../../../../wav/lasolisa.wav"; // for duplication
+import lasolisa from "../../../../../wav/lasolisa.wav"; // for success
+import lasolisa2 from "../../../../../wav/lasolisa2.wav"; // for duplication
 import lasomarie from "../../../../../wav/lasomarie.wav"; // for error
 
 const parseDataMatrix = (dataMatrix) => {
@@ -117,9 +118,9 @@ export default function ScanInv() {
             source,
             cost,
           });
-          if (data.code === 208) {
-            new Audio(lasolisa).play();
-          }
+          data.code === 208
+            ? new Audio(lasolisa2).play()
+            : new Audio(lasolisa).play();
           setState("updated");
         } catch (e) {
           console.error(e);
@@ -177,6 +178,7 @@ export default function ScanInv() {
     <AppContainer>
       <Box sx={{}}>
         <ToggleButtonGroup
+          exclusive
           color="primary"
           onChange={handleModeChange}
           value={mode}
@@ -207,6 +209,7 @@ export default function ScanInv() {
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <ToggleButtonGroup
+            exclusive
             disabled={disabled}
             color="primary"
             onChange={handleSourceChange}
