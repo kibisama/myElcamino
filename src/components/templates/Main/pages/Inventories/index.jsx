@@ -139,19 +139,22 @@ export default function Inventories() {
   }, []);
   const handleChange = React.useCallback(
     (e, value) => {
-      const { _id } = value;
-      set_Id(_id);
-      search(_id, checked);
+      if (value) {
+        const { _id } = value;
+        search(_id, checked);
+        return set_Id(_id);
+      } else {
+        return set_Id("");
+      }
     },
     [checked, search]
   );
   const handleCheckbox = React.useCallback(() => {
     setChecked((prev) => {
-      search(_id, !prev);
+      _id && search(_id, !prev);
       return !prev;
     });
   }, [_id, search]);
-
   const getOptions = React.useCallback(() => {
     (async () => {
       try {
