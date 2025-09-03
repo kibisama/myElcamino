@@ -14,9 +14,12 @@ export default function Search({
   ...props
 }) {
   return (
-    <FormControl sx={{ width: `${width || "25ch"}` }} variant="outlined">
+    <FormControl
+      ref={ref}
+      sx={{ width: `${width || "25ch"}` }}
+      variant="outlined"
+    >
       <OutlinedInput
-        ref={ref}
         size="small"
         id="search"
         placeholder={placeholder || "Search…"}

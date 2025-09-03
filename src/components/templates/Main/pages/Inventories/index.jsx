@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 import {
   Autocomplete,
   Box,
+  Checkbox,
+  FormControlLabel,
   IconButton,
   Stack,
   Tooltip,
@@ -32,7 +34,7 @@ export default function Drugs() {
   const [options, setOptions] = React.useState([]);
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
-  const [rows, setRows] = React.useState([]);
+  const [rowState, setRowState] = React.useState({ rows: [], count: 0 });
   const [isLoading, setIsLoading] = React.useState(false);
 
   const initialState = React.useMemo(
@@ -46,24 +48,27 @@ export default function Drugs() {
 
   const columns = React.useMemo(
     () => [
-      // {
-      //   field: "name",
-      //   headerName: "",
-      //   // for colspanning: include gtins here
-      //   // flex: 1,
-      // },
-      { field: "lot", headerName: "Lot", width: 140, sortable: false },
+      {
+        field: "lot",
+        headerName: "Lot",
+        width: 140,
+        sortable: false,
+        colSpan: (value, row) => (row.label ? 7 : undefined),
+      },
       {
         field: "sn",
         headerName: "Serial Number",
-        width: 280,
+        width: 240,
         sortable: false,
       },
-      { field: "source", headerName: "Source", width: 120, sortable: false },
+      { field: "source", headerName: "Source", sortable: false },
+      { field: "cost", headerName: "Cost", width: 120, sortable: false },
       {
         field: "exp",
         headerName: "Exp. Date",
         type: "date",
+        headerAlign: "center",
+        align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
         sortable: false,
@@ -72,6 +77,8 @@ export default function Drugs() {
         field: "dateReceived",
         headerName: "Received",
         type: "date",
+        headerAlign: "center",
+        align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
         sortable: false,
@@ -80,6 +87,8 @@ export default function Drugs() {
         field: "dateFilled",
         headerName: "Filled",
         type: "date",
+        headerAlign: "center",
+        align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
         sortable: false,
@@ -88,6 +97,8 @@ export default function Drugs() {
         field: "dateReturned",
         headerName: "Returned",
         type: "date",
+        headerAlign: "center",
+        align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
         sortable: false,
@@ -109,29 +120,35 @@ export default function Drugs() {
     ],
     []
   );
-  const search = React.useCallback((_id) => {
+  const search = React.useCallback((_id, checked) => {
     setIsLoading(true);
     set_Id(_id);
     (async () => {
       try {
-        const { data } = await getInventories({ _id });
-        setRows(data.data);
+        const { data } = await getInventories({ _id, all: checked });
+        setRowState(data.data);
       } catch (e) {
         console.error(e);
         enqueueSnackbar(e.response?.data.message || e.message, {
           variant: "error",
         });
-        setRows([]);
+        setRowState({ rows: [], count: 0 });
       }
       setIsLoading(false);
     })();
   }, []);
   const handleChange = React.useCallback(
     (e, value) => {
-      value && search(value._id);
+      value && search(value._id, checked);
     },
-    [search]
+    [search, checked]
   );
+  const handleCheckbox = React.useCallback(() => {
+    setChecked((prev) => !prev);
+    if (_id) {
+      return search(_id, checked);
+    }
+  }, [_id, checked, search]);
 
   const getOptions = React.useCallback(() => {
     (async () => {
@@ -153,7 +170,7 @@ export default function Drugs() {
   React.useEffect(() => {
     getOptions();
   }, [getOptions]);
-
+  console.log(checked);
   return (
     <PageContainer
       title="Inventories"
@@ -181,14 +198,29 @@ export default function Drugs() {
             onChange={handleChange}
             disablePortal
             options={options}
-            renderInput={(params) => (
-              <Search
-                {...params}
-                ref={params.InputProps.ref}
-                width={isOverSmViewport ? "64ch" : "30ch"}
-                size="small"
+            renderInput={(params) => {
+              const _params = { ...params };
+              delete _params.InputLabelProps;
+              delete _params.InputProps;
+              return (
+                <Search
+                  {..._params}
+                  ref={params.InputProps.ref}
+                  width={isOverSmViewport ? "64ch" : "30ch"}
+                  size="small"
+                />
+              );
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                onChange={handleCheckbox}
+                sx={{ height: 28, width: 28 }}
+                checked={checked}
               />
-            )}
+            }
+            label="Show filled items"
           />
         </Stack>
       }
@@ -197,7 +229,9 @@ export default function Drugs() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={rows}
+          rows={rowState.rows}
+          rowCount={rowState.count}
+          paginationMode="server"
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
