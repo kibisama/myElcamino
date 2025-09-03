@@ -14,22 +14,16 @@ import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
-import AppButton from "../AppButton";
-import Search from "../../../../inputs/Search";
+import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar } from "notistack";
-import {
-  getAutocompleteOptions,
-  getInventories,
-} from "../../../../../lib/api/client";
+import { getInventories } from "../../../../../lib/api/client";
 
 const INITIAL_PAGE_SIZE = 10;
 
 export default function UsageReport() {
   // const dialogs = useDialogs();
-  const [options, setOptions] = React.useState([]);
-  const [_id, set_Id] = React.useState("");
-  const [checked, setChecked] = React.useState(false);
+  const [date, setDate] = React.useState(null);
   const [rowState, setRowState] = React.useState({ rows: [] });
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -45,11 +39,14 @@ export default function UsageReport() {
   const columns = React.useMemo(
     () => [
       {
-        field: "lot",
-        headerName: "Lot",
-        width: 140,
+        field: "exp",
+        headerName: "",
+        type: "date",
+        headerAlign: "center",
+        align: "center",
+        valueGetter: (v) => v && new Date(v),
+        valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
         sortable: false,
-        colSpan: (value, row) => (row.label ? 7 : undefined),
       },
       {
         field: "sn",
@@ -59,46 +56,6 @@ export default function UsageReport() {
       },
       { field: "source", headerName: "Source", sortable: false },
       { field: "cost", headerName: "Cost", width: 120, sortable: false },
-      {
-        field: "exp",
-        headerName: "Exp. Date",
-        type: "date",
-        headerAlign: "center",
-        align: "center",
-        valueGetter: (v) => v && new Date(v),
-        valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
-        sortable: false,
-      },
-      {
-        field: "dateReceived",
-        headerName: "Received",
-        type: "date",
-        headerAlign: "center",
-        align: "center",
-        valueGetter: (v) => v && new Date(v),
-        valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
-        sortable: false,
-      },
-      {
-        field: "dateFilled",
-        headerName: "Filled",
-        type: "date",
-        headerAlign: "center",
-        align: "center",
-        valueGetter: (v) => v && new Date(v),
-        valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
-        sortable: false,
-      },
-      {
-        field: "dateReturned",
-        headerName: "Returned",
-        type: "date",
-        headerAlign: "center",
-        align: "center",
-        valueGetter: (v) => v && new Date(v),
-        valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
-        sortable: false,
-      },
       // {
       //   field: "actions",
       //   type: "actions",
@@ -120,8 +77,8 @@ export default function UsageReport() {
     setIsLoading(true);
     (async () => {
       try {
-        const { data } = await getInventories({ _id, filled: checked });
-        setRowState(data.data);
+        // const { data } = await getInventories({ _id, filled: checked });
+        // setRowState(data.data);
       } catch (e) {
         console.error(e);
         const { status } = e;
@@ -135,36 +92,20 @@ export default function UsageReport() {
       setIsLoading(false);
     })();
   }, []);
-  const handleChange = React.useCallback(
-    (e, value) => {
-      const { _id } = value;
-      set_Id(_id);
-      search(_id, checked);
-    },
-    [checked, search]
-  );
-  const handleCheckbox = React.useCallback(() => {
-    setChecked((prev) => {
-      search(_id, !prev);
-      return !prev;
-    });
-  }, [_id, search]);
 
-  const getOptions = React.useCallback(() => {
-    (async () => {
-      try {
-        const { data } = await getAutocompleteOptions();
-        setOptions(data.data);
-      } catch (e) {
-        console.error(e);
-        //
-        setOptions([]);
+  const handleChangeDate = React.useCallback((date, context) => {
+    if (!context.validationError) {
+      if (date) {
+        setDate(dayjs(date));
+      } else {
+        setDate(null);
       }
-    })();
+    }
   }, []);
-  React.useEffect(() => {
-    getOptions();
-  }, [getOptions]);
+
+  // React.useEffect(() => {
+  //   getOptions();
+  // }, [getOptions]);
   return (
     <PageContainer
       title="Usage Report"
@@ -181,14 +122,11 @@ export default function UsageReport() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton app={"ScanInv"}>
-            <BarcodeReaderIcon />
-          </AppButton>
         </Stack>
       }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          //
+          <DatePickerSm value={date} onChange={handleChangeDate} />
         </Stack>
       }
     >
