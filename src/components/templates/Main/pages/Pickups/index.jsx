@@ -136,11 +136,10 @@ export default function Pickups() {
     [actionMode]
   );
   const search = React.useCallback(
-    (lastRxNumber, lastDate) => {
+    (arg1 = "", arg2 = null) => {
       setIsLoading(true);
-
-      const _rxNumber = (lastRxNumber || rxNumber).trim();
-      const _date = lastDate || date;
+      const _rxNumber = (arg1 || arg2 ? arg1 : rxNumber).trim();
+      const _date = arg1 || arg2 ? arg2 : date;
       setLastQuery({
         rxNumber: _rxNumber,
         date: _date,
@@ -185,7 +184,8 @@ export default function Pickups() {
   );
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {
-      search(lastQuery.rxNumber, lastQuery.date);
+      const { rxNumber, date } = lastQuery;
+      (rxNumber || date) && search(rxNumber, date);
     }
   }, [isLoading, lastQuery, search]);
 
