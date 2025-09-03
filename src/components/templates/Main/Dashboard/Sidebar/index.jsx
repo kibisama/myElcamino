@@ -174,7 +174,11 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <HeaderItem>Inventories</HeaderItem>
             <PageItem id="Drugs" icon={<MedicationIcon />} />
             <PageItem id="Inventories" icon={<InventoryIcon />} />
-            <PageItem id="Usage Report" icon={<DescriptionIcon />} />
+            <PageItem
+              title="Usage Report"
+              id="UsageReport"
+              icon={<DescriptionIcon />}
+            />
             <DividerItem />
             <HeaderItem>Invoices & Reconciliation</HeaderItem>
             <DividerItem />

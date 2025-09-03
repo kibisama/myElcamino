@@ -8,8 +8,6 @@ import {
   IconButton,
   Stack,
   Tooltip,
-  useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
@@ -27,14 +25,12 @@ import {
 
 const INITIAL_PAGE_SIZE = 10;
 
-export default function Inventories() {
+export default function UsageReport() {
   // const dialogs = useDialogs();
-  const theme = useTheme();
-  const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
   const [options, setOptions] = React.useState([]);
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
-  const [rowState, setRowState] = React.useState({ rows: [], count: 0 });
+  const [rowState, setRowState] = React.useState({ rows: [] });
   const [isLoading, setIsLoading] = React.useState(false);
 
   const initialState = React.useMemo(
@@ -43,6 +39,8 @@ export default function Inventories() {
     }),
     []
   );
+
+  // row count wrong label present
 
   const columns = React.useMemo(
     () => [
@@ -169,7 +167,7 @@ export default function Inventories() {
   }, [getOptions]);
   return (
     <PageContainer
-      title="Inventories"
+      title="Usage Report"
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
@@ -190,34 +188,7 @@ export default function Inventories() {
       }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Autocomplete
-            onChange={handleChange}
-            disablePortal
-            options={options}
-            renderInput={(params) => {
-              const _params = { ...params };
-              delete _params.InputLabelProps;
-              delete _params.InputProps;
-              return (
-                <Search
-                  {..._params}
-                  ref={params.InputProps.ref}
-                  width={isOverSmViewport ? "64ch" : "30ch"}
-                  size="small"
-                />
-              );
-            }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                onChange={handleCheckbox}
-                sx={{ height: 28, width: 28 }}
-                checked={checked}
-              />
-            }
-            label="Show filled items"
-          />
+          //
         </Stack>
       }
     >
@@ -226,8 +197,6 @@ export default function Inventories() {
           autoPageSize
           columns={columns}
           rows={rowState.rows}
-          rowCount={rowState.count}
-          paginationMode="server"
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick

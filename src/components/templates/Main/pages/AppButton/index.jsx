@@ -8,6 +8,7 @@ export default function AppButton({ app, children }) {
     <Button
       variant="contained"
       sx={{
+        height: 36,
         "&:hover": { borderColor: "transparent" },
       }}
       onClick={() => {
