@@ -7,14 +7,14 @@ import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
 import PageContainer from "../PageContainer";
+import { getDrugs } from "../../../../../lib/api/client";
 
 const INITIAL_PAGE_SIZE = 10;
 
 export default function Drugs() {
   // const dialogs = useDialogs();
-  // const notifications = useNotifications();
 
-  const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
+  const [rows, setRows] = React.useState([]);
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -29,45 +29,63 @@ export default function Drugs() {
   const columns = React.useMemo(
     () => [
       {
+        field: "bookmark",
+        headerName: "",
+        width: 80,
+      },
+      {
         field: "name",
-        headerName: "Group Name",
+        headerName: "Name",
         flex: 1,
       },
       {
-        field: "stations",
-        headerName: "Stations",
-        width: 124,
-        headerAlign: "center",
-        align: "center",
+        field: "packages",
+        headerName: "Packages",
+        width: 120,
       },
       {
-        field: "actions",
-        type: "actions",
-        width: 160,
-        align: "center",
-        getActions: ({ row }) => [
-          <GridActionsCellItem
-          // key={actionMode ? "print-item" : "edit-item"}
-          // icon={actionMode ? <PrintIcon /> : <EditIcon />}
-          // label={actionMode ? "Print" : "Edit"}
-          // onClick={
-          //   actionMode
-          //     ? () =>
-          //         window.open(
-          //           `/print/pickups/${row._id}/${row.rxNumber}`,
-          //           "_blank"
-          //         )
-          //     : //
-          //       undefined
-          // }
-          />,
-        ],
-        rowSpanValueGetter: (v, r) => r._id,
+        field: "track",
+        headerName: "Track",
+        width: 80,
       },
+      // {
+      //   field: "actions",
+      //   type: "actions",
+      //   width: 80,
+      //   align: "center",
+      //   getActions: ({ row }) => [
+      //     <GridActionsCellItem
+      //       key="edit-item"
+      //       icon={<EditIcon />}
+      //       label="Edit"
+      //       onClick={() => {}}
+      //     />,
+      //   ],
+      // },
     ],
     []
   );
-
+  const search = React.useCallback(() => {
+    (async () => {
+      try {
+        // const { data } = await getDrugs();
+        // setRows(data.data);
+      } catch (e) {
+        console.error(e);
+        // const { status } = e;
+        // if (status !== 404) {
+        //   enqueueSnackbar(e.response?.data.message || e.message, {
+        //     variant: "error",
+        //   });
+        // }
+        // setRows([]);
+      }
+      setIsLoading(false);
+    })();
+  }, []);
+  React.useEffect(() => {
+    search();
+  }, [search]);
   return (
     <PageContainer
       title="Drugs"
@@ -94,13 +112,14 @@ export default function Drugs() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={[]}
+          rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
           loading={isLoading}
           // initialState={initialState}
           pageSizeOptions={[]}
+          // showToolbar
           sx={{
             [`& .${gridClasses.cell}`]: {
               display: "flex",

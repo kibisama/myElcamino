@@ -16,6 +16,10 @@ export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
 export const getDeliveryGroups = () => client.get("apps/delivery");
 //
 
+/** INVENTORIES */
+export const getAutocompleteOptions = () => client.get("inv/alt");
+export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
+
 /** APPS_SANINV **/
 export const postScanInv = (body) => client.post("apps/scanInv", body);
 /** APPS_PICKUP **/

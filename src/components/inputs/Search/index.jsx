@@ -1,3 +1,4 @@
+import React from "react";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -9,10 +10,13 @@ export default function Search({
   width,
   onChange = () => {},
   onKeyDown = () => {},
+  ref,
+  ...props
 }) {
   return (
     <FormControl sx={{ width: `${width || "25ch"}` }} variant="outlined">
       <OutlinedInput
+        ref={ref}
         size="small"
         id="search"
         placeholder={placeholder || "Search…"}
@@ -27,6 +31,7 @@ export default function Search({
         }}
         onChange={onChange}
         onKeyDown={onKeyDown}
+        {...props}
       />
     </FormControl>
   );

@@ -14,6 +14,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import GroupIcon from "@mui/icons-material/Group";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import MedicationIcon from "@mui/icons-material/Medication";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import DescriptionIcon from "@mui/icons-material/Description";
 import { DashboardSidebarContext } from "../../context";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import PageItem from "./PageItem";
@@ -134,7 +136,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Home" icon={<HomeIcon />} />
             <DividerItem />
             <HeaderItem>Deliveries & Pickups</HeaderItem>
-            <PageItem
+            {/* <PageItem
               id="Deliveries"
               icon={<LocalShippingIcon />}
               defaultExpanded={page === "Deliveries"}
@@ -165,12 +167,14 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   />
                 </List>
               }
-            />
+            /> */}
 
             <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
             <PageItem id="Drugs" icon={<MedicationIcon />} />
+            <PageItem id="Inventories" icon={<InventoryIcon />} />
+            <PageItem id="Usage Report" icon={<DescriptionIcon />} />
             <DividerItem />
             <HeaderItem>Invoices & Reconciliation</HeaderItem>
             <DividerItem />
