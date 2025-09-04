@@ -175,7 +175,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Drugs" icon={<MedicationIcon />} />
             <PageItem id="Inventories" icon={<InventoryIcon />} />
             <PageItem
-              title="Usage Report"
+              title={mini ? "Usage" : "Usage Report"}
               id="UsageReport"
               icon={<DescriptionIcon />}
             />

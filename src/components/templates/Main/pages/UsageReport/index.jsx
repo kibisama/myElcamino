@@ -39,23 +39,45 @@ export default function UsageReport() {
   const columns = React.useMemo(
     () => [
       {
-        field: "exp",
+        field: "time",
         headerName: "",
         type: "date",
         headerAlign: "center",
         align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
+      },
+      {
+        field: "name",
+        headerName: "Item",
+        width: 240,
+      },
+      {
+        field: "qty",
+        headerName: "Qty",
+        type: "number",
+        width: 80,
+        sortable: false,
+      },
+      { field: "cahPrd", headerName: "Cah Cost", width: 120, sortable: false },
+      {
+        field: "cahSrc",
+        headerName: "Cah Contract",
+        width: 120,
         sortable: false,
       },
       {
-        field: "sn",
-        headerName: "Serial Number",
-        width: 240,
+        field: "psPkg",
+        headerName: "Ps Cost",
+        width: 120,
         sortable: false,
       },
-      { field: "source", headerName: "Source", sortable: false },
-      { field: "cost", headerName: "Cost", width: 120, sortable: false },
+      {
+        field: "psAlt",
+        headerName: "Ps Deal",
+        width: 120,
+        sortable: false,
+      },
       // {
       //   field: "actions",
       //   type: "actions",
