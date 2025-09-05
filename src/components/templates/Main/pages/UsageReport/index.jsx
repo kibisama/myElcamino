@@ -46,36 +46,44 @@ export default function UsageReport() {
         align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
+        width: 80,
       },
       {
         field: "name",
         headerName: "Item",
-        width: 240,
+        flex: 1,
       },
       {
         field: "qty",
         headerName: "Qty",
         type: "number",
-        width: 80,
+        width: 48,
+        headerAlign: "center",
+        align: "center",
         sortable: false,
       },
-      { field: "cahPrd", headerName: "Cah Cost", width: 120, sortable: false },
       {
-        field: "cahSrc",
-        headerName: "Cah Contract",
-        width: 120,
+        field: "cahPrd",
+        headerName: "@CaH",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+      },
+      {
+        field: "contract",
+        headerName: "Contract",
+        headerAlign: "center",
+        align: "center",
         sortable: false,
       },
       {
         field: "psPkg",
-        headerName: "Ps Cost",
-        width: 120,
+        headerName: "@Ps",
         sortable: false,
       },
       {
         field: "psAlt",
         headerName: "Ps Deal",
-        width: 120,
         sortable: false,
       },
       // {
@@ -169,6 +177,7 @@ export default function UsageReport() {
           // initialState={initialState}
           pageSizeOptions={[]}
           // showToolbar
+          // integrate sx into shared-theme
           sx={{
             [`& .${gridClasses.cell}`]: {
               display: "flex",
