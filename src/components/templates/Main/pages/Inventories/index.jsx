@@ -49,17 +49,23 @@ export default function Inventories() {
       {
         field: "lot",
         headerName: "Lot",
-        width: 140,
+        width: 120,
         sortable: false,
-        colSpan: (value, row) => (row.label ? 7 : undefined),
+        colSpan: (value, row) => (row.label ? 10 : undefined),
       },
       {
         field: "sn",
         headerName: "Serial Number",
-        width: 240,
+        width: 180,
         sortable: false,
       },
-      { field: "source", headerName: "Source", sortable: false },
+      { field: "source", headerName: "Source", width: 100, sortable: false },
+      {
+        field: "invoiceRef",
+        headerName: "Invoice",
+        width: 120,
+        sortable: false,
+      },
       { field: "cost", headerName: "Cost", width: 120, sortable: false },
       {
         field: "exp",
@@ -104,7 +110,7 @@ export default function Inventories() {
       // {
       //   field: "actions",
       //   type: "actions",
-      //   width: 80,
+      //   flex: 1,
       //   align: "center",
       //   getActions: ({ row }) => [
       //     <GridActionsCellItem
@@ -198,13 +204,11 @@ export default function Inventories() {
             disablePortal
             options={options}
             renderInput={(params) => {
-              const _params = { ...params };
-              delete _params.InputLabelProps;
-              delete _params.InputProps;
+              const { InputLabelProps, InputProps, ...rest } = params;
               return (
                 <Search
-                  {..._params}
-                  ref={params.InputProps.ref}
+                  {...rest}
+                  ref={InputProps.ref}
                   width={isOverSmViewport ? "64ch" : "30ch"}
                   size="small"
                 />

@@ -17,14 +17,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar } from "notistack";
-import { getInventories } from "../../../../../lib/api/client";
+import { getInventoryUsage } from "../../../../../lib/api/client";
 
 const INITIAL_PAGE_SIZE = 10;
 
 export default function UsageReport() {
   // const dialogs = useDialogs();
-  const [date, setDate] = React.useState(null);
-  const [rowState, setRowState] = React.useState({ rows: [] });
+  const [date, setDate] = React.useState(dayjs());
+  const [rows, setRows] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const initialState = React.useMemo(
@@ -95,12 +95,12 @@ export default function UsageReport() {
     ],
     []
   );
-  const search = React.useCallback((_id, checked) => {
+  const search = React.useCallback((date) => {
     setIsLoading(true);
     (async () => {
       try {
-        // const { data } = await getInventories({ _id, filled: checked });
-        // setRowState(data.data);
+        const { data } = await getInventoryUsage(date);
+        setRows(data.data);
       } catch (e) {
         console.error(e);
         const { status } = e;
@@ -109,25 +109,30 @@ export default function UsageReport() {
             variant: "error",
           });
         }
-        setRowState({ rows: [], count: 0 });
+        setRows([]);
       }
       setIsLoading(false);
     })();
   }, []);
 
-  const handleChangeDate = React.useCallback((date, context) => {
-    if (!context.validationError) {
-      if (date) {
-        setDate(dayjs(date));
-      } else {
-        setDate(null);
+  const handleChangeDate = React.useCallback(
+    (date, context) => {
+      if (!context.validationError) {
+        if (date) {
+          const day = dayjs(date);
+          setDate(day);
+          search(day.format("MMDDYYYY"));
+        } else {
+          setDate(null);
+        }
       }
-    }
-  }, []);
+    },
+    [search]
+  );
 
-  // React.useEffect(() => {
-  //   getOptions();
-  // }, [getOptions]);
+  React.useEffect(() => {
+    search(dayjs().format("MMDDYYYY"));
+  }, [search]);
   return (
     <PageContainer
       title="Usage Report"
@@ -156,7 +161,7 @@ export default function UsageReport() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={rowState.rows}
+          rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick

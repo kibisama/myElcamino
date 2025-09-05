@@ -9,16 +9,16 @@ import { asyncGetDeliveryGroups } from "../../../../reduxjs@toolkit/mainSlice";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
-  React.useEffect(() => {
-    (async function getDeliveryGroups() {
-      try {
-        dispatch(asyncGetDeliveryGroups());
-      } catch (e) {
-        console.error(e);
-        //
-      }
-    })();
-  }, [dispatch]);
+  // React.useEffect(() => {
+  //   (async function getDeliveryGroups() {
+  //     try {
+  //       dispatch(asyncGetDeliveryGroups());
+  //     } catch (e) {
+  //       console.error(e);
+  //       //
+  //     }
+  //   })();
+  // }, [dispatch]);
   const theme = useTheme();
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =

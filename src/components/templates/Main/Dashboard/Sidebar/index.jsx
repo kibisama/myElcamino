@@ -11,7 +11,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
-import GroupIcon from "@mui/icons-material/Group";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PersonIcon from "@mui/icons-material/Person";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import MedicationIcon from "@mui/icons-material/Medication";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -136,7 +137,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Home" icon={<HomeIcon />} />
             <DividerItem />
             <HeaderItem>Deliveries & Pickups</HeaderItem>
-            {/* <PageItem
+            <PageItem
               id="Deliveries"
               icon={<LocalShippingIcon />}
               defaultExpanded={page === "Deliveries"}
@@ -151,15 +152,20 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     minWidth: 240,
                   }}
                 >
-                  {deliveryGroups.map((v, i) => (
+                  {/* {deliveryGroups.map((v, i) => (
                     <PageItem
                       id="Deliveries"
                       key={i}
                       section={`${v}`}
                       title={`${v}`}
-                      icon={<GroupIcon />}
+                      icon={<GroupsIcon />}
                     />
-                  ))}
+                  ))} */}
+                  <PageItem
+                    id="PrivateDelivery"
+                    title="Private"
+                    icon={<PersonIcon />}
+                  />
                   <PageItem
                     id="DeliveryGroups"
                     title="Manage Groups"
@@ -167,7 +173,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   />
                 </List>
               }
-            /> */}
+            />
 
             <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
@@ -193,7 +199,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       isFullyExpanded,
       expandedItemIds,
       page,
-      deliveryGroups,
+      // deliveryGroups,
     ]
   );
 
