@@ -7,14 +7,20 @@ import {
   FormControlLabel,
   IconButton,
   Stack,
+  Select,
+  MenuItem,
   Tooltip,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridPagination,
+  GridActionsCellItem,
+} from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import EditIcon from "@mui/icons-material/Edit";
+import UnarchiveIcon from "@mui/icons-material/Unarchive";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
 import Search from "../../../../inputs/Search";
@@ -25,7 +31,7 @@ import {
   getInventories,
 } from "../../../../../lib/api/client";
 
-const INITIAL_PAGE_SIZE = 10;
+const rowHeight = 42;
 
 export default function Inventories() {
   // const dialogs = useDialogs();
@@ -34,15 +40,9 @@ export default function Inventories() {
   const [options, setOptions] = React.useState([]);
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
-  const [rowState, setRowState] = React.useState({ rows: [], count: 0 });
+  const [rows, setRows] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
-
-  const initialState = React.useMemo(
-    () => ({
-      pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
-    }),
-    []
-  );
+  const [sort, setSort] = React.useState("dateReceived");
 
   const columns = React.useMemo(
     () => [
@@ -51,6 +51,7 @@ export default function Inventories() {
         headerName: "Lot",
         width: 120,
         sortable: false,
+
         colSpan: (value, row) => (row.label ? 10 : undefined),
       },
       {
@@ -59,7 +60,14 @@ export default function Inventories() {
         width: 180,
         sortable: false,
       },
-      { field: "source", headerName: "Source", width: 100, sortable: false },
+      {
+        field: "source",
+        headerName: "Source",
+        width: 72,
+        valueFormatter: (v) =>
+          v === "CARDINAL" ? "CaHlth" : v === "SECONDARY" ? "2ND" : "",
+        sortable: false,
+      },
       {
         field: "invoiceRef",
         headerName: "Invoice",
@@ -107,29 +115,29 @@ export default function Inventories() {
         valueFormatter: (v) => v && dayjs(v).format("M. D. YYYY"),
         sortable: false,
       },
-      // {
-      //   field: "actions",
-      //   type: "actions",
-      //   flex: 1,
-      //   align: "center",
-      //   getActions: ({ row }) => [
-      //     <GridActionsCellItem
-      //       key="edit-item"
-      //       icon={<EditIcon />}
-      //       label="Edit"
-      //       onClick={() => {}}
-      //     />,
-      //   ],
-      // },
+      {
+        field: "actions",
+        type: "actions",
+        flex: 1,
+        align: "center",
+        getActions: ({ row }) => [
+          <GridActionsCellItem
+            key="receive-item"
+            icon={<UnarchiveIcon />}
+            label="Receive"
+            onClick={() => {}}
+          />,
+        ],
+      },
     ],
     []
   );
-  const search = React.useCallback((_id, checked) => {
+  const search = React.useCallback((_id, checked, sort) => {
     setIsLoading(true);
     (async () => {
       try {
-        const { data } = await getInventories({ _id, filled: checked });
-        setRowState(data.data);
+        const { data } = await getInventories({ _id, filled: checked, sort });
+        setRows(data.data);
       } catch (e) {
         console.error(e);
         const { status } = e;
@@ -138,7 +146,7 @@ export default function Inventories() {
             variant: "error",
           });
         }
-        setRowState({ rows: [], count: 0 });
+        setRows({ rows: [], count: 0 });
       }
       setIsLoading(false);
     })();
@@ -147,20 +155,35 @@ export default function Inventories() {
     (e, value) => {
       if (value) {
         const { _id } = value;
-        search(_id, checked);
+        search(_id, checked, sort);
         return set_Id(_id);
       } else {
         return set_Id("");
       }
     },
-    [checked, search]
+    [checked, sort, search]
   );
   const handleCheckbox = React.useCallback(() => {
     setChecked((prev) => {
-      _id && search(_id, !prev);
+      let _sort = sort;
+      if (prev && _sort === "dateFilled") {
+        _sort = "dateReceived";
+        setSort("dateReceived");
+      }
+      _id && search(_id, !prev, _sort);
       return !prev;
     });
-  }, [_id, search]);
+  }, [_id, sort, search]);
+  const handleSort = React.useCallback(
+    (e) => {
+      setSort(() => {
+        const { value } = e.target;
+        _id && search(_id, checked, value);
+        return value;
+      });
+    },
+    [_id, checked, search]
+  );
   const getOptions = React.useCallback(() => {
     (async () => {
       try {
@@ -176,6 +199,7 @@ export default function Inventories() {
   React.useEffect(() => {
     getOptions();
   }, [getOptions]);
+
   return (
     <PageContainer
       title="Inventories"
@@ -186,7 +210,10 @@ export default function Inventories() {
               <IconButton
                 size="small"
                 aria-label="refresh"
-                // onClick={}
+                onClick={() => {
+                  getOptions();
+                  _id && search(_id, checked);
+                }}
               >
                 <RefreshIcon />
               </IconButton>
@@ -209,12 +236,23 @@ export default function Inventories() {
                 <Search
                   {...rest}
                   ref={InputProps.ref}
-                  width={isOverSmViewport ? "64ch" : "30ch"}
+                  width={isOverSmViewport ? "60ch" : "30ch"}
                   size="small"
                 />
               );
             }}
           />
+          <Select
+            value={sort}
+            onChange={handleSort}
+            labelId="sort-label"
+            name="sort"
+            sx={{ width: "22ch" }}
+          >
+            <MenuItem value="dateReceived">Sort by received</MenuItem>
+            {checked && <MenuItem value="dateFilled">Sort by filled</MenuItem>}
+            <MenuItem value="exp">Sort by exp.</MenuItem>
+          </Select>
           <FormControlLabel
             control={
               <Checkbox
@@ -223,44 +261,37 @@ export default function Inventories() {
                 checked={checked}
               />
             }
-            label="Show filled items"
+            label="Show filled"
           />
         </Stack>
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <DataGrid
+          rowHeight={rowHeight}
+          sx={{
+            maxHeight: rowHeight * 100,
+            "& .filled": { color: "text.disabled" },
+            "& .label": { fontWeight: 600 },
+          }}
           autoPageSize
           columns={columns}
-          rows={rowState.rows}
-          rowCount={rowState.count}
-          paginationMode="server"
+          rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
           loading={isLoading}
-          // initialState={initialState}
           pageSizeOptions={[]}
-          // showToolbar
-          sx={{
-            [`& .${gridClasses.cell}`]: {
-              display: "flex",
-              alignItems: "center",
-            },
-            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-              outline: "transparent",
-            },
-            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-              {
-                outline: "none",
-              },
-            [`& .${gridClasses.row}:hover`]: {
-              backgroundColor: "inherit",
-            },
-            ".MuiDataGrid-sortButton": {
-              ml: 1,
-            },
+          getRowClassName={(params) => {
+            switch (true) {
+              case !!params.row.dateFilled:
+                return "filled";
+              case !!params.row.label:
+                return "label";
+              default:
+            }
           }}
+          // showToolbar
           slotProps={{
             loadingOverlay: {
               variant: "circular-progress",

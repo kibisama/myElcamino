@@ -17,19 +17,10 @@ import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 
-const INITIAL_PAGE_SIZE = 10;
-
 export default function Pickups() {
   const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
-
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const initialState = React.useMemo(
-    () => ({
-      pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
-    }),
-    []
-  );
   const [rxNumber, setRxNumber] = React.useState("");
   const [date, setDate] = React.useState(null);
   const [filtered, setFiltered] = React.useState(false);
@@ -252,7 +243,6 @@ export default function Pickups() {
           disableColumnMenu
           disableRowSelectionOnClick
           loading={isLoading}
-          // initialState={initialState}
           pageSizeOptions={[]}
           sx={{
             [`& .${gridClasses.cell}`]: {

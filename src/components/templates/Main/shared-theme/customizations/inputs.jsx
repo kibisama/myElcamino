@@ -354,10 +354,10 @@ export const inputsCustomizations = {
           borderColor: brand[400],
         },
         "&.Mui-checked": {
-          color: "white",
+          color: (theme.vars || theme).palette.background.default,
           backgroundColor: brand[500],
           borderColor: brand[500],
-          boxShadow: `none`,
+          // boxShadow: `none`,
           "&:hover": {
             backgroundColor: brand[600],
           },

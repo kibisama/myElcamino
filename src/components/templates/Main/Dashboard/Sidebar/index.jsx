@@ -181,9 +181,27 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Drugs" icon={<MedicationIcon />} />
             <PageItem id="Inventories" icon={<InventoryIcon />} />
             <PageItem
-              title={mini ? "Usage" : "Usage Report"}
-              id="UsageReport"
+              id="InventoryReports"
+              title="Reports"
               icon={<DescriptionIcon />}
+              expanded={expandedItemIds.includes("InventoryReports")}
+              nestedNavigation={
+                <List
+                  dense
+                  sx={{
+                    padding: 0,
+                    my: 1,
+                    pl: mini ? 0 : 1,
+                    minWidth: 240,
+                  }}
+                >
+                  <PageItem
+                    id="UsageReport"
+                    title="Usage"
+                    icon={<DescriptionIcon />}
+                  />
+                </List>
+              }
             />
             <DividerItem />
             <HeaderItem>Invoices & Reconciliation</HeaderItem>

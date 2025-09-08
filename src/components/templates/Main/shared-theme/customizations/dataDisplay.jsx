@@ -242,6 +242,13 @@ export const dataDisplayCustomizations = {
         [`& .${gridClasses.footerContainer}`]: {
           backgroundColor: (theme.vars || theme).palette.background.paper,
         },
+        [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+          {
+            outline: "none",
+          },
+        ".MuiDataGrid-sortButton": {
+          ml: 1,
+        },
       }),
       cell: ({ theme }) => ({
         borderTopColor: (theme.vars || theme).palette.divider,
