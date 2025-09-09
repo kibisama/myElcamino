@@ -5,7 +5,7 @@ client.defaults.baseURL = process.env.REACT_APP_CLIENT_API_ADDRESS;
 
 const generateQuery = (q) =>
   Object.keys(q)
-    .map((v) => q[v] && `${v}=${q[v]}`)
+    .map((v) => (q[v] ? `${v}=${q[v]}` : ""))
     .join("&");
 
 //

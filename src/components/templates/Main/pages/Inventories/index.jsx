@@ -13,11 +13,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import {
-  DataGrid,
-  GridPagination,
-  GridActionsCellItem,
-} from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
@@ -212,7 +208,7 @@ export default function Inventories() {
                 aria-label="refresh"
                 onClick={() => {
                   getOptions();
-                  _id && search(_id, checked);
+                  _id && search(_id, checked, sort);
                 }}
               >
                 <RefreshIcon />
@@ -231,11 +227,10 @@ export default function Inventories() {
             disablePortal
             options={options}
             renderInput={(params) => {
-              const { InputLabelProps, InputProps, ...rest } = params;
               return (
                 <Search
-                  {...rest}
-                  ref={InputProps.ref}
+                  {...params}
+                  ref={params.InputProps.ref}
                   width={isOverSmViewport ? "60ch" : "30ch"}
                   size="small"
                 />
@@ -291,7 +286,6 @@ export default function Inventories() {
               default:
             }
           }}
-          // showToolbar
           slotProps={{
             loadingOverlay: {
               variant: "circular-progress",

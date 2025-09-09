@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import dayjs from "dayjs";
-import { Box, IconButton, Stack, ToggleButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
-import FilterList from "@mui/icons-material/FilterList";
-import SearchIcon from "@mui/icons-material/Search";
+import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
+import TableRowsIcon from "@mui/icons-material/TableRows";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import PrintIcon from "@mui/icons-material/Print";
@@ -17,10 +17,11 @@ import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 
+const rowHeight = 88;
+
 export default function Pickups() {
   const [rowState, setRowState] = React.useState({ rows: [], filtered: [] });
   const [isLoading, setIsLoading] = React.useState(false);
-
   const [rxNumber, setRxNumber] = React.useState("");
   const [date, setDate] = React.useState(null);
   const [filtered, setFiltered] = React.useState(false);
@@ -28,17 +29,7 @@ export default function Pickups() {
     rxNumber: "",
     date: null,
   });
-  const disableSearchButton = !rxNumber && !date;
-  const actionMode = filtered && rowState.rows !== rowState.filtered;
-  const handleChangeDate = React.useCallback((date, context) => {
-    if (!context.validationError) {
-      if (date) {
-        setDate(dayjs(date));
-      } else {
-        setDate(null);
-      }
-    }
-  }, []);
+  const actionMode = filtered && lastQuery.rxNumber;
   const columns = React.useMemo(
     () => [
       {
@@ -49,7 +40,6 @@ export default function Pickups() {
         headerAlign: "center",
         align: "center",
         sortable: false,
-        rowSpanValueGetter: () => null,
       },
       {
         field: "deliveryDate",
@@ -65,20 +55,18 @@ export default function Pickups() {
       {
         field: "_id",
         headerName: "Signature",
-        width: 188,
+        width: 256,
         headerAlign: "center",
         align: "center",
         sortable: false,
         renderCell: (params) => (
-          <Box sx={{ display: "flex", height: "50px", alignItems: "center" }}>
-            <img
-              style={{ borderRadius: "4px", height: "48px" }}
-              src={
-                process.env.REACT_APP_CLIENT_API_ADDRESS +
-                `/apps/pickup/png/${params.value}`
-              }
-            />
-          </Box>
+          <img
+            style={{ borderRadius: "4px", height: "72px" }}
+            src={
+              process.env.REACT_APP_CLIENT_API_ADDRESS +
+              `/apps/pickup/png/${params.value}`
+            }
+          />
         ),
         // resizable: false,
         rowSpanValueGetter: (v, r) => r._id,
@@ -126,60 +114,67 @@ export default function Pickups() {
     ],
     [actionMode]
   );
-  const search = React.useCallback(
-    (arg1 = "", arg2 = null) => {
-      setIsLoading(true);
-      const _rxNumber = (arg1 || arg2 ? arg1 : rxNumber).trim();
-      const _date = arg1 || arg2 ? arg2 : date;
-      setLastQuery({
-        rxNumber: _rxNumber,
-        date: _date,
-      });
-      (async () => {
-        try {
-          const { data } = await searchPickup({
-            rxNumber: _rxNumber,
-            date: _date,
+  const search = React.useCallback((date, _rxNumber = "") => {
+    const rxNumber = _rxNumber.trim();
+    setIsLoading(true);
+    setLastQuery({
+      rxNumber,
+      date,
+    });
+    (async () => {
+      try {
+        const { data } = await searchPickup({
+          rxNumber,
+          date,
+        });
+        const rows = data.data;
+        setRowState({
+          rows,
+          filtered: rxNumber
+            ? rows.filter((v) => v.rxNumber === rxNumber)
+            : rows,
+        });
+      } catch (e) {
+        const { status } = e;
+        if (status !== 404) {
+          enqueueSnackbar(e.response?.data.message || e.message, {
+            variant: "error",
           });
-          const rows = data.data;
-          setRowState({
-            rows,
-            filtered: rxNumber
-              ? rows.filter((v) => v.rxNumber === rxNumber)
-              : rows,
-          });
-        } catch (e) {
-          const { status } = e;
-          if (status !== 404) {
-            enqueueSnackbar(e.response?.data.message || e.message, {
-              variant: "error",
-            });
-          }
-          setRowState({ rows: [], filtered: [] });
         }
-        setIsLoading(false);
-      })();
+        setRowState({ rows: [], filtered: [] });
+      }
+      setIsLoading(false);
+    })();
+  }, []);
+  const handleChangeDate = React.useCallback(
+    (date, context) => {
+      if (!context.validationError) {
+        setDate(date);
+        search(date, rxNumber);
+      }
     },
-    [date, rxNumber]
+    [search, rxNumber]
   );
   const handleChangeRxNumber = React.useCallback((e) => {
     setRxNumber(e.target.value);
   }, []);
+  const handleChangeFiltered = React.useCallback(() => {
+    setFiltered((prev) => !prev);
+  }, []);
   const handleKeyDown = React.useCallback(
     (e) => {
-      if (e.key === "Enter" && !disableSearchButton) {
-        search();
+      if (e.key === "Enter" && (date || rxNumber)) {
+        search(date, rxNumber);
       }
     },
-    [search, disableSearchButton]
+    [search, date, rxNumber]
   );
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {
       const { rxNumber, date } = lastQuery;
-      (rxNumber || date) && search(rxNumber, date);
+      (rxNumber || date) && search(date, rxNumber);
     }
   }, [isLoading, lastQuery, search]);
-
   return (
     <PageContainer
       title="Pickups"
@@ -208,43 +203,26 @@ export default function Pickups() {
             onKeyDown={handleKeyDown}
           />
           <DatePickerSm value={date} onChange={handleChangeDate} />
-          <ToggleButton
-            color="primary"
-            sx={{
-              borderRadius: 1,
-              width: "2.25rem",
-              height: "2.25rem",
-              padding: "0.25rem",
-            }}
-            selected={filtered}
-            onChange={() => {
-              setFiltered((prev) => !prev);
-            }}
-          >
-            <FilterList />
-          </ToggleButton>
-          <IconButton
-            onClick={(e) => search()}
-            disabled={disableSearchButton}
-            size="small"
-          >
-            <SearchIcon />
+          <IconButton onClick={handleChangeFiltered} size="small">
+            {filtered ? <ViewHeadlineIcon /> : <TableRowsIcon />}
           </IconButton>
         </Stack>
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <DataGrid
+          rowHeight={rowHeight}
           autoPageSize
           columns={columns}
           rows={filtered ? rowState.filtered : rowState.rows}
-          rowSpanning={!actionMode}
+          rowSpanning
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
           loading={isLoading}
           pageSizeOptions={[]}
           sx={{
+            maxHeight: rowHeight * 100,
             [`& .${gridClasses.cell}`]: {
               display: "flex",
               alignItems: "center",

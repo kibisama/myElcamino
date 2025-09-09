@@ -1,7 +1,4 @@
-import React from "react";
-import FormControl from "@mui/material/FormControl";
-import InputAdornment from "@mui/material/InputAdornment";
-import OutlinedInput from "@mui/material/OutlinedInput";
+import { TextField, InputAdornment } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 export default function Search({
@@ -11,31 +8,30 @@ export default function Search({
   onChange = () => {},
   onKeyDown = () => {},
   ref,
+  slotProps,
   ...props
 }) {
   return (
-    <FormControl
+    <TextField
+      value={value}
       ref={ref}
       sx={{ width: `${width || "25ch"}` }}
-      variant="outlined"
-    >
-      <OutlinedInput
-        size="small"
-        id="search"
-        placeholder={placeholder || "Search…"}
-        sx={{ flexGrow: 1 }}
-        startAdornment={
-          <InputAdornment position="start" sx={{ color: "text.primary" }}>
-            <SearchRoundedIcon fontSize="small" />
-          </InputAdornment>
-        }
-        inputProps={{
-          "aria-label": "search",
-        }}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        {...props}
-      />
-    </FormControl>
+      size="small"
+      id="search"
+      placeholder={placeholder || "Search…"}
+      slotProps={{
+        input: {
+          startAdornment: (
+            <InputAdornment position="start" sx={{ color: "text.primary" }}>
+              <SearchRoundedIcon fontSize="small" />
+            </InputAdornment>
+          ),
+        },
+        ...slotProps,
+      }}
+      onChange={onChange}
+      onKeyDown={onKeyDown}
+      {...props}
+    />
   );
 }
