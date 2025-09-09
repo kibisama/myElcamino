@@ -5,10 +5,8 @@ export default function Search({
   value,
   placeholder,
   width,
-  onChange = () => {},
-  onKeyDown = () => {},
   ref,
-  slotProps,
+  slotProps = {},
   ...props
 }) {
   return (
@@ -26,11 +24,10 @@ export default function Search({
               <SearchRoundedIcon fontSize="small" />
             </InputAdornment>
           ),
+          ...slotProps.input,
         },
         ...slotProps,
       }}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
       {...props}
     />
   );

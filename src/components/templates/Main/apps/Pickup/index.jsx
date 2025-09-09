@@ -1,6 +1,5 @@
-import { forwardRef, useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
-import { NumericFormat } from "react-number-format";
 import { Box, Button, TextField, IconButton } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,33 +15,10 @@ import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
+import NumericFormat from "./NumericFormat";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
-
-const NumericFormatCustom = forwardRef(function NumericFormatCustom(
-  props,
-  ref
-) {
-  const { onChange, ...other } = props;
-  return (
-    <NumericFormat
-      decimalScale={0}
-      allowNegative={false}
-      {...other}
-      getInputRef={ref}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        });
-      }}
-      valueIsNumericString
-    />
-  );
-});
 
 export default function Pickup() {
   if (!socket) {
@@ -148,7 +124,7 @@ export default function Pickup() {
               <TextField
                 sx={{ width: 138 }}
                 label="Rx Number"
-                slotProps={{ input: { inputComponent: NumericFormatCustom } }}
+                slotProps={{ input: { inputComponent: NumericFormat } }}
                 autoFocus
                 value={rxNumber}
                 onChange={(e) => setRxNumber(e.target.value)}

@@ -16,6 +16,7 @@ import Search from "../../../../inputs/Search";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
+import NumericFormat from "../../apps/Pickup/NumericFormat";
 
 const rowHeight = 88;
 
@@ -197,6 +198,7 @@ export default function Pickups() {
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Search
+            slotProps={{ input: { inputComponent: NumericFormat } }}
             placeholder="Search Rx…"
             width="18ch"
             onChange={handleChangeRxNumber}
