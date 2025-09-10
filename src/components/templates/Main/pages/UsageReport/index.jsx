@@ -326,6 +326,8 @@ const Page = ({ socket }) => {
       socket.off("refresh", onRefresh);
     };
   }, [socket]);
+
+  console.log(rows);
   return (
     <PageContainer
       title="Usage Report"

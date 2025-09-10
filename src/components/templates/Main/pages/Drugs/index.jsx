@@ -5,7 +5,6 @@ import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
-import AppButton from "../AppButton";
 import PageContainer from "../PageContainer";
 
 export default function Drugs() {
@@ -76,7 +75,7 @@ export default function Drugs() {
   React.useEffect(() => {
     search();
   }, [search]);
-  console.log("render");
+
   return (
     <PageContainer
       title="Drugs"
@@ -93,9 +92,6 @@ export default function Drugs() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton app={"ScanInv"}>
-            <BarcodeReaderIcon />
-          </AppButton>
         </Stack>
       }
     >
