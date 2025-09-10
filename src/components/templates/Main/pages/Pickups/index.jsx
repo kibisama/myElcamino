@@ -4,8 +4,8 @@ import * as React from "react";
 import dayjs from "dayjs";
 import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
+import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
-import TableRowsIcon from "@mui/icons-material/TableRows";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import PrintIcon from "@mui/icons-material/Print";
@@ -17,6 +17,25 @@ import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { searchPickup } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import NumericFormat from "../../apps/Pickup/NumericFormat";
+
+const PrintAction = ({ row }) => (
+  <GridActionsCellItem
+    key="print-item"
+    icon={<PrintIcon />}
+    label={"Print"}
+    onClick={() =>
+      window.open(`/print/pickups/${row._id}/${row.rxNumber}`, "_blank")
+    }
+  />
+);
+const EditAction = ({ row }) => (
+  <GridActionsCellItem
+    key="edit-item"
+    icon={<EditIcon />}
+    label={"Edit"}
+    onClick={() => {}}
+  />
+);
 
 const rowHeight = 88;
 
@@ -30,7 +49,7 @@ export default function Pickups() {
     rxNumber: "",
     date: null,
   });
-  const actionMode = filtered && lastQuery.rxNumber;
+  const [rowSpanning, setRowSpanning] = React.useState(true);
   const columns = React.useMemo(
     () => [
       {
@@ -41,6 +60,7 @@ export default function Pickups() {
         headerAlign: "center",
         align: "center",
         sortable: false,
+        rowSpanValueGetter: (v, r) => null,
       },
       {
         field: "deliveryDate",
@@ -91,33 +111,26 @@ export default function Pickups() {
       {
         field: "actions",
         type: "actions",
-        width: 80,
+        width: 96,
         align: "center",
-        getActions: ({ row }) => [
-          <GridActionsCellItem
-            key={actionMode ? "print-item" : "edit-item"}
-            icon={actionMode ? <PrintIcon /> : <EditIcon />}
-            label={actionMode ? "Print" : "Edit"}
-            onClick={
-              actionMode
-                ? () =>
-                    window.open(
-                      `/print/pickups/${row._id}/${row.rxNumber}`,
-                      "_blank"
-                    )
-                : //
-                  undefined
-            }
-          />,
-        ],
+        getActions: ({ row }) => {
+          const actions = [];
+          (!(filtered && lastQuery.rxNumber) || row.length === 1) &&
+            actions.push(<EditAction row={row} />);
+          ((filtered && lastQuery.rxNumber) || row.length === 1) &&
+            actions.push(<PrintAction row={row} />);
+          return actions;
+        },
         rowSpanValueGetter: (v, r) => r._id,
       },
     ],
-    [actionMode]
+    [filtered, lastQuery]
   );
   const search = React.useCallback((date, _rxNumber = "") => {
     const rxNumber = _rxNumber.trim();
     setIsLoading(true);
+    setRowSpanning(false);
+    setRowState({ rows: [], filtered: [] });
     setLastQuery({
       rxNumber,
       date,
@@ -142,8 +155,8 @@ export default function Pickups() {
             variant: "error",
           });
         }
-        setRowState({ rows: [], filtered: [] });
       }
+      setRowSpanning(true);
       setIsLoading(false);
     })();
   }, []);
@@ -151,7 +164,7 @@ export default function Pickups() {
     (date, context) => {
       if (!context.validationError) {
         setDate(date);
-        search(date, rxNumber);
+        (date || rxNumber) && search(date, rxNumber);
       }
     },
     [search, rxNumber]
@@ -160,8 +173,15 @@ export default function Pickups() {
     setRxNumber(e.target.value);
   }, []);
   const handleChangeFiltered = React.useCallback(() => {
-    setFiltered((prev) => !prev);
-  }, []);
+    setFiltered((prev) => {
+      if (prev) {
+        setRowSpanning(true);
+      } else if (lastQuery.rxNumber) {
+        setRowSpanning(false);
+      }
+      return !prev;
+    });
+  }, [lastQuery]);
   const handleKeyDown = React.useCallback(
     (e) => {
       if (e.key === "Enter" && (date || rxNumber)) {
@@ -206,7 +226,7 @@ export default function Pickups() {
           />
           <DatePickerSm value={date} onChange={handleChangeDate} />
           <IconButton onClick={handleChangeFiltered} size="small">
-            {filtered ? <ViewHeadlineIcon /> : <TableRowsIcon />}
+            {filtered ? <ViewHeadlineIcon /> : <SplitscreenIcon />}
           </IconButton>
         </Stack>
       }
@@ -217,7 +237,7 @@ export default function Pickups() {
           autoPageSize
           columns={columns}
           rows={filtered ? rowState.filtered : rowState.rows}
-          rowSpanning
+          rowSpanning={rowSpanning}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
@@ -229,18 +249,8 @@ export default function Pickups() {
               display: "flex",
               alignItems: "center",
             },
-            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-              outline: "transparent",
-            },
-            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-              {
-                outline: "none",
-              },
             [`& .${gridClasses.row}:hover`]: {
               backgroundColor: "inherit",
-            },
-            ".MuiDataGrid-sortButton": {
-              ml: 1,
             },
           }}
           slotProps={{

@@ -18,6 +18,7 @@ export default function Search({
       id="search"
       placeholder={placeholder || "Search…"}
       slotProps={{
+        ...slotProps,
         input: {
           startAdornment: (
             <InputAdornment position="start" sx={{ color: "text.primary" }}>
@@ -26,7 +27,6 @@ export default function Search({
           ),
           ...slotProps.input,
         },
-        ...slotProps,
       }}
       {...props}
     />

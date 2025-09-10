@@ -210,7 +210,7 @@ export default function UsageReport() {
       {
         field: "actions",
         type: "actions",
-        width: 120,
+        width: 96,
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
