@@ -44,7 +44,7 @@ const getStockStatus = (cah_stockStatus) => {
   return <Chip label="In Stock" color={color} variant={variant} />;
 };
 const stringToNumber = (string) => {
-  return Number(string.replaceAll(/[^0-9.-]+/g, ""));
+  return Number(string?.replaceAll(/[^0-9.-]+/g, ""));
 };
 const getPriceMatched = (
   cah_brandName,
@@ -303,10 +303,14 @@ const Page = ({ socket }) => {
               }}
             />,
           ];
+          const ps_low =
+            stringToNumber(row.ps_pkgPrice) <
+            stringToNumber(row.ps_alt_pkgPrice)
+              ? row.ps_pkgPrice
+              : row.ps_alt_pkgPrice || row.ps_pkgPrice;
           row.cah_contract &&
             !row.cah_brandName &&
-            stringToNumber(row.cah_estNetCost) >
-              stringToNumber(row.ps_pkgPrice || row.ps_alt_pkgPrice) &&
+            stringToNumber(row.cah_estNetCost) > stringToNumber(ps_low) &&
             actions.push(
               <GridActionsCellItem
                 key="copy-quote"
@@ -314,19 +318,14 @@ const Page = ({ socket }) => {
                 label="Quote"
                 onClick={(e) => {
                   const textArea = document.createElement("textarea");
-                  textArea.value = `${row.cah_cin} ${
-                    stringToNumber(row.ps_pkgPrice) >
-                    stringToNumber(row.ps_alt_pkgPrice)
-                      ? row.ps_alt_pkgPrice
-                      : row.ps_pkgPrice
-                  } #${row.qty}`;
+                  textArea.value = `${row.cah_cin} ${ps_low} #${row.qty}`;
                   document.body.appendChild(textArea);
                   textArea.focus({ preventScroll: true });
                   textArea.select();
                   try {
                     document.execCommand("copy");
                     enqueueSnackbar(
-                      "The quote message has been copied to the clipboard.",
+                      "A quote message has been copied to the clipboard.",
                       { variant: "success" }
                     );
                   } catch (err) {
