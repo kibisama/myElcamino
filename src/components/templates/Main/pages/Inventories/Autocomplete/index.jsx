@@ -7,7 +7,7 @@ import {
 import Search from "../../../../../inputs/Search";
 import { getAutocompleteOptions } from "../../../../../../lib/api/client";
 
-export default function Autocomplete({ handleChange, refresh }) {
+export default function Autocomplete({ refresh, ...props }) {
   const theme = useTheme();
   const [options, setOptions] = React.useState([]);
   const getOptions = React.useCallback(() => {
@@ -28,7 +28,6 @@ export default function Autocomplete({ handleChange, refresh }) {
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
   return (
     <MuiAutoComplete
-      onChange={handleChange}
       disablePortal
       options={options}
       renderInput={(params) => {
@@ -41,6 +40,7 @@ export default function Autocomplete({ handleChange, refresh }) {
           />
         );
       }}
+      {...props}
     />
   );
 }
