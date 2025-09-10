@@ -89,7 +89,6 @@ export default function Pickups() {
             }
           />
         ),
-        // resizable: false,
         rowSpanValueGetter: (v, r) => r._id,
       },
       {
@@ -113,6 +112,7 @@ export default function Pickups() {
         type: "actions",
         width: 96,
         align: "center",
+        resizable: false,
         getActions: ({ row }) => {
           const actions = [];
           (!(filtered && lastQuery.rxNumber) || row.length === 1) &&

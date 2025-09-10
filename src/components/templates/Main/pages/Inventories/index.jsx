@@ -53,7 +53,7 @@ export default function Inventories() {
       {
         field: "sn",
         headerName: "Serial Number",
-        width: 180,
+        flex: 1,
         sortable: false,
       },
       {
@@ -114,8 +114,9 @@ export default function Inventories() {
       {
         field: "actions",
         type: "actions",
-        flex: 1,
+        width: 96,
         align: "center",
+        resizable: false,
         getActions: ({ row }) => [
           <GridActionsCellItem
             key="receive-item"

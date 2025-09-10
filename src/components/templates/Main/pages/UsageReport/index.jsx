@@ -212,6 +212,7 @@ export default function UsageReport() {
         type: "actions",
         width: 96,
         align: "center",
+        resizable: false,
         getActions: ({ row }) => [
           <GridActionsCellItem
             key="copy-ndc"
