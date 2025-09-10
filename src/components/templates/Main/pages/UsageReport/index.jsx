@@ -16,6 +16,7 @@ import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import { getInventoryUsage } from "../../../../../lib/api/client";
+import RequestPageOutlinedIcon from "@mui/icons-material/RequestPageOutlined";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
 
@@ -260,47 +261,80 @@ const Page = ({ socket }) => {
       {
         field: "actions",
         type: "actions",
-        width: 96,
+        width: 140,
         align: "center",
         resizable: false,
-        getActions: ({ row }) => [
-          <GridActionsCellItem
-            key="copy-ndc"
-            icon={<ContentCopyIcon />}
-            label="Copy"
-            onClick={(e) => {
-              if (row.ndc) {
-                const textArea = document.createElement("textarea");
-                textArea.value = row.ndc;
-                document.body.appendChild(textArea);
-                textArea.focus({ preventScroll: true });
-                textArea.select();
-                try {
-                  document.execCommand("copy");
-                  enqueueSnackbar(
-                    "The item NDC has been copied to the clipboard.",
-                    { variant: "success" }
-                  );
-                } catch (err) {
-                  console.error("Unable to copy to clipboard", err);
+        getActions: ({ row }) => {
+          const actions = [
+            <GridActionsCellItem
+              key="check-item"
+              icon={<CheckIcon />}
+              label="Check"
+              onClick={() => {
+                socket.emit(
+                  "check",
+                  dayjs(row.time).format("MMDDYYYY"),
+                  row.gtin
+                );
+              }}
+            />,
+            <GridActionsCellItem
+              key="copy-ndc"
+              icon={<ContentCopyIcon />}
+              label="Copy"
+              onClick={(e) => {
+                if (row.ndc) {
+                  const textArea = document.createElement("textarea");
+                  textArea.value = row.ndc;
+                  document.body.appendChild(textArea);
+                  textArea.focus({ preventScroll: true });
+                  textArea.select();
+                  try {
+                    document.execCommand("copy");
+                    enqueueSnackbar(
+                      "The item NDC has been copied to the clipboard.",
+                      { variant: "success" }
+                    );
+                  } catch (err) {
+                    console.error("Unable to copy to clipboard", err);
+                  }
+                  document.body.removeChild(textArea);
                 }
-                document.body.removeChild(textArea);
-              }
-            }}
-          />,
-          <GridActionsCellItem
-            key="check-item"
-            icon={<CheckIcon />}
-            label="Check"
-            onClick={() => {
-              socket.emit(
-                "check",
-                dayjs(row.time).format("MMDDYYYY"),
-                row.gtin
-              );
-            }}
-          />,
-        ],
+              }}
+            />,
+          ];
+          row.cah_contract &&
+            !row.cah_brandName &&
+            stringToNumber(row.cah_estNetCost) >
+              stringToNumber(row.ps_pkgPrice || row.ps_alt_pkgPrice) &&
+            actions.push(
+              <GridActionsCellItem
+                key="copy-quote"
+                icon={<RequestPageOutlinedIcon />}
+                label="Quote"
+                onClick={(e) => {
+                  const textArea = document.createElement("textarea");
+                  textArea.value = `${row.cah_cin} ${
+                    row.ps_pkgPrice || row.ps_alt_pkgPrice
+                  } #${row.qty}`;
+                  document.body.appendChild(textArea);
+                  textArea.focus({ preventScroll: true });
+                  textArea.select();
+                  try {
+                    document.execCommand("copy");
+                    enqueueSnackbar(
+                      "The quote message has been copied to the clipboard.",
+                      { variant: "success" }
+                    );
+                  } catch (err) {
+                    console.error("Unable to copy to clipboard", err);
+                  }
+                  document.body.removeChild(textArea);
+                }}
+              />
+            );
+          return actions;
+        },
       },
     ],
     [socket]
