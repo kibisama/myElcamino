@@ -55,8 +55,7 @@ const getPriceMatched = (
   let color, variant;
   switch (true) {
     case !!cah_brandName || !cah_contract:
-      color = "default";
-      break;
+      return;
     case !cah_lastSFDCDate:
       color = "error";
       break;
@@ -128,7 +127,7 @@ const Page = ({ socket }) => {
         align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
-        width: 80,
+        width: 84,
       },
       {
         field: "name",
@@ -184,7 +183,7 @@ const Page = ({ socket }) => {
         cellClassName: "alignCenter",
         renderCell: (params) => (
           <React.Fragment>
-            {params.row.cah_status === "ACTIVE" ? (
+            {params.row.ps_status === "ACTIVE" ? (
               <CustomCell
                 title={params.row.ps_pkgPrice}
                 subtitle={params.row.ps_unitPrice}
@@ -196,11 +195,11 @@ const Page = ({ socket }) => {
                     );
                 }}
               />
-            ) : params.row.cah_status === "PENDING" ? (
+            ) : params.row.ps_status === "PENDING" ? (
               <div className="pending">
                 <CircularProgress size={24} />
               </div>
-            ) : params.row.cah_status === "NA" ? (
+            ) : params.row.ps_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
           </React.Fragment>
@@ -213,7 +212,7 @@ const Page = ({ socket }) => {
         cellClassName: "alignCenter",
         renderCell: (params) => (
           <React.Fragment>
-            {params.row.cah_status === "ACTIVE" ? (
+            {params.row.ps_alt_status === "ACTIVE" ? (
               <CustomCell
                 title={params.row.ps_alt_pkgPrice}
                 subtitle={params.row.ps_alt_unitPrice}
@@ -225,11 +224,11 @@ const Page = ({ socket }) => {
                     );
                 }}
               />
-            ) : params.row.cah_status === "PENDING" ? (
+            ) : params.row.ps_alt_status === "PENDING" ? (
               <div className="pending">
                 <CircularProgress size={24} />
               </div>
-            ) : params.row.cah_status === "NA" ? (
+            ) : params.row.ps_alt_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
           </React.Fragment>
