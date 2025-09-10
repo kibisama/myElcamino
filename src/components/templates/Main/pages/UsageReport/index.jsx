@@ -46,14 +46,20 @@ const stringToNumber = (string) => {
   return Number(string.replaceAll(/[^0-9.-]+/g, ""));
 };
 const getPriceMatched = (
+  cah_brandName,
+  cah_contract,
   cah_lastSFDCDate,
   cah_lastSFDCCost,
   cah_estNetCost
 ) => {
   let color, variant;
   switch (true) {
+    case !!cah_brandName || !cah_contract:
+      color = "default";
+      break;
     case !cah_lastSFDCDate:
-      return;
+      color = "error";
+      break;
     case stringToNumber(cah_estNetCost) > stringToNumber(cah_lastSFDCCost):
       color = "error";
       break;
@@ -128,7 +134,7 @@ const Page = ({ socket }) => {
         field: "name",
         headerName: "Item",
         flex: 1,
-        cellClassName: "layered",
+        cellClassName: "alignCenter",
         renderCell: (params) => (
           <CustomCell title={params.row.name} subtitle={params.row.mfr} />
         ),
@@ -146,7 +152,7 @@ const Page = ({ socket }) => {
         field: "row.cah_estNetCost",
         headerName: "@CaH",
         sortable: false,
-        cellClassName: "layered",
+        cellClassName: "alignCenter",
         renderCell: (params) => (
           <React.Fragment>
             {params.row.cah_status === "ACTIVE" ? (
@@ -175,7 +181,7 @@ const Page = ({ socket }) => {
         field: "ps_status",
         headerName: "@Ps",
         sortable: false,
-        cellClassName: "layered",
+        cellClassName: "alignCenter",
         renderCell: (params) => (
           <React.Fragment>
             {params.row.cah_status === "ACTIVE" ? (
@@ -202,8 +208,32 @@ const Page = ({ socket }) => {
       },
       {
         field: "psAlt",
-        headerName: "Ps Deal",
+        headerName: "Best@Ps",
         sortable: false,
+        cellClassName: "alignCenter",
+        renderCell: (params) => (
+          <React.Fragment>
+            {params.row.cah_status === "ACTIVE" ? (
+              <CustomCell
+                title={params.row.ps_alt_pkgPrice}
+                subtitle={params.row.ps_alt_unitPrice}
+                onClick={() => {
+                  params.row.ps_alt_ndc &&
+                    window.open(
+                      `https://pharmsaver.net/Pharmacy/Order.aspx?q=${params.row.ps_alt_ndc}`,
+                      "_blank"
+                    );
+                }}
+              />
+            ) : params.row.cah_status === "PENDING" ? (
+              <div className="pending">
+                <CircularProgress size={24} />
+              </div>
+            ) : params.row.cah_status === "NA" ? (
+              <span className="na">NA</span>
+            ) : null}
+          </React.Fragment>
+        ),
       },
       {
         field: "cah_stockStatus",
@@ -213,12 +243,14 @@ const Page = ({ socket }) => {
         sortable: false,
         resizable: false,
         width: 158,
-        cellClassName: "layered",
+        cellClassName: "alignCenter",
         renderCell: (params) =>
           params.row.cah_status === "ACTIVE" && (
             <Stack direction="row" spacing={1}>
               {getStockStatus(params.row.cah_stockStatus)}
               {getPriceMatched(
+                params.row.cah_brandName,
+                params.row.cah_contract,
                 params.row.cah_lastSFDCDate,
                 params.row.cah_lastSFDCCost,
                 params.row.cah_estNetCost
@@ -312,6 +344,11 @@ const Page = ({ socket }) => {
     },
     [search]
   );
+  const handleRefresh = React.useCallback(
+    () => search(date.format("MMDDYYYY")),
+
+    [date, search]
+  );
   React.useEffect(() => {
     const date = dayjs().format("MMDDYYYY");
     search(date);
@@ -328,6 +365,7 @@ const Page = ({ socket }) => {
   }, [socket]);
 
   console.log(rows);
+
   return (
     <PageContainer
       title="Usage Report"
@@ -338,7 +376,7 @@ const Page = ({ socket }) => {
               <IconButton
                 size="small"
                 aria-label="refresh"
-                // onClick={}
+                onClick={handleRefresh}
               >
                 <RefreshIcon />
               </IconButton>
@@ -359,7 +397,7 @@ const Page = ({ socket }) => {
             maxHeight: rowHeight * 100,
             "& .na": { color: "text.disabled" },
             "& .done": { textDecoration: "line-through" },
-            "& .layered": { display: "flex", alignItems: "center" },
+            "& .alignCenter": { display: "flex", alignItems: "center" },
             "& .pending": {
               display: "flex",
               width: "inherit",
