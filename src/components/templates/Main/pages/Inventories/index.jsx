@@ -1,7 +1,6 @@
 import * as React from "react";
 import dayjs from "dayjs";
 import {
-  Autocomplete,
   Box,
   Checkbox,
   FormControlLabel,
@@ -10,8 +9,6 @@ import {
   Select,
   MenuItem,
   Tooltip,
-  useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
@@ -19,25 +16,21 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
-import Search from "../../../../inputs/Search";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar } from "notistack";
-import {
-  getAutocompleteOptions,
-  getInventories,
-} from "../../../../../lib/api/client";
+import { getInventories } from "../../../../../lib/api/client";
+import Autocomplete from "./Autocomplete";
 
 const rowHeight = 42;
 
 export default function Inventories() {
   // const dialogs = useDialogs();
-  const theme = useTheme();
-  const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
-  const [options, setOptions] = React.useState([]);
+
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
   const [rows, setRows] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [refreshAutocomplete, setRefreshAutocomplete] = React.useState(false);
   const [sort, setSort] = React.useState("dateReceived");
 
   const columns = React.useMemo(
@@ -181,21 +174,6 @@ export default function Inventories() {
     },
     [_id, checked, search]
   );
-  const getOptions = React.useCallback(() => {
-    (async () => {
-      try {
-        const { data } = await getAutocompleteOptions();
-        setOptions(data.data);
-      } catch (e) {
-        console.error(e);
-        //
-        setOptions([]);
-      }
-    })();
-  }, []);
-  React.useEffect(() => {
-    getOptions();
-  }, [getOptions]);
 
   return (
     <PageContainer
@@ -208,7 +186,7 @@ export default function Inventories() {
                 size="small"
                 aria-label="refresh"
                 onClick={() => {
-                  getOptions();
+                  setRefreshAutocomplete((prev) => !prev);
                   _id && search(_id, checked, sort);
                 }}
               >
@@ -223,21 +201,7 @@ export default function Inventories() {
       }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Autocomplete
-            onChange={handleChange}
-            disablePortal
-            options={options}
-            renderInput={(params) => {
-              return (
-                <Search
-                  {...params}
-                  ref={params.InputProps.ref}
-                  width={isOverSmViewport ? "60ch" : "30ch"}
-                  size="small"
-                />
-              );
-            }}
-          />
+          <Autocomplete refresh={refreshAutocomplete} onChange={handleChange} />
           <Select
             value={sort}
             onChange={handleSort}

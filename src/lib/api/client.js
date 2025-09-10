@@ -8,10 +8,6 @@ const generateQuery = (q) =>
     .map((v) => (q[v] ? `${v}=${q[v]}` : ""))
     .join("&");
 
-//
-export const getDailyOrder = (date) => client.get(`inv/dailyOrder/${date}`);
-
-//
 /** APPS_DELIVERY **/
 export const getDeliveryGroups = () => client.get("apps/delivery");
 //
@@ -29,7 +25,7 @@ export const searchPickup = (q) =>
   client.get(`apps/pickup/search?${generateQuery(q)}`);
 export const getPickupReport = ({ _id, rxNumber }) =>
   client.get(`apps/pickup/report/${_id}/${rxNumber}`);
-//
+/** APPS_SETTINGS **/
 export const getSettings = () => client.get("apps/settings");
 
 //

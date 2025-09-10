@@ -196,6 +196,7 @@ export default function Pickups() {
       (rxNumber || date) && search(date, rxNumber);
     }
   }, [isLoading, lastQuery, search]);
+
   return (
     <PageContainer
       title="Pickups"

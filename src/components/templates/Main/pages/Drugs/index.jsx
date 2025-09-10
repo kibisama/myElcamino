@@ -7,9 +7,6 @@ import EditIcon from "@mui/icons-material/Edit";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
 import PageContainer from "../PageContainer";
-import { getDrugs } from "../../../../../lib/api/client";
-
-const INITIAL_PAGE_SIZE = 10;
 
 export default function Drugs() {
   // const dialogs = useDialogs();
@@ -18,13 +15,6 @@ export default function Drugs() {
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-
-  const initialState = React.useMemo(
-    () => ({
-      pagination: { paginationModel: { pageSize: INITIAL_PAGE_SIZE } },
-    }),
-    []
-  );
 
   const columns = React.useMemo(
     () => [
@@ -86,6 +76,7 @@ export default function Drugs() {
   React.useEffect(() => {
     search();
   }, [search]);
+  console.log("render");
   return (
     <PageContainer
       title="Drugs"

@@ -14,10 +14,15 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
-import { enqueueSnackbar } from "notistack";
+import { enqueueSnackbar, closeSnackbar } from "notistack";
 import { getInventoryUsage } from "../../../../../lib/api/client";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
+
+import { io } from "socket.io-client";
+
+const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/invUsage";
+let socket;
 
 const getStockStatus = (cah_stockStatus) => {
   let color, variant;
@@ -85,6 +90,7 @@ const CustomCell = ({ title, subtitle, onClick }) => {
       </Typography>
       {subtitle && (
         <Typography
+          className="subtitle"
           sx={{
             fontSize: 11,
             color: onClick && hover ? "primary.dark" : "text.secondary",
@@ -99,11 +105,12 @@ const CustomCell = ({ title, subtitle, onClick }) => {
 
 const rowHeight = 64;
 
-export default function UsageReport() {
+const Page = ({ socket }) => {
   // const dialogs = useDialogs();
   const [date, setDate] = React.useState(dayjs());
   const [rows, setRows] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [checkState, setCheckState] = React.useState({});
 
   const columns = React.useMemo(
     () => [
@@ -155,12 +162,48 @@ export default function UsageReport() {
                 }}
               />
             ) : params.row.cah_status === "PENDING" ? (
-              <CircularProgress />
+              <div className="pending">
+                <CircularProgress size={24} />
+              </div>
             ) : params.row.cah_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
           </React.Fragment>
         ),
+      },
+      {
+        field: "ps_status",
+        headerName: "@Ps",
+        sortable: false,
+        cellClassName: "layered",
+        renderCell: (params) => (
+          <React.Fragment>
+            {params.row.cah_status === "ACTIVE" ? (
+              <CustomCell
+                title={params.row.ps_pkgPrice}
+                subtitle={params.row.ps_unitPrice}
+                onClick={() => {
+                  params.row.ps_ndc &&
+                    window.open(
+                      `https://pharmsaver.net/Pharmacy/Order.aspx?q=${params.row.ps_ndc}`,
+                      "_blank"
+                    );
+                }}
+              />
+            ) : params.row.cah_status === "PENDING" ? (
+              <div className="pending">
+                <CircularProgress size={24} />
+              </div>
+            ) : params.row.cah_status === "NA" ? (
+              <span className="na">NA</span>
+            ) : null}
+          </React.Fragment>
+        ),
+      },
+      {
+        field: "psAlt",
+        headerName: "Ps Deal",
+        sortable: false,
       },
       {
         field: "cah_stockStatus",
@@ -182,30 +225,6 @@ export default function UsageReport() {
               )}
             </Stack>
           ),
-      },
-      {
-        field: "ps_status",
-        headerName: "@Ps",
-        sortable: false,
-        cellClassName: "layered",
-        renderCell: (params) => (
-          <CustomCell
-            title={params.row.ps_pkgPrice}
-            subtitle={params.row.ps_unitPrice}
-            onClick={() => {
-              params.row.ps_ndc &&
-                window.open(
-                  `https://pharmsaver.net/Pharmacy/Order.aspx?q=${params.row.ps_ndc}`,
-                  "_blank"
-                );
-            }}
-          />
-        ),
-      },
-      {
-        field: "psAlt",
-        headerName: "Ps Deal",
-        sortable: false,
       },
       {
         field: "actions",
@@ -242,32 +261,42 @@ export default function UsageReport() {
             key="check-item"
             icon={<CheckIcon />}
             label="Check"
-            onClick={(e) => {}}
+            onClick={() => {
+              socket.emit(
+                "check",
+                dayjs(row.time).format("MMDDYYYY"),
+                row.gtin
+              );
+            }}
           />,
         ],
       },
     ],
-    []
+    [socket]
   );
-  const search = React.useCallback((date) => {
-    setIsLoading(true);
-    (async () => {
-      try {
-        const { data } = await getInventoryUsage(date);
-        setRows(data.data);
-      } catch (e) {
-        console.error(e);
-        const { status } = e;
-        if (status !== 404) {
-          enqueueSnackbar(e.response?.data.message || e.message, {
-            variant: "error",
-          });
+  const search = React.useCallback(
+    (date) => {
+      (async () => {
+        setIsLoading(true);
+        try {
+          const { data } = await getInventoryUsage(date);
+          socket.emit("refresh", date);
+          setRows(data.data);
+        } catch (e) {
+          console.error(e);
+          const { status } = e;
+          if (status !== 404) {
+            enqueueSnackbar(e.response?.data.message || e.message, {
+              variant: "error",
+            });
+          }
+          setRows([]);
         }
-        setRows([]);
-      }
-      setIsLoading(false);
-    })();
-  }, []);
+        setIsLoading(false);
+      })();
+    },
+    [socket]
+  );
 
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -283,11 +312,20 @@ export default function UsageReport() {
     },
     [search]
   );
-
   React.useEffect(() => {
-    search(dayjs().format("MMDDYYYY"));
+    const date = dayjs().format("MMDDYYYY");
+    search(date);
   }, [search]);
-  console.log(rows);
+  React.useEffect(() => {
+    function onRefresh(data) {
+      setCheckState(data);
+    }
+
+    socket.on("refresh", onRefresh);
+    return () => {
+      socket.off("refresh", onRefresh);
+    };
+  }, [socket]);
   return (
     <PageContainer
       title="Usage Report"
@@ -318,11 +356,18 @@ export default function UsageReport() {
           sx={{
             maxHeight: rowHeight * 100,
             "& .na": { color: "text.disabled" },
+            "& .done": { textDecoration: "line-through" },
             "& .layered": { display: "flex", alignItems: "center" },
+            "& .pending": {
+              display: "flex",
+              width: "inherit",
+              justifyContent: "center",
+            },
             [`& .${gridClasses.row}:hover`]: {
               backgroundColor: "inherit",
             },
           }}
+          getRowClassName={(params) => checkState?.[params.row.gtin] && "done"}
           autoPageSize
           columns={columns}
           rows={rows}
@@ -331,7 +376,6 @@ export default function UsageReport() {
           disableRowSelectionOnClick
           loading={isLoading}
           pageSizeOptions={[]}
-          // showToolbar
           slotProps={{
             loadingOverlay: {
               variant: "circular-progress",
@@ -345,4 +389,32 @@ export default function UsageReport() {
       </Box>
     </PageContainer>
   );
+};
+
+export default function UsageReport() {
+  if (!socket) {
+    socket = io(URL);
+  } else {
+    socket.connect();
+  }
+  React.useEffect(() => {
+    const key = "APPS_PICKUP_CONNECT_ERROR";
+    socket.on("connect_error", (e) => {
+      enqueueSnackbar("Unable to connect to the server.", {
+        persist: true,
+        variant: "error",
+        key,
+        preventDuplicate: true,
+      });
+    });
+    socket.on("connect", () => {
+      closeSnackbar(key);
+    });
+
+    return () => {
+      socket.disconnect();
+      closeSnackbar(key);
+    };
+  }, []);
+  return <Page socket={socket} />;
 }
