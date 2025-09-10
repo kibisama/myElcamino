@@ -16,7 +16,7 @@ import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import { getInventoryUsage } from "../../../../../lib/api/client";
-import RequestPageOutlinedIcon from "@mui/icons-material/RequestPageOutlined";
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
 
@@ -310,12 +310,15 @@ const Page = ({ socket }) => {
             actions.push(
               <GridActionsCellItem
                 key="copy-quote"
-                icon={<RequestPageOutlinedIcon />}
+                icon={<RequestQuoteIcon />}
                 label="Quote"
                 onClick={(e) => {
                   const textArea = document.createElement("textarea");
                   textArea.value = `${row.cah_cin} ${
-                    row.ps_pkgPrice || row.ps_alt_pkgPrice
+                    stringToNumber(row.ps_pkgPrice) >
+                    stringToNumber(row.ps_alt_pkgPrice)
+                      ? row.ps_alt_pkgPrice
+                      : row.ps_pkgPrice
                   } #${row.qty}`;
                   document.body.appendChild(textArea);
                   textArea.focus({ preventScroll: true });
