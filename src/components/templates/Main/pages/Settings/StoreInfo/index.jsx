@@ -74,6 +74,9 @@ const StoreInfo = () => {
       } catch (e) {
         setSettings(null);
         console.error(e);
+        enqueueSnackbar("Failed to load store information from the server.", {
+          variant: "error",
+        });
       }
     })();
   }, [onGetSettings]);
@@ -110,6 +113,7 @@ const StoreInfo = () => {
             size="small"
             fullWidth
             onChange={(e) => setName(e.target.value)}
+            placeholder="Store Name"
             value={name}
           />
         }
