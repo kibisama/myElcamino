@@ -23,6 +23,10 @@ const Pickup = () => {
   }
   const timeout = React.useRef(null);
 
+  React.useLayoutEffect(() => {
+    document.title = "Customer Pickup";
+  }, []);
+
   React.useEffect(() => {
     function onCanvas(data) {
       if (data) {

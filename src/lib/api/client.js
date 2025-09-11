@@ -27,8 +27,6 @@ export const getPickupReport = ({ _id, rxNumber }) =>
   client.get(`apps/pickup/report/${_id}/${rxNumber}`);
 /** APPS_SETTINGS **/
 export const getSettings = () => client.get("apps/settings");
-
-//
 export const postSettings = (body) => client.post("apps/settings", body);
 
 export const checkDRxCSV = (body) =>

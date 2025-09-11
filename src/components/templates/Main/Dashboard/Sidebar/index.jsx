@@ -204,7 +204,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
               }
             />
             <DividerItem />
-            <HeaderItem>Invoices & Reconciliation</HeaderItem>
+            <HeaderItem>Invoices</HeaderItem>
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
           </List>
