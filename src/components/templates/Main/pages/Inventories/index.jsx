@@ -211,6 +211,9 @@ export default function Inventories() {
           >
             <MenuItem value="dateReceived">Sort by received</MenuItem>
             {checked && <MenuItem value="dateFilled">Sort by filled</MenuItem>}
+            {checked && (
+              <MenuItem value="dateReturned">Sort by returned</MenuItem>
+            )}
             <MenuItem value="exp">Sort by exp.</MenuItem>
           </Select>
           <FormControlLabel
@@ -221,7 +224,7 @@ export default function Inventories() {
                 checked={checked}
               />
             }
-            label="Show filled"
+            label="Show all"
           />
         </Stack>
       }

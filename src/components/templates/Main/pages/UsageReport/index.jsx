@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
   Tooltip,
+  Skeleton,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -149,7 +150,7 @@ const Page = ({ socket }) => {
         sortable: false,
       },
       {
-        field: "row.cah_estNetCost",
+        field: "row.cah_status",
         headerName: "@CaH",
         sortable: false,
         cellClassName: "alignCenter",
@@ -168,9 +169,7 @@ const Page = ({ socket }) => {
                 }}
               />
             ) : params.row.cah_status === "PENDING" ? (
-              <div className="pending">
-                <CircularProgress size={24} />
-              </div>
+              <Skeleton width="100%" animation="wave" />
             ) : params.row.cah_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
@@ -197,9 +196,7 @@ const Page = ({ socket }) => {
                 }}
               />
             ) : params.row.ps_status === "PENDING" ? (
-              <div className="pending">
-                <CircularProgress size={24} />
-              </div>
+              <Skeleton width="100%" animation="wave" />
             ) : params.row.ps_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
@@ -207,7 +204,7 @@ const Page = ({ socket }) => {
         ),
       },
       {
-        field: "psAlt",
+        field: "ps_alt_status",
         headerName: "Best@Ps",
         sortable: false,
         cellClassName: "alignCenter",
@@ -226,9 +223,7 @@ const Page = ({ socket }) => {
                 }}
               />
             ) : params.row.ps_alt_status === "PENDING" ? (
-              <div className="pending">
-                <CircularProgress size={24} />
-              </div>
+              <Skeleton width="100%" animation="wave" />
             ) : params.row.ps_alt_status === "NA" ? (
               <span className="na">NA</span>
             ) : null}
@@ -303,14 +298,10 @@ const Page = ({ socket }) => {
               }}
             />,
           ];
-          const ps_low =
-            stringToNumber(row.ps_pkgPrice) <
-            stringToNumber(row.ps_alt_pkgPrice)
-              ? row.ps_pkgPrice
-              : row.ps_alt_pkgPrice || row.ps_pkgPrice;
           row.cah_contract &&
             !row.cah_brandName &&
-            stringToNumber(row.cah_estNetCost) > stringToNumber(ps_low) &&
+            stringToNumber(row.cah_estNetCost) >
+              stringToNumber(row.ps_alt_pkgPrice) &&
             actions.push(
               <GridActionsCellItem
                 key="copy-quote"
@@ -318,7 +309,7 @@ const Page = ({ socket }) => {
                 label="Quote"
                 onClick={(e) => {
                   const textArea = document.createElement("textarea");
-                  textArea.value = `${row.cah_cin} ${ps_low} #${row.qty}`;
+                  textArea.value = `${row.cah_cin} ${row.ps_alt_pkgPrice} #${row.qty}`;
                   document.body.appendChild(textArea);
                   textArea.focus({ preventScroll: true });
                   textArea.select();
@@ -399,8 +390,6 @@ const Page = ({ socket }) => {
     };
   }, [socket]);
 
-  console.log(rows);
-
   return (
     <PageContainer
       title="Usage Report"
@@ -433,11 +422,6 @@ const Page = ({ socket }) => {
             "& .na": { color: "text.disabled" },
             "& .done": { textDecoration: "line-through" },
             "& .alignCenter": { display: "flex", alignItems: "center" },
-            "& .pending": {
-              display: "flex",
-              width: "inherit",
-              justifyContent: "center",
-            },
             [`& .${gridClasses.row}:hover`]: {
               backgroundColor: "inherit",
             },
