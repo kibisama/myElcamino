@@ -148,7 +148,7 @@ export default function ScanInv() {
   const inputTimeout = React.useRef(null);
   const handleFocus = React.useCallback(() => {
     inputTimeout.current = setTimeout(
-      () => document.querySelector("#APPS_INVENTORYSCAN_INPUT_COST").blur(),
+      () => document.querySelector("#APPS_INVENTORYSCAN_INPUT_COST")?.blur(),
       5000
     );
   }, []);
@@ -169,7 +169,10 @@ export default function ScanInv() {
     return () => clearTimeout(timeout.current);
   }, [state]);
   React.useEffect(
-    () => () => errorKeysRef.current.forEach((key) => closeSnackbar(key)),
+    () => () => {
+      errorKeysRef.current.forEach((key) => closeSnackbar(key));
+      clearTimeout(inputTimeout.current);
+    },
     []
   );
 
