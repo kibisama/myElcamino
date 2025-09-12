@@ -10,22 +10,24 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
+import ForwardIcon from "@mui/icons-material/Forward";
 // import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar } from "notistack";
-import { getInventories } from "../../../../../lib/api/client";
+import { getInventories, postScanInv } from "../../../../../lib/api/client";
 import Autocomplete from "./Autocomplete";
 
 const rowHeight = 42;
 
 export default function Inventories() {
   // const dialogs = useDialogs();
-
+  const apiRef = useGridApiRef();
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
   const [rows, setRows] = React.useState([]);
@@ -110,14 +112,78 @@ export default function Inventories() {
         width: 96,
         align: "center",
         resizable: false,
-        getActions: ({ row }) => [
-          <GridActionsCellItem
-            key="receive-item"
-            icon={<UnarchiveIcon />}
-            label="Receive"
-            onClick={() => {}}
-          />,
-        ],
+        getActions: ({ row }) => {
+          const actions = [];
+          const handleActions = async (mode) => {
+            try {
+              const { data } = await postScanInv({
+                mode,
+                method: "EDIT",
+                gtin: row.gtin,
+                lot: row.lot,
+                sn: row.sn,
+                exp: dayjs(row.exp).format("YYMMDD"),
+              });
+              const { data: item, code, message } = data;
+              enqueueSnackbar(message, {
+                variant: code === 200 ? "success" : "info",
+              });
+              apiRef.current?.updateRows([
+                {
+                  id: row.id,
+                  dateFilled: item.dateFilled,
+                  dateReturned: item.dateReturned,
+                },
+              ]);
+            } catch (e) {
+              console.error(e);
+              enqueueSnackbar(e.response?.data.message || e.message, {
+                variant: "error",
+              });
+            }
+          };
+
+          row.dateFilled || row.dateReturned
+            ? actions.push(
+                <Tooltip
+                  title="Reverse"
+                  arrow
+                  placement="right"
+                  enterDelay={1000}
+                >
+                  <GridActionsCellItem
+                    key="reverse-item"
+                    icon={<ArchiveIcon />}
+                    label="Reverse"
+                    onClick={() => handleActions("REVERSE")}
+                  />
+                </Tooltip>
+              )
+            : actions.push(
+                <Tooltip title="Fill" arrow placement="left" enterDelay={1000}>
+                  <GridActionsCellItem
+                    key="fill-item"
+                    icon={<UnarchiveIcon />}
+                    label="Fill"
+                    onClick={() => handleActions("FILL")}
+                  />
+                </Tooltip>,
+                <Tooltip
+                  title="Return"
+                  arrow
+                  placement="right"
+                  enterDelay={1000}
+                >
+                  <GridActionsCellItem
+                    key="return-item"
+                    icon={<ForwardIcon />}
+                    label="Return"
+                    onClick={() => handleActions("RETURN")}
+                  />
+                </Tooltip>
+              );
+          return actions;
+        },
       },
     ],
     []
@@ -180,7 +246,12 @@ export default function Inventories() {
       title="Inventories"
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+          <Tooltip
+            title="Reload data"
+            arrow
+            placement="bottom"
+            enterDelay={1000}
+          >
             <div>
               <IconButton
                 size="small"
@@ -231,6 +302,7 @@ export default function Inventories() {
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <DataGrid
+          apiRef={apiRef}
           rowHeight={rowHeight}
           sx={{
             maxHeight: rowHeight * 100,
@@ -247,7 +319,7 @@ export default function Inventories() {
           pageSizeOptions={[]}
           getRowClassName={(params) => {
             switch (true) {
-              case !!params.row.dateFilled:
+              case !!params.row.dateFilled || !!params.row.dateReturned:
                 return "filled";
               case !!params.row.label:
                 return "label";

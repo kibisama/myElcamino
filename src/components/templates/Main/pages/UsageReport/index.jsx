@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import {
   Box,
   Chip,
-  CircularProgress,
   IconButton,
   Stack,
   Typography,
@@ -395,7 +394,12 @@ const Page = ({ socket }) => {
       title="Usage Report"
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+          <Tooltip
+            title="Reload data"
+            arrow
+            placement="bottom"
+            enterDelay={1000}
+          >
             <div>
               <IconButton
                 size="small"
