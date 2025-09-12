@@ -126,7 +126,8 @@ export default function Inventories() {
               });
               const { data: item, code, message } = data;
               enqueueSnackbar(message, {
-                variant: code === 200 ? "success" : "info",
+                variant:
+                  code === 200 ? "success" : code === 208 ? "info" : "warning",
               });
               apiRef.current?.updateRows([
                 {
