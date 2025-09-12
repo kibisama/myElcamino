@@ -38,7 +38,6 @@ const PageHeaderToolbar = styled("div")(({ theme }) => ({
 }));
 
 const ExtraPageHeaderToolbar = styled("div")(({ theme }) => ({
-  height: 48,
   display: "flex",
   flexDirection: "row",
   gap: theme.spacing(1),

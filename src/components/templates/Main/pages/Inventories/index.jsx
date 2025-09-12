@@ -9,6 +9,8 @@ import {
   Select,
   MenuItem,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
 import BarcodeReaderIcon from "@mui/icons-material/BarcodeReader";
@@ -28,6 +30,8 @@ const rowHeight = 42;
 export default function Inventories() {
   // const dialogs = useDialogs();
   const apiRef = useGridApiRef();
+  const theme = useTheme();
+  const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));
   const [_id, set_Id] = React.useState("");
   const [checked, setChecked] = React.useState(false);
   const [rows, setRows] = React.useState([]);
@@ -187,7 +191,7 @@ export default function Inventories() {
         },
       },
     ],
-    []
+    [apiRef]
   );
   const search = React.useCallback((_id, checked, sort) => {
     setIsLoading(true);
@@ -272,9 +276,14 @@ export default function Inventories() {
         </Stack>
       }
       extraActions={
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack
+          direction={isOverMdViewport ? "row" : "column"}
+          alignItems={isOverMdViewport ? "center" : "flex-start"}
+          spacing={1}
+        >
           <Autocomplete refresh={refreshAutocomplete} onChange={handleChange} />
           <Select
+            size="small"
             value={sort}
             onChange={handleSort}
             labelId="sort-label"
