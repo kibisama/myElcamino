@@ -14,11 +14,11 @@ export default function Settings() {
       <Box sx={{ flex: 1, width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange}>
-            <Tab value={0} label="Store Info" />
-            <Tab value={1} label="Import csv" />
+            <Tab value={0} label="Import csv" />
+            <Tab value={1} label="Store Info" />
           </Tabs>
         </Box>
-        {value === 0 && <StoreInfo />}
+        {value === 1 && <StoreInfo />}
       </Box>
     </PageContainer>
   );
