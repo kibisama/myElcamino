@@ -105,7 +105,7 @@ const StoreInfo = () => {
       managerLN === settings?.storeManagerLN &&
       managerFN === settings?.storeManagerFN);
   return (
-    <React.Fragment>
+    <div>
       <Section
         title="Store Name"
         Input={
@@ -116,6 +116,27 @@ const StoreInfo = () => {
             placeholder="Store Name"
             value={name}
           />
+        }
+      />
+      <Section
+        title="Manager"
+        Input={
+          <Stack direction="row" spacing={1}>
+            <OutlinedInput
+              size="small"
+              fullWidth
+              onChange={(e) => setManagerFN(e.target.value)}
+              placeholder="First Name"
+              value={managerFN}
+            />
+            <OutlinedInput
+              size="small"
+              fullWidth
+              onChange={(e) => setManagerLN(e.target.value)}
+              placeholder="Last Name"
+              value={managerLN}
+            />
+          </Stack>
         }
       />
       <Section
@@ -183,27 +204,6 @@ const StoreInfo = () => {
           </Stack>
         }
       />
-      <Section
-        title="Manager"
-        Input={
-          <Stack direction="row" spacing={1}>
-            <OutlinedInput
-              size="small"
-              fullWidth
-              onChange={(e) => setManagerLN(e.target.value)}
-              placeholder="Last Name"
-              value={managerLN}
-            />
-            <OutlinedInput
-              size="small"
-              fullWidth
-              onChange={(e) => setManagerFN(e.target.value)}
-              placeholder="First Name"
-              value={managerFN}
-            />
-          </Stack>
-        }
-      />
       <Box
         sx={{
           justifySelf: "flex-end",
@@ -252,7 +252,7 @@ const StoreInfo = () => {
           }}
         />
       </Box>
-    </React.Fragment>
+    </div>
   );
 };
 
