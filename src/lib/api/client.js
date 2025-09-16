@@ -16,6 +16,9 @@ export const getDeliveryGroups = () => client.get("apps/delivery");
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
 export const getInventoryUsage = (date) => client.get(`inv/usage/${date}`); //MMDDYYYY
+/** dRx **/
+export const getImportDRx = () => client.get("dRx/import");
+export const postImportDRx = (body) => client.post("dRx/import", body);
 
 /** APPS_SANINV **/
 export const postScanInv = (body) => client.post("apps/scanInv", body);

@@ -10,7 +10,7 @@ import {
 import BackupIcon from "@mui/icons-material/Backup";
 import { enqueueSnackbar } from "notistack";
 import FileSvg from "../../../../../svg/File";
-import useWindowSize from "../../../../../../hooks/useWindowSize";
+import { getImportDRx, postImportDRx } from "../../../../../../lib/api/client";
 
 export default function UploadDRx() {
   const theme = useTheme();
@@ -18,14 +18,31 @@ export default function UploadDRx() {
   const removeRef = React.useRef(null);
   const rootRef = React.useRef(null);
   const { CSVReader } = useCSVReader();
-  const [disableClear, setDisableClear] = React.useState(true);
-  const [disableSubmit, setDisableSubmit] = React.useState(true);
+  const [disable, setDisable] = React.useState(true);
   const [zoneHover, setZoneHover] = React.useState(false);
-  const [, windowWidth] = useWindowSize();
-  const [pbWidth, setPbWidth] = React.useState("");
-  React.useEffect(() => {
-    setPbWidth(rootRef.current?.clientWidth - 64);
-  }, [windowWidth]);
+  const [data, setData] = React.useState(null);
+  const handleClear = React.useCallback((e) => {
+    removeRef.current(e);
+    setData(null);
+    setDisable(true);
+  }, []);
+  const handleSubmit = React.useCallback(() => {
+    setDisable(true);
+    (async function () {
+      try {
+        const { data: result } = await postImportDRx({ data });
+        enqueueSnackbar(result.message, { variant: "success" });
+        setData(null);
+        setDisable(false);
+      } catch (e) {
+        console.error(e);
+        enqueueSnackbar(e.response?.data.message || e.message, {
+          variant: "error",
+        });
+        setDisable(false);
+      }
+    })();
+  }, [data]);
 
   return (
     <Box
@@ -39,8 +56,32 @@ export default function UploadDRx() {
     >
       <CSVReader
         onUploadAccepted={(results) => {
-          // console.log(results);
           setZoneHover(false);
+          (async function () {
+            try {
+              const { data } = await getImportDRx();
+              const headerTable = {};
+              results.data[0].forEach((v) => {
+                headerTable[v] = true;
+              });
+              const reqFields = data.data;
+              for (let i = 0; i < reqFields.length; i++) {
+                if (!headerTable[reqFields[i]]) {
+                  return enqueueSnackbar(
+                    `The CSV file does not have one or more required fields, including ${reqFields[i]}`,
+                    { variant: "error" }
+                  );
+                }
+              }
+              setData(results.data);
+              setDisable(false);
+            } catch (e) {
+              console.error(e);
+              enqueueSnackbar(e.response?.data.message || e.message, {
+                variant: "error",
+              });
+            }
+          })();
         }}
         onDragOver={(event) => {
           event.preventDefault();
@@ -51,9 +92,8 @@ export default function UploadDRx() {
           setZoneHover(false);
         }}
       >
-        {({ getRootProps, acceptedFile, ProgressBar, getRemoveFileProps }) => {
+        {({ getRootProps, acceptedFile, getRemoveFileProps }) => {
           removeRef.current = getRemoveFileProps().onClick;
-          acceptedFile && setDisableClear(false);
           return (
             <Box
               ref={rootRef}
@@ -74,8 +114,8 @@ export default function UploadDRx() {
                 borderRadius: 1,
                 ":hover": {
                   cursor: "pointer",
-                  border: "2px solid",
-                  borderColor: (theme.vars || theme).palette.primary.main,
+                  // border: "2px solid",
+                  // borderColor: (theme.vars || theme).palette.primary.main,
                 },
                 ...(zoneHover && {
                   border: "2px solid",
@@ -101,28 +141,6 @@ export default function UploadDRx() {
                       {formatFileSize(acceptedFile.size)}
                     </Typography>
                   </Box>
-                  <Box
-                    sx={{
-                      width: pbWidth,
-                      translate: "0 52px",
-                      backgroundColor:
-                        mode === "dark"
-                          ? (theme.vars || theme).palette.grey[700]
-                          : (theme.vars || theme).palette.grey[200],
-                      position: "absolute",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <ProgressBar
-                      style={{
-                        height: "14px",
-                        borderRadius: "4px",
-                        backgroundColor: (theme.vars || theme).palette.primary
-                          .dark,
-                        transition: "width 2s",
-                      }}
-                    />
-                  </Box>
                 </Box>
               ) : (
                 <Box
@@ -138,7 +156,7 @@ export default function UploadDRx() {
                     Drag & drop your CSV file
                   </Typography>
                   <Typography sx={{ fontSize: 12 }}>
-                    or click to browse
+                    or click to browse (up to 50 MB)
                   </Typography>
                 </Box>
               )}
@@ -156,21 +174,18 @@ export default function UploadDRx() {
         }}
       >
         <Button
-          disabled={disableClear}
+          disabled={disable}
           sx={{ width: 100 }}
           variant="outlined"
           children="CLEAR"
-          onClick={(e) => {
-            removeRef.current(e);
-            setDisableClear(true);
-          }}
+          onClick={handleClear}
         />
         <Button
-          disabled={disableSubmit}
+          disabled={disable}
           sx={{ width: 100 }}
           variant="outlined"
           children="SUBMIT"
-          onClick={() => {}}
+          onClick={handleSubmit}
         />
       </Box>
     </Box>
