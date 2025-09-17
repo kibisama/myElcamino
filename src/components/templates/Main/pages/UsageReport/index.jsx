@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem, gridClasses } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
-// import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
@@ -112,7 +111,6 @@ const CustomCell = ({ title, subtitle, onClick }) => {
 const rowHeight = 64;
 
 const Page = ({ socket }) => {
-  // const dialogs = useDialogs();
   const [date, setDate] = React.useState(dayjs());
   const [rows, setRows] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);

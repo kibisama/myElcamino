@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getDeliveryGroups } from "../lib/api/client";
+import { getDeliveries } from "../lib/api/client";
 
-const asyncGetDeliveryGroups = createAsyncThunk(
-  "scanSlice/asyncGetDeliveryGroups",
+const asyncGetDeliveryStations = createAsyncThunk(
+  "scanSlice/asyncGetDeliveryStations",
   async (body, { rejectWithValue }) => {
     try {
-      const { data } = await getDeliveryGroups(body);
+      const { data } = await getDeliveries(body);
       return data;
     } catch (e) {
       return rejectWithValue(e.response.data);
@@ -22,7 +22,7 @@ const mainSlice = createSlice({
     section: "",
     /** @type {"expanded"|"mobile-expanded"|"mini"|"collapsed"} */
     sidebar: "expanded",
-    deliveryGroups: [],
+    deliveries: [],
   },
   reducers: {
     setApp: (state, action) => {
@@ -39,14 +39,13 @@ const mainSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(asyncGetDeliveryGroups.fulfilled, (state, action) => {
+    builder.addCase(asyncGetDeliveryStations.fulfilled, (state, action) => {
       const { data } = action.payload;
-      state.deliveryGroups = data;
+      state.deliveries = data;
     });
-    builder.addCase(asyncGetDeliveryGroups.rejected, (state, action) => {});
   },
 });
 
 export default mainSlice.reducer;
 export const { setPage, setApp, setSidebar, setSection } = mainSlice.actions;
-export { asyncGetDeliveryGroups };
+export { asyncGetDeliveryStations };

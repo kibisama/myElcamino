@@ -11,7 +11,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
-import GroupsIcon from "@mui/icons-material/Groups";
+import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import MedicationIcon from "@mui/icons-material/Medication";
@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSidebar } from "../../../../../reduxjs@toolkit/mainSlice";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
-  const { page, deliveryGroups } = useSelector((s) => s.main);
+  const { page, deliveries } = useSelector((s) => s.main);
   const dispatch = useDispatch();
   const theme = useTheme();
 
@@ -152,15 +152,15 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     minWidth: 240,
                   }}
                 >
-                  {/* {deliveryGroups.map((v, i) => (
+                  {deliveries.map((v, i) => (
                     <PageItem
                       id="Deliveries"
-                      key={i}
-                      section={`${v}`}
-                      title={`${v}`}
-                      icon={<GroupsIcon />}
+                      key={v.displayName}
+                      section={v.displayName}
+                      title={v.displayName}
+                      icon={<GroupIcon />}
                     />
-                  ))} */}
+                  ))}
                   <PageItem
                     id="PrivateDelivery"
                     title="Private"

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Box, Tab, Tabs } from "@mui/material";
-// import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import PageContainer from "../PageContainer";
 import ImportDRx from "./ImportDRx";
 import StoreInfo from "./StoreInfo";

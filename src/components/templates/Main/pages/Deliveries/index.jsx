@@ -6,14 +6,27 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
-import { useSelector } from "react-redux";
+import { getDeliveryStations } from "../../../../../lib/api/client";
 
 const rowHeight = 52;
 
-export default function DeliveryGroups() {
-  const { deliveries } = useSelector((s) => s.main);
+export default function Deliveries({ section }) {
   const [isLoading, setIsLoading] = React.useState(false);
-
+  const [rows, setRows] = React.useState([]);
+  //   const getStations = React.useCallback(() => {
+  //     (async () => {
+  //       try {
+  //         const { data } = await getDeliveryStations();
+  //         setRows(data.data);
+  //       } catch (e) {
+  //         console.error(e);
+  //         setRows([]);
+  //       }
+  //     })();
+  //   }, []);
+  //   React.useEffect(() => {
+  //     getStations();
+  //   }, [getStations]);
   const columns = React.useMemo(
     () => [
       {
@@ -72,7 +85,7 @@ export default function DeliveryGroups() {
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }]}
-      title="Delivery Groups"
+      title={section}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
@@ -94,7 +107,7 @@ export default function DeliveryGroups() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={deliveries}
+          rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick

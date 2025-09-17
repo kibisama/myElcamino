@@ -9,8 +9,8 @@ const generateQuery = (q) =>
     .join("&");
 
 /** APPS_DELIVERY **/
-export const getDeliveryGroups = () => client.get("apps/delivery");
-//
+export const getDeliveries = () => client.get("apps/delivery");
+export const getDeliveryStations = () => client.get("apps/delivery/stations");
 
 /** INVENTORIES */
 export const getAutocompleteOptions = () => client.get("inv/alt");

@@ -18,7 +18,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import ForwardIcon from "@mui/icons-material/Forward";
-// import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import AppButton from "../AppButton";
 import PageContainer from "../PageContainer";
 import { enqueueSnackbar } from "notistack";
@@ -28,7 +27,6 @@ import Autocomplete from "./Autocomplete";
 const rowHeight = 42;
 
 export default function Inventories() {
-  // const dialogs = useDialogs();
   const apiRef = useGridApiRef();
   const theme = useTheme();
   const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));

@@ -4,21 +4,9 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Logo from "./Logo";
 import * as pages from "../pages";
-import { useDispatch, useSelector } from "react-redux";
-import { asyncGetDeliveryGroups } from "../../../../reduxjs@toolkit/mainSlice";
+import { useSelector } from "react-redux";
 
 export default function Dashboard() {
-  const dispatch = useDispatch();
-  // React.useEffect(() => {
-  //   (async function getDeliveryGroups() {
-  //     try {
-  //       dispatch(asyncGetDeliveryGroups());
-  //     } catch (e) {
-  //       console.error(e);
-  //       //
-  //     }
-  //   })();
-  // }, [dispatch]);
   const theme = useTheme();
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
@@ -98,7 +86,7 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          {page && <Page section={section ? section : undefined} />}
+          {page && <Page section={section} />}
         </Box>
       </Box>
     </Box>
