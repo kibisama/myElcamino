@@ -68,7 +68,8 @@ const useScanDetection = (_a) => {
 
   const onKeyPress = React.useCallback(
     (event) => {
-      if (!disabled) {
+      const activeEl = document.activeElement.tagName;
+      if (!disabled && activeEl !== "INPUT" && activeEl !== "TEXTAREA") {
         if (
           buffer.current.slice(startCharacter.length > 0 ? 1 : 0).length >=
             minLength &&

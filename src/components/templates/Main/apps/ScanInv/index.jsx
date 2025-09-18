@@ -94,9 +94,6 @@ export default function ScanInv({ id }) {
 
   const onComplete = React.useCallback(
     (barcode) => {
-      if (document.activeElement === document.querySelector("input").current) {
-        return;
-      }
       setState("updating");
       setRefresh((prev) => !prev);
       clearTimeout(timeout.current);

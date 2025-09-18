@@ -33,15 +33,12 @@ export default function Pickup({ id }) {
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
   const onComplete = useCallback((barcode) => {
-    const activeEl = document.activeElement.tagName;
-    if (activeEl !== "INPUT" && activeEl !== "TEXTAREA") {
-      const rxNumber = barcode.match(/\d+/g);
-      rxNumber &&
-        socket.emit("items", {
-          action: "push",
-          item: rxNumber.join(""),
-        });
-    }
+    const rxNumber = barcode.match(/\d+/g);
+    rxNumber &&
+      socket.emit("items", {
+        action: "push",
+        item: rxNumber.join(""),
+      });
   }, []);
   useScanDetection({ onComplete, disabled: activeApp !== id });
 

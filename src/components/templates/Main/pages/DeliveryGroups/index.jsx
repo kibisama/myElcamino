@@ -65,7 +65,6 @@ export default function DeliveryGroups() {
     ],
     []
   );
-
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}

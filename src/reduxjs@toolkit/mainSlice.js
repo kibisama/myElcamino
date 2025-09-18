@@ -44,6 +44,7 @@ const mainSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(asyncGetDeliveryStations.fulfilled, (state, action) => {
       const { data } = action.payload;
+      data.forEach((v, i) => (v.id = i + 1));
       state.deliveries = data;
     });
   },

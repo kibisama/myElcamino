@@ -8,15 +8,16 @@ const generateQuery = (q) =>
     .map((v) => (q[v] ? `${v}=${q[v]}` : ""))
     .join("&");
 
-/** APPS_DELIVERY **/
-export const getDeliveries = () => client.get("apps/delivery");
-export const getDeliveryStations = () => client.get("apps/delivery/stations");
-
+/** DELIVERIES **/
+export const getDeliveries = () => client.get("delivery");
+export const getDeliveryLogs = (q) =>
+  client.get(`delivery/logs/?${generateQuery(q)}`);
 /** INVENTORIES */
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
 export const getInventoryUsage = (date) => client.get(`inv/usage/${date}`); //MMDDYYYY
 /** dRx **/
+export const postDRxQR = (body) => client.post("dRx/qr", body);
 export const getImportDRx = () => client.get("dRx/import");
 export const postImportDRx = (body) => client.post("dRx/import", body);
 

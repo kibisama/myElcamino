@@ -1,16 +1,32 @@
 import * as React from "react";
+import dayjs from "dayjs";
 import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
+import { useSelector, useDispatch } from "react-redux";
+import { postDRxQR } from "../../../../../lib/api/client";
+import { enqueueSnackbar } from "notistack";
+import DatePickerSm from "../../../../inputs/DatePickerSm";
+import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
+  const dispatch = useDispatch();
+  const { activeApp, deliveries } = useSelector((s) => s.main);
+  const getStation_id = React.useCallback(() => {
+    for (let i = 0; i < deliveries.length; i++) {
+      if (deliveries[i].displayName === section) {
+        return deliveries[i]._id;
+      }
+    }
+  }, [deliveries, section]);
+  const [date, setDate] = React.useState(dayjs());
   const [isLoading, setIsLoading] = React.useState(false);
   //   const getStations = React.useCallback(() => {
   //     (async () => {
@@ -26,27 +42,39 @@ export default function Deliveries({ section }) {
   //   React.useEffect(() => {
   //     getStations();
   //   }, [getStations]);
-  //     const onComplete = useCallback((barcode) => {
-  //     if (document.activeElement.tagName !== "INPUT") {
-  //       const rxNumber = barcode.match(/\d+/g);
-  //       rxNumber &&
-  //         socket.emit("items", {
-  //           action: "push",
-  //           item: rxNumber.join(""),
-  //         });
-  //     }
-  //   }, []);
-  //   useScanDetection({ onComplete });
+  const onComplete = React.useCallback(
+    (data) => {
+      (async function () {
+        try {
+          const station = getStation_id();
+          if (!station) {
+            return dispatch(asyncGetDeliveryStations());
+          }
+          const delimiter = "|";
+          if (data.split(delimiter).length !== 11) {
+            return enqueueSnackbar("Invalid barcode reading", {
+              variant: "error",
+            });
+          }
+          await postDRxQR({ data, delimiter, station });
+        } catch (e) {
+          console.error(e);
+        }
+      })();
+    },
+    [dispatch, getStation_id]
+  );
+  useScanDetection({ onComplete, disabled: activeApp });
   const columns = React.useMemo(
     () => [
       {
-        field: "time",
+        field: "rxDate",
         headerName: "",
-        // type: "date",
+        type: "date",
         headerAlign: "center",
         align: "center",
-        // valueGetter: (v) => v && new Date(v),
-        // valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
+        valueGetter: (v) => v && new Date(v),
+        valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
         width: 84,
       },
       {
@@ -77,34 +105,34 @@ export default function Deliveries({ section }) {
         headerName: "Copay",
         type: "number",
       },
-      // {
-      //   field: "actions",
-      //   type: "actions",
-      //   width: 160,
-      //   align: "center",
-      //   getActions: ({ row }) => [
-      //     <GridActionsCellItem
-      //     // key={actionMode ? "print-item" : "edit-item"}
-      //     // icon={actionMode ? <PrintIcon /> : <EditIcon />}
-      //     // label={actionMode ? "Print" : "Edit"}
-      //     // onClick={
-      //     //   actionMode
-      //     //     ? () =>
-      //     //         window.open(
-      //     //           `/print/pickups/${row._id}/${row.rxNumber}`,
-      //     //           "_blank"
-      //     //         )
-      //     //     : //
-      //     //       undefined
-      //     // }
-      //     />,
-      //   ],
-      //   rowSpanValueGetter: (v, r) => r._id,
-      // },
+      {
+        field: "actions",
+        type: "actions",
+        width: 160,
+        align: "center",
+        getActions: ({ row }) => [
+          <GridActionsCellItem
+            key={"delete-item"}
+            icon={<DeleteIcon />}
+            label={"Delete"}
+            onClick={() => {}}
+          />,
+        ],
+      },
     ],
     []
   );
-
+  const handleChangeDate = React.useCallback((date, context) => {
+    if (!context.validationError) {
+      if (date) {
+        const day = dayjs(date);
+        setDate(day);
+        //   search(day.format("MMDDYYYY"));
+      } else {
+        setDate(null);
+      }
+    }
+  }, []);
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
@@ -123,6 +151,11 @@ export default function Deliveries({ section }) {
             </div>
           </Tooltip>
           <AppButton children={<CreateNewFolderIcon />} onClick={() => {}} />
+        </Stack>
+      }
+      extraActions={
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <DatePickerSm value={date} onChange={handleChangeDate} />
         </Stack>
       }
     >
