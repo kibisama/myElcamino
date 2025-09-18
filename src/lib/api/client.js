@@ -10,8 +10,10 @@ const generateQuery = (q) =>
 
 /** DELIVERIES **/
 export const getDeliveries = () => client.get("delivery");
-export const getDeliveryLogs = (q) =>
-  client.get(`delivery/logs/?${generateQuery(q)}`);
+export const getDeliverySessions = ({ section, date }) =>
+  client.get(`delivery/${section}/${date}`);
+export const getDeliveryLogs = ({ section, date, session }) =>
+  client.get(`delivery/${section}/${date}/${session}`);
 /** INVENTORIES */
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);

@@ -9,7 +9,7 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useSelector, useDispatch } from "react-redux";
-import { postDRxQR } from "../../../../../lib/api/client";
+import { getDeliveryLogs, postDRxQR } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
@@ -26,22 +26,29 @@ export default function Deliveries({ section }) {
       }
     }
   }, [deliveries, section]);
+  const [rows, setRows] = React.useState([]);
   const [date, setDate] = React.useState(dayjs());
+  const [session, setSession] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
-  //   const getStations = React.useCallback(() => {
-  //     (async () => {
-  //       try {
-  //         const { data } = await getDeliveryStations();
-  //         setRows(data.data);
-  //       } catch (e) {
-  //         console.error(e);
-  //         setRows([]);
-  //       }
-  //     })();
-  //   }, []);
-  //   React.useEffect(() => {
-  //     getStations();
-  //   }, [getStations]);
+  const getLogs = React.useCallback(() => {
+    (async () => {
+      try {
+        const { data } = await getDeliveryLogs({
+          section,
+          date: date.format("MMDDYYYY"),
+          session,
+        });
+        console.log(data);
+        setRows(data.data);
+      } catch (e) {
+        console.error(e);
+        setRows([]);
+      }
+    })();
+  }, [date, section, session]);
+  React.useEffect(() => {
+    getLogs();
+  }, [getLogs]);
   const onComplete = React.useCallback(
     (data) => {
       (async function () {
@@ -68,7 +75,7 @@ export default function Deliveries({ section }) {
   const columns = React.useMemo(
     () => [
       {
-        field: "rxDate",
+        field: "time",
         headerName: "",
         type: "date",
         headerAlign: "center",
@@ -84,6 +91,15 @@ export default function Deliveries({ section }) {
         width: 120,
         headerAlign: "center",
         align: "center",
+      },
+      {
+        field: "rxDate",
+        headerName: "Rx Date",
+        type: "date",
+        headerAlign: "center",
+        align: "center",
+        valueGetter: (v) => v && new Date(v),
+        valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
       },
       {
         field: "patientName",
@@ -163,7 +179,7 @@ export default function Deliveries({ section }) {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={[]}
+          rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
