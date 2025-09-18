@@ -6,13 +6,12 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
-import { getDeliveryStations } from "../../../../../lib/api/client";
+import useScanDetection from "../../../../../hooks/useScanDetection";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [rows, setRows] = React.useState([]);
   //   const getStations = React.useCallback(() => {
   //     (async () => {
   //       try {
@@ -27,32 +26,56 @@ export default function Deliveries({ section }) {
   //   React.useEffect(() => {
   //     getStations();
   //   }, [getStations]);
+  //     const onComplete = useCallback((barcode) => {
+  //     if (document.activeElement.tagName !== "INPUT") {
+  //       const rxNumber = barcode.match(/\d+/g);
+  //       rxNumber &&
+  //         socket.emit("items", {
+  //           action: "push",
+  //           item: rxNumber.join(""),
+  //         });
+  //     }
+  //   }, []);
+  //   useScanDetection({ onComplete });
   const columns = React.useMemo(
     () => [
       {
-        field: "displayName",
-        headerName: "Display",
+        field: "time",
+        headerName: "",
+        // type: "date",
+        headerAlign: "center",
+        align: "center",
+        // valueGetter: (v) => v && new Date(v),
+        // valueFormatter: (v) => v && dayjs(v).format("hh:mm A"),
+        width: 84,
+      },
+      {
+        field: "rxNumber",
+        headerName: "Rx Number",
+        type: "number",
         width: 120,
+        headerAlign: "center",
+        align: "center",
       },
       {
-        field: "invoiceCode",
-        headerName: "Code",
-        width: 80,
+        field: "patientName",
+        headerName: "Patient Name",
+        width: 280,
       },
       {
-        field: "name",
-        headerName: "Name",
+        field: "drugName",
+        headerName: "Drug Name",
         flex: 1,
       },
       {
-        field: "address",
-        headerName: "Address",
-        flex: 1,
+        field: "rxQty",
+        headerName: "Qty",
+        type: "number",
       },
       {
-        field: "city",
-        headerName: "City",
-        width: 140,
+        field: "patPay",
+        headerName: "Copay",
+        type: "number",
       },
       // {
       //   field: "actions",
@@ -84,7 +107,7 @@ export default function Deliveries({ section }) {
 
   return (
     <PageContainer
-      breadcrumbs={[{ title: "Deliveries" }]}
+      breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
       title={section}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
@@ -107,7 +130,7 @@ export default function Deliveries({ section }) {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={rows}
+          rows={[]}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick

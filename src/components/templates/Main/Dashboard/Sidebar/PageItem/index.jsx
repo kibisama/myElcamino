@@ -18,10 +18,7 @@ import { DashboardSidebarContext } from "../../../context";
 import { MINI_DRAWER_WIDTH } from "../../../constants";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setPage,
-  setSection,
-} from "../../../../../../reduxjs@toolkit/mainSlice";
+import { setPage } from "../../../../../../reduxjs@toolkit/mainSlice";
 
 function PageItem({
   id,
@@ -54,8 +51,7 @@ function PageItem({
       onPageItemClick(id, !!nestedNavigation);
     }
     if (!nestedNavigation) {
-      dispatch(setPage(id));
-      dispatch(setSection(section || ""));
+      dispatch(setPage({ page: id, section }));
     }
   }, [dispatch, onPageItemClick, id, section, nestedNavigation]);
 

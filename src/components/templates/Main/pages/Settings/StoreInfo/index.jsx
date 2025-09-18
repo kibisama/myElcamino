@@ -13,7 +13,7 @@ import { enqueueSnackbar } from "notistack";
 
 const Section = ({ title, subtitle, Input }) => {
   const theme = useTheme();
-  const { mode } = useColorScheme();
+  const { systemMode, mode } = useColorScheme();
   return (
     <Box
       sx={{
@@ -21,7 +21,7 @@ const Section = ({ title, subtitle, Input }) => {
         justifyContent: "space-between",
         borderBottom: 1,
         borderColor:
-          mode === "dark"
+          mode === "dark" || systemMode === "dark"
             ? (theme.vars || theme).palette.grey[800]
             : (theme.vars || theme).palette.grey[100],
         py: 2,
@@ -81,7 +81,7 @@ const StoreInfo = () => {
     })();
   }, [onGetSettings]);
 
-  const disableSave =
+  const disable =
     !(
       name &&
       address &&
@@ -215,13 +215,14 @@ const StoreInfo = () => {
       >
         <Button
           sx={{ width: 100 }}
+          disabled={disable}
           variant="outlined"
           children="RESET"
           onClick={() => onGetSettings(settings)}
         />
         <Button
           sx={{ width: 100 }}
-          disabled={disableSave}
+          disabled={disable}
           variant="outlined"
           children="SAVE"
           onClick={async () => {

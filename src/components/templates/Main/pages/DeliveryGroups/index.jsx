@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
@@ -19,7 +20,7 @@ export default function DeliveryGroups() {
       {
         field: "displayName",
         headerName: "Display",
-        width: 120,
+        width: 140,
       },
       {
         field: "invoiceCode",
@@ -33,7 +34,7 @@ export default function DeliveryGroups() {
       },
       {
         field: "address",
-        headerName: "Address",
+        headerName: "Street Address",
         flex: 1,
       },
       {
@@ -41,38 +42,34 @@ export default function DeliveryGroups() {
         headerName: "City",
         width: 140,
       },
-      // {
-      //   field: "actions",
-      //   type: "actions",
-      //   width: 160,
-      //   align: "center",
-      //   getActions: ({ row }) => [
-      //     <GridActionsCellItem
-      //     // key={actionMode ? "print-item" : "edit-item"}
-      //     // icon={actionMode ? <PrintIcon /> : <EditIcon />}
-      //     // label={actionMode ? "Print" : "Edit"}
-      //     // onClick={
-      //     //   actionMode
-      //     //     ? () =>
-      //     //         window.open(
-      //     //           `/print/pickups/${row._id}/${row.rxNumber}`,
-      //     //           "_blank"
-      //     //         )
-      //     //     : //
-      //     //       undefined
-      //     // }
-      //     />,
-      //   ],
-      //   rowSpanValueGetter: (v, r) => r._id,
-      // },
+      {
+        field: "actions",
+        type: "actions",
+        width: 96,
+        align: "center",
+        getActions: ({ row }) => [
+          <GridActionsCellItem
+            key="edit"
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => {}}
+          />,
+          <GridActionsCellItem
+            key="delete"
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => {}}
+          />,
+        ],
+      },
     ],
     []
   );
 
   return (
     <PageContainer
-      breadcrumbs={[{ title: "Deliveries" }]}
-      title="Delivery Groups"
+      breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
+      title="Manage Groups"
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
@@ -86,7 +83,7 @@ export default function DeliveryGroups() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<CreateNewFolderIcon />} onClick={() => {}} />
+          <AppButton children={<GroupAddIcon />} onClick={() => {}} />
         </Stack>
       }
     >

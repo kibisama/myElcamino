@@ -26,13 +26,16 @@ const mainSlice = createSlice({
   },
   reducers: {
     setApp: (state, action) => {
-      state.app = action.payload;
+      state.app === action.payload
+        ? (state.app = "")
+        : (state.app = action.payload);
+    },
+    setActiveApp: (state, action) => {
+      state.activeApp = action.payload;
     },
     setPage: (state, action) => {
-      state.page = action.payload;
-    },
-    setSection: (state, action) => {
-      state.section = action.payload;
+      state.page = action.payload.page;
+      state.section = action.payload.section;
     },
     setSidebar: (state, action) => {
       state.sidebar = action.payload;
@@ -47,5 +50,5 @@ const mainSlice = createSlice({
 });
 
 export default mainSlice.reducer;
-export const { setPage, setApp, setSidebar, setSection } = mainSlice.actions;
+export const { setPage, setApp, setActiveApp, setSidebar } = mainSlice.actions;
 export { asyncGetDeliveryStations };

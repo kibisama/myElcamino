@@ -389,7 +389,8 @@ const Page = ({ socket }) => {
 
   return (
     <PageContainer
-      title="Usage Report"
+      breadcrumbs={[{ title: "Reports" }, { title: "" }]}
+      title="Usage"
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip

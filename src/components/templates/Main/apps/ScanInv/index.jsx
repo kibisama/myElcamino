@@ -5,6 +5,7 @@ import AppContainer from "../AppContainer";
 import { postScanInv } from "../../../../../lib/api/client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { enqueueSnackbar as _enqueueSnackbar, closeSnackbar } from "notistack";
+import { useSelector } from "react-redux";
 
 import QrCodeSvg from "../../../../svg/QrCode";
 import LoadingSvg from "../../../../svg/Loading";
@@ -64,7 +65,8 @@ const StateSvg = React.memo(({ state }) => {
   );
 });
 
-export default function ScanInv() {
+export default function ScanInv({ id }) {
+  const { activeApp } = useSelector((s) => s.main);
   const [mode, setMode] = React.useState("FILL");
   const [state, setState] = React.useState("standby");
   const [source, setSource] = React.useState("CARDINAL");
@@ -135,7 +137,7 @@ export default function ScanInv() {
     },
     [enqueueSnackbar, cost, mode, source]
   );
-  useScanDetection({ onComplete });
+  useScanDetection({ onComplete, disabled: activeApp !== id });
 
   const handleModeChange = React.useCallback(
     (e) => setMode(e.target.value),
@@ -177,66 +179,64 @@ export default function ScanInv() {
   );
 
   return (
-    <AppContainer>
-      <Box sx={{}}>
+    <AppContainer id={id}>
+      <ToggleButtonGroup
+        exclusive
+        color="primary"
+        onChange={handleModeChange}
+        value={mode}
+      >
+        <ToggleButton sx={{ width: 99 }} value="FILL">
+          FILL
+        </ToggleButton>
+        <ToggleButton sx={{ width: 99 }} value="RECEIVE">
+          RECEIVE
+        </ToggleButton>
+        <ToggleButton sx={{ width: 99 }} value="REVERSE">
+          REVERSE
+        </ToggleButton>
+        <ToggleButton sx={{ width: 99 }} value="RETURN">
+          RETURN
+        </ToggleButton>
+      </ToggleButtonGroup>
+      <Box
+        sx={{
+          width: 393,
+          height: 393,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <StateSvg key={refresh} state={state} />
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <ToggleButtonGroup
           exclusive
+          disabled={disabled}
           color="primary"
-          onChange={handleModeChange}
-          value={mode}
+          onChange={handleSourceChange}
+          value={source}
         >
-          <ToggleButton sx={{ width: 99 }} value="FILL">
-            FILL
+          <ToggleButton sx={{ width: 119 }} value="CARDINAL">
+            CARDINAL
           </ToggleButton>
-          <ToggleButton sx={{ width: 99 }} value="RECEIVE">
-            RECEIVE
-          </ToggleButton>
-          <ToggleButton sx={{ width: 99 }} value="REVERSE">
-            REVERSE
-          </ToggleButton>
-          <ToggleButton sx={{ width: 99 }} value="RETURN">
-            RETURN
+          <ToggleButton sx={{ width: 119 }} value="SECONDARY">
+            SECONDARY
           </ToggleButton>
         </ToggleButtonGroup>
-        <Box
-          sx={{
-            width: 393,
-            height: 393,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+        <TextField
+          disabled={disabled}
+          placeholder="Cost"
+          onChange={handleCostChange}
+          sx={{ width: 140 }}
+          slotProps={{
+            input: {
+              id: "APPS_INVENTORYSCAN_INPUT_COST",
+              inputComponent: NumericFormatCustom,
+            },
           }}
-        >
-          <StateSvg key={refresh} state={state} />
-        </Box>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <ToggleButtonGroup
-            exclusive
-            disabled={disabled}
-            color="primary"
-            onChange={handleSourceChange}
-            value={source}
-          >
-            <ToggleButton sx={{ width: 119 }} value="CARDINAL">
-              CARDINAL
-            </ToggleButton>
-            <ToggleButton sx={{ width: 119 }} value="SECONDARY">
-              SECONDARY
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <TextField
-            disabled={disabled}
-            placeholder="Cost"
-            onChange={handleCostChange}
-            sx={{ width: 140 }}
-            slotProps={{
-              input: {
-                id: "APPS_INVENTORYSCAN_INPUT_COST",
-                inputComponent: NumericFormatCustom,
-              },
-            }}
-          />
-        </Box>
+        />
       </Box>
     </AppContainer>
   );

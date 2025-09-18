@@ -1,8 +1,8 @@
 import React from "react";
 import Draggable from "react-draggable";
-import { Box, Zoom, styled } from "@mui/material";
+import { Box, Zoom, styled, useColorScheme, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { setApp } from "../../../../../reduxjs@toolkit/mainSlice";
+import { setActiveApp, setApp } from "../../../../../reduxjs@toolkit/mainSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import useWindowSize from "../../../../../hooks/useWindowSize";
@@ -15,7 +15,7 @@ const CloseButton = styled(CloseIcon)(({ theme }) => ({
   },
 }));
 
-const Titlebar = () => {
+const Titlebar = ({ id }) => {
   const dispatch = useDispatch();
   return (
     <Box
@@ -34,31 +34,26 @@ const Titlebar = () => {
           pr: 1,
         }}
         onClick={() => {
-          dispatch(setApp(""));
+          dispatch(setApp(id));
         }}
       />
     </Box>
   );
 };
 
-const Container = styled("div")(({ theme }) => ({
-  cursor: "grab",
-  border: "1px solid",
-  borderColor: (theme.vars || theme).palette.divider,
-  borderRadius: 8,
-  backgroundColor: (theme.vars || theme).palette.background.paper,
-  ":hover": {
-    borderColor: theme.vars ? theme.palette.grey[400] : theme.palette.grey[600],
-  },
-  ":focus-within": {
-    borderColor: theme.vars ? theme.palette.grey[100] : theme.palette.grey[900],
-  },
-  ":active": {
-    borderColor: theme.vars ? theme.palette.grey[100] : theme.palette.grey[900],
-  },
-}));
-
-const AppContainer = ({ children }) => {
+const AppContainer = ({ id, children }) => {
+  if (!id) {
+    throw new Error("You are rending AppContainer without an id prop.");
+  }
+  const theme = useTheme();
+  const { mode, systemMode } = useColorScheme();
+  const palette = (theme.vars || theme).palette;
+  const isDarkMode = mode === "dark" || systemMode === "dark";
+  const { activeApp } = useSelector((s) => s.main);
+  const dispatch = useDispatch();
+  const handleAppClick = React.useCallback(() => {
+    dispatch(setActiveApp(id));
+  }, [dispatch, id]);
   const nodeRef = React.useRef(null);
   const { sidebar } = useSelector((s) => s.main);
   const top = (sidebar === "expanded" || sidebar === "mini" ? 33 : 29) / 2;
@@ -97,6 +92,7 @@ const AppContainer = ({ children }) => {
           position: "fixed",
           zIndex: sidebar === "mobile-expanded" ? -1 : null,
         }}
+        onClick={activeApp !== id ? handleAppClick : undefined}
       >
         <Draggable
           bounds={{
@@ -108,14 +104,38 @@ const AppContainer = ({ children }) => {
           cancel=".app-content"
           nodeRef={nodeRef}
         >
-          <Container ref={nodeRef}>
-            <Titlebar />
+          <Box
+            sx={{
+              cursor: "grab",
+              border: "1px solid",
+              borderRadius: 1,
+              backgroundColor: (theme.vars || theme).palette.background.paper,
+              ":hover": {
+                borderColor:
+                  activeApp === id
+                    ? isDarkMode
+                      ? palette.grey[100]
+                      : palette.grey[900]
+                    : isDarkMode
+                    ? palette.grey[400]
+                    : palette.grey[600],
+              },
+              borderColor:
+                activeApp === id
+                  ? isDarkMode
+                    ? palette.grey[100]
+                    : palette.grey[900]
+                  : palette.divider,
+            }}
+            ref={nodeRef}
+          >
+            <Titlebar id={id} />
             <Box sx={{ p: `${padding}px` }}>
               <Box sx={{ cursor: "default" }} className="app-content">
                 {children}
               </Box>
             </Box>
-          </Container>
+          </Box>
         </Draggable>
       </Box>
     </Zoom>

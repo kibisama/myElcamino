@@ -4,11 +4,15 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Logo from "./Logo";
 import * as pages from "../pages";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveApp } from "../../../../reduxjs@toolkit/mainSlice";
 
 export default function Dashboard() {
   const theme = useTheme();
-
+  const dispatch = useDispatch();
+  const handleClick = React.useCallback(() => {
+    dispatch(setActiveApp(""));
+  }, [dispatch]);
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(true);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] =
@@ -44,7 +48,7 @@ export default function Dashboard() {
 
   const layoutRef = React.useRef(null);
 
-  const { page, section } = useSelector((s) => s.main);
+  const { page, section, activeApp } = useSelector((s) => s.main);
   const Page = pages[page] || "div";
 
   return (
@@ -57,6 +61,7 @@ export default function Dashboard() {
         height: "100%",
         width: "100%",
       }}
+      onClick={activeApp ? handleClick : undefined}
     >
       <Header
         logo={<Logo />}

@@ -13,7 +13,7 @@ const useScanDetection = (_a) => {
     onError = _a.onError,
     _f = _a.minLength,
     minLength = _f === void 0 ? 1 : _f,
-    ignoreIfFocusOn = _a.ignoreIfFocusOn,
+    disabled = _a.disabled,
     _g = _a.stopPropagation,
     stopPropagation = _g === void 0 ? false : _g,
     _h = _a.preventDefault,
@@ -68,7 +68,7 @@ const useScanDetection = (_a) => {
 
   const onKeyPress = React.useCallback(
     (event) => {
-      if (event.currentTarget !== ignoreIfFocusOn) {
+      if (!disabled) {
         if (
           buffer.current.slice(startCharacter.length > 0 ? 1 : 0).length >=
             minLength &&
@@ -100,7 +100,7 @@ const useScanDetection = (_a) => {
     [
       endCharacter,
       evaluateBuffer,
-      ignoreIfFocusOn,
+      disabled,
       preventDefault,
       startCharacter,
       stopPropagation,

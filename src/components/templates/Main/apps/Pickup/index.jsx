@@ -16,23 +16,25 @@ import { useDebouncedCallback } from "use-debounce";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import NumericFormat from "./NumericFormat";
+import { useSelector } from "react-redux";
 
 const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
 let socket;
 
-export default function Pickup() {
+export default function Pickup({ id }) {
   if (!socket) {
     socket = io(URL);
   } else {
     socket.connect();
   }
-
+  const { activeApp } = useSelector((s) => s.main);
   const [state, setState] = useState("standby");
   const [rxNumber, setRxNumber] = useState("");
   const [date, setDate] = useState(null);
   const [notes, setNotes] = useState("");
   const onComplete = useCallback((barcode) => {
-    if (document.activeElement.tagName !== "INPUT") {
+    const activeEl = document.activeElement.tagName;
+    if (activeEl !== "INPUT" && activeEl !== "TEXTAREA") {
       const rxNumber = barcode.match(/\d+/g);
       rxNumber &&
         socket.emit("items", {
@@ -41,7 +43,7 @@ export default function Pickup() {
         });
     }
   }, []);
-  useScanDetection({ onComplete });
+  useScanDetection({ onComplete, disabled: activeApp !== id });
 
   useEffect(() => {
     function onState(data) {
@@ -89,7 +91,7 @@ export default function Pickup() {
   );
 
   return (
-    <AppContainer>
+    <AppContainer id={id}>
       <Box
         sx={{
           height: 476,

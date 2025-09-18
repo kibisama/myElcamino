@@ -20,7 +20,7 @@ const Main = () => {
       <CssBaseline>
         <SnackbarProvider>
           <Dashboard />
-          {app && <App />}
+          {app && <App id={app} />}
         </SnackbarProvider>
       </CssBaseline>
     </AppTheme>

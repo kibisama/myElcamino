@@ -14,7 +14,7 @@ import { getImportDRx, postImportDRx } from "../../../../../../lib/api/client";
 
 export default function UploadDRx() {
   const theme = useTheme();
-  const { mode } = useColorScheme();
+  const { mode, systemMode } = useColorScheme();
   const removeRef = React.useRef(null);
   const rootRef = React.useRef(null);
   const { CSVReader } = useCSVReader();
@@ -108,7 +108,7 @@ export default function UploadDRx() {
                 justifyContent: "center",
                 padding: 4,
                 borderColor:
-                  mode === "dark"
+                  mode === "dark" || systemMode === "dark"
                     ? (theme.vars || theme).palette.grey[700]
                     : (theme.vars || theme).palette.grey[200],
                 borderRadius: 1,
