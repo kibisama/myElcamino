@@ -1,7 +1,7 @@
 import * as React from "react";
 import dayjs from "dayjs";
-import { Box, IconButton, Stack, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { Box, IconButton, Stack, Button, Tooltip, styled } from "@mui/material";
+import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,10 +14,16 @@ import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
 
+const SessionButton = styled(Button)(({ theme }) => ({
+  width: 120,
+  height: "2.25rem",
+}));
+
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
   const dispatch = useDispatch();
+  const apiRef = useGridApiRef();
   const { activeApp, deliveries } = useSelector((s) => s.main);
   const getStation_id = React.useCallback(() => {
     for (let i = 0; i < deliveries.length; i++) {
@@ -31,6 +37,7 @@ export default function Deliveries({ section }) {
   const [session, setSession] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const getLogs = React.useCallback(() => {
+    setIsLoading(true);
     (async () => {
       try {
         const { data } = await getDeliveryLogs({
@@ -38,11 +45,12 @@ export default function Deliveries({ section }) {
           date: date.format("MMDDYYYY"),
           session,
         });
-        console.log(data);
         setRows(data.data);
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
         setRows([]);
+        setIsLoading(false);
       }
     })();
   }, [date, section, session]);
@@ -63,13 +71,30 @@ export default function Deliveries({ section }) {
               variant: "error",
             });
           }
-          await postDRxQR({ data, delimiter, station });
+          const result = await postDRxQR({
+            data,
+            delimiter,
+            station,
+          });
+          const row = result.data.data;
+          apiRef.current?.updateRows([
+            {
+              id: row._id,
+              _id: row._id,
+              time: row.deliveryDate,
+              rxDate: row.rxDate,
+              rxNumber: row.rxNumber,
+              drugName: row.drugName,
+              rxQty: row.rxQty,
+              patPay: row.patPay,
+            },
+          ]);
         } catch (e) {
           console.error(e);
         }
       })();
     },
-    [dispatch, getStation_id]
+    [apiRef, dispatch, getStation_id]
   );
   useScanDetection({ onComplete, disabled: activeApp });
   const columns = React.useMemo(
@@ -157,11 +182,7 @@ export default function Deliveries({ section }) {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
-              <IconButton
-                size="small"
-                aria-label="refresh"
-                // onClick={}
-              >
+              <IconButton size="small" aria-label="refresh" onClick={getLogs}>
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -172,11 +193,18 @@ export default function Deliveries({ section }) {
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <DatePickerSm value={date} onChange={handleChangeDate} />
+          <SessionButton children="Session 1" />
+          <SessionButton
+            children={
+              date.isSame(dayjs(), "d") ? "New Session" : "Not Delivered"
+            }
+          />
         </Stack>
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <DataGrid
+          apiRef={apiRef}
           autoPageSize
           columns={columns}
           rows={rows}

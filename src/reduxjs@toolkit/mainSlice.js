@@ -22,6 +22,7 @@ const mainSlice = createSlice({
     section: "",
     /** @type {"expanded"|"mobile-expanded"|"mini"|"collapsed"} */
     sidebar: "expanded",
+    isLoadingDeliveries: false,
     deliveries: [],
   },
   reducers: {
@@ -42,10 +43,17 @@ const mainSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(asyncGetDeliveryStations.pending, (state, action) => {
+      state.isLoadingDeliveries = true;
+    });
     builder.addCase(asyncGetDeliveryStations.fulfilled, (state, action) => {
       const { data } = action.payload;
       data.forEach((v, i) => (v.id = i + 1));
       state.deliveries = data;
+      state.isLoadingDeliveries = false;
+    });
+    builder.addCase(asyncGetDeliveryStations.rejected, (state, action) => {
+      state.isLoadingDeliveries = false;
     });
   },
 });

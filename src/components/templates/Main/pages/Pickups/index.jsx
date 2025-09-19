@@ -28,6 +28,7 @@ const PrintAction = ({ row }) => (
 );
 const EditAction = ({ row }) => (
   <GridActionsCellItem
+    disabled
     key="edit-item"
     icon={<EditIcon />}
     label={"Edit"}

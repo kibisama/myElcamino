@@ -7,13 +7,26 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const rowHeight = 52;
 
 export default function DeliveryGroups() {
-  const { deliveries } = useSelector((s) => s.main);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
+  const { deliveries, isLoadingDeliveries } = useSelector((s) => s.main);
+  const refresh = React.useCallback(() => {
+    (async function () {
+      try {
+        dispatch(asyncGetDeliveryStations());
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [dispatch]);
+  React.useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const columns = React.useMemo(
     () => [
@@ -55,6 +68,7 @@ export default function DeliveryGroups() {
             onClick={() => {}}
           />,
           <GridActionsCellItem
+            disabled
             key="delete"
             icon={<DeleteIcon />}
             label="Delete"
@@ -73,11 +87,7 @@ export default function DeliveryGroups() {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
-              <IconButton
-                size="small"
-                aria-label="refresh"
-                // onClick={}
-              >
+              <IconButton size="small" aria-label="refresh" onClick={refresh}>
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -94,7 +104,7 @@ export default function DeliveryGroups() {
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
-          loading={isLoading}
+          loading={isLoadingDeliveries}
           pageSizeOptions={[]}
           sx={{
             maxHeight: rowHeight * 100,
