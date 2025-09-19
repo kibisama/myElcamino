@@ -66,7 +66,7 @@ export default function Deliveries({ section }) {
             return dispatch(asyncGetDeliveryStations());
           }
           const delimiter = "|";
-          if (data.split(delimiter).length !== 11) {
+          if (data.split(delimiter).length !== 12) {
             return enqueueSnackbar("Invalid barcode reading", {
               variant: "error",
             });
