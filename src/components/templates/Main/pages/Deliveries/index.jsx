@@ -59,42 +59,43 @@ export default function Deliveries({ section }) {
   }, [getLogs]);
   const onComplete = React.useCallback(
     (data) => {
-      (async function () {
-        try {
-          const station = getStation_id();
-          if (!station) {
-            return dispatch(asyncGetDeliveryStations());
-          }
-          const delimiter = "|";
-          if (data.split(delimiter).length !== 12) {
-            return enqueueSnackbar("Invalid barcode reading", {
-              variant: "error",
+      session === 0 &&
+        (async function () {
+          try {
+            const station = getStation_id();
+            if (!station) {
+              return dispatch(asyncGetDeliveryStations());
+            }
+            const delimiter = "|";
+            if (data.split(delimiter).length !== 12) {
+              return enqueueSnackbar("Invalid barcode reading", {
+                variant: "error",
+              });
+            }
+            const result = await postDRxQR({
+              data,
+              delimiter,
+              station,
             });
+            const row = result.data.data;
+            apiRef.current?.updateRows([
+              {
+                id: row._id,
+                _id: row._id,
+                time: row.deliveryDate,
+                rxDate: row.rxDate,
+                rxNumber: row.rxNumber,
+                drugName: row.drugName,
+                rxQty: row.rxQty,
+                patPay: row.patPay,
+              },
+            ]);
+          } catch (e) {
+            console.error(e);
           }
-          const result = await postDRxQR({
-            data,
-            delimiter,
-            station,
-          });
-          const row = result.data.data;
-          apiRef.current?.updateRows([
-            {
-              id: row._id,
-              _id: row._id,
-              time: row.deliveryDate,
-              rxDate: row.rxDate,
-              rxNumber: row.rxNumber,
-              drugName: row.drugName,
-              rxQty: row.rxQty,
-              patPay: row.patPay,
-            },
-          ]);
-        } catch (e) {
-          console.error(e);
-        }
-      })();
+        })();
     },
-    [apiRef, dispatch, getStation_id]
+    [session, apiRef, dispatch, getStation_id]
   );
   useScanDetection({ onComplete, disabled: activeApp });
   const columns = React.useMemo(
