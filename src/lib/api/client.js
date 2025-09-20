@@ -14,7 +14,7 @@ export const getDeliverySessions = ({ section, date }) =>
   client.get(`delivery/${section}/${date}`);
 export const getDeliveryLogs = ({ section, date, session }) =>
   client.get(`delivery/${section}/${date}/${session}`);
-/** INVENTORIES */
+/** INVENTORIES **/
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
 export const getInventoryUsage = (date) => client.get(`inv/usage/${date}`); //MMDDYYYY

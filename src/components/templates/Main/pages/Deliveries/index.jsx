@@ -9,7 +9,11 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useSelector, useDispatch } from "react-redux";
-import { getDeliveryLogs, postDRxQR } from "../../../../../lib/api/client";
+import {
+  getDeliveryLogs,
+  getDeliverySessions,
+  postDRxQR,
+} from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
@@ -34,6 +38,7 @@ export default function Deliveries({ section }) {
   }, [deliveries, section]);
   const [rows, setRows] = React.useState([]);
   const [date, setDate] = React.useState(dayjs());
+  const [sessions, setSessions] = React.useState([]);
   const [session, setSession] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const getLogs = React.useCallback(() => {
@@ -54,9 +59,24 @@ export default function Deliveries({ section }) {
       }
     })();
   }, [date, section, session]);
+  const getSessions = React.useCallback(() => {
+    (async () => {
+      try {
+        const { data } = await getDeliverySessions({
+          section,
+          date: date.format("MMDDYYYY"),
+        });
+        setSessions(data.data);
+      } catch (e) {
+        console.error(e);
+        setSessions([]);
+      }
+    })();
+  }, [date, section]);
   React.useEffect(() => {
     getLogs();
-  }, [getLogs]);
+    getSessions();
+  }, [getLogs, getSessions]);
   const onComplete = React.useCallback(
     (data) => {
       session === 0 &&
@@ -194,7 +214,9 @@ export default function Deliveries({ section }) {
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <DatePickerSm value={date} onChange={handleChangeDate} />
-          <SessionButton children="Session 1" />
+          {sessions.map((v, i) => (
+            <SessionButton children={v} key={i} />
+          ))}
           <SessionButton
             children={
               date.isSame(dayjs(), "d") ? "New Session" : "Not Delivered"
