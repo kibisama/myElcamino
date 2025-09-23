@@ -1,8 +1,8 @@
 import * as React from "react";
 import dayjs from "dayjs";
-import { Box, IconButton, Stack, Button, Tooltip, styled } from "@mui/material";
+import { Box, Button, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PageContainer from "../PageContainer";
@@ -17,11 +17,6 @@ import {
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
-
-const SessionButton = styled(Button)(({ theme }) => ({
-  width: 120,
-  height: "2.25rem",
-}));
 
 const rowHeight = 52;
 
@@ -39,7 +34,7 @@ export default function Deliveries({ section }) {
   const [rows, setRows] = React.useState([]);
   const [date, setDate] = React.useState(dayjs());
   const [sessions, setSessions] = React.useState([]);
-  const [session, setSession] = React.useState(0);
+  const [session, setSession] = React.useState("0");
   const [isLoading, setIsLoading] = React.useState(false);
   const getLogs = React.useCallback(() => {
     setIsLoading(true);
@@ -73,13 +68,19 @@ export default function Deliveries({ section }) {
       }
     })();
   }, [date, section]);
+  const focusRef = React.useRef(null);
+  React.useEffect(() => {
+    if (focusRef.current) {
+      focusRef.current.focus();
+    }
+  }, [section]);
   React.useEffect(() => {
     getLogs();
     getSessions();
   }, [getLogs, getSessions]);
   const onComplete = React.useCallback(
     (data) => {
-      session === 0 &&
+      session === "0" &&
         (async function () {
           try {
             const station = getStation_id();
@@ -97,19 +98,7 @@ export default function Deliveries({ section }) {
               delimiter,
               station,
             });
-            const row = result.data.data;
-            apiRef.current?.updateRows([
-              {
-                id: row._id,
-                _id: row._id,
-                time: row.deliveryDate,
-                rxDate: row.rxDate,
-                rxNumber: row.rxNumber,
-                drugName: row.drugName,
-                rxQty: row.rxQty,
-                patPay: row.patPay,
-              },
-            ]);
+            apiRef.current?.updateRows([result.data.data]);
           } catch (e) {
             console.error(e);
           }
@@ -134,23 +123,24 @@ export default function Deliveries({ section }) {
         field: "rxNumber",
         headerName: "Rx Number",
         type: "number",
-        width: 120,
-        headerAlign: "center",
-        align: "center",
       },
       {
         field: "rxDate",
         headerName: "Rx Date",
         type: "date",
-        headerAlign: "center",
-        align: "center",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
+        width: 80,
       },
       {
-        field: "patientName",
-        headerName: "Patient Name",
-        width: 280,
+        field: "patient",
+        headerName: "Patient",
+        width: 180,
+      },
+      {
+        field: "doctorName",
+        headerName: "Prescriber",
+        width: 180,
       },
       {
         field: "drugName",
@@ -161,16 +151,23 @@ export default function Deliveries({ section }) {
         field: "rxQty",
         headerName: "Qty",
         type: "number",
+        width: 60,
+      },
+      {
+        field: "plan",
+        headerName: "Plan",
+        width: 80,
       },
       {
         field: "patPay",
         headerName: "Copay",
         type: "number",
+        width: 80,
       },
       {
         field: "actions",
         type: "actions",
-        width: 160,
+        width: 52,
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
@@ -195,6 +192,7 @@ export default function Deliveries({ section }) {
       }
     }
   }, []);
+
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
@@ -208,16 +206,31 @@ export default function Deliveries({ section }) {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<CreateNewFolderIcon />} onClick={() => {}} />
+          <AppButton children={<NoteAddIcon />} onClick={() => {}} />
         </Stack>
       }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <DatePickerSm value={date} onChange={handleChangeDate} />
           {sessions.map((v, i) => (
-            <SessionButton children={v} key={i} />
+            <Button
+              onClick={() => setSession(v)}
+              size="small"
+              sx={{
+                width: 120,
+                color: session === v ? "primary.main" : "text.secondary",
+              }}
+              children={v}
+              key={i}
+            />
           ))}
-          <SessionButton
+          <Button
+            onClick={() => setSession("0")}
+            size="small"
+            sx={{
+              width: 120,
+              color: session === "0" ? "primary.main" : "text.secondary",
+            }}
             children={
               date.isSame(dayjs(), "d") ? "New Session" : "Not Delivered"
             }
@@ -250,6 +263,7 @@ export default function Deliveries({ section }) {
           }}
         />
       </Box>
+      <div tabIndex="-1" ref={focusRef} />
     </PageContainer>
   );
 }

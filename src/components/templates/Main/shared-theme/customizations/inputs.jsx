@@ -183,7 +183,7 @@ export const inputsCustomizations = {
               variant: "text",
             },
             style: {
-              color: gray[600],
+              // color: gray[600],
               "&:hover": {
                 backgroundColor: gray[100],
               },
@@ -191,7 +191,7 @@ export const inputsCustomizations = {
                 backgroundColor: gray[200],
               },
               ...theme.applyStyles("dark", {
-                color: gray[50],
+                // color: gray[50],
                 "&:hover": {
                   backgroundColor: gray[700],
                 },
