@@ -13,6 +13,7 @@ import {
   getDeliveryLogItems,
   getDeliverySessions,
   postDeliveryQR,
+  postDeliveryLog,
 } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
@@ -27,6 +28,21 @@ export default function Deliveries({ section }) {
   const [sessions, setSessions] = React.useState([]);
   const [session, setSession] = React.useState("0");
   const [isLoading, setIsLoading] = React.useState(false);
+  const postLog = React.useCallback(() => {
+    setIsLoading(true);
+    (async function () {
+      try {
+        const { data } = await postDeliveryLog(section);
+        const session = data.data?.session;
+        setSessions((prev) => [...prev, session]);
+        setSession(session);
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+        setIsLoading(false);
+      }
+    })();
+  }, [section]);
   const getLogs = React.useCallback(
     (date, session) => {
       setIsLoading(true);
@@ -69,9 +85,12 @@ export default function Deliveries({ section }) {
     }
   }, []);
   React.useEffect(() => {
-    getLogs(date, session);
     getSessions();
+    getLogs(date, session);
   }, [date, session, getLogs, getSessions]);
+  React.useEffect(() => {
+    setSession("0");
+  }, [section]);
   const onComplete = React.useCallback(
     (data) => {
       (async function () {
@@ -159,6 +178,7 @@ export default function Deliveries({ section }) {
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
+            disabled={row.deliveryLog}
             key={"delete-item"}
             icon={<DeleteIcon />}
             label={"Delete"}
@@ -193,6 +213,7 @@ export default function Deliveries({ section }) {
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
               <IconButton
+                disabled={isLoading}
                 size="small"
                 aria-label="refresh"
                 onClick={() => getLogs(date, session)}
@@ -201,7 +222,7 @@ export default function Deliveries({ section }) {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<NoteAddIcon />} onClick={() => {}} />
+          <AppButton children={<NoteAddIcon />} onClick={postLog} />
         </Stack>
       }
       extraActions={
