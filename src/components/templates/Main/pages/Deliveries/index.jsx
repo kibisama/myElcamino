@@ -8,59 +8,53 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
-  getDeliveryLogs,
+  getDeliveryLogItems,
   getDeliverySessions,
-  postDRxQR,
+  postDeliveryQR,
 } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
-import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
-  const dispatch = useDispatch();
   const apiRef = useGridApiRef();
-  const { activeApp, deliveries } = useSelector((s) => s.main);
-  const getStation_id = React.useCallback(() => {
-    for (let i = 0; i < deliveries.length; i++) {
-      if (deliveries[i].displayName === section) {
-        return deliveries[i]._id;
-      }
-    }
-  }, [deliveries, section]);
+  const { activeApp } = useSelector((s) => s.main);
   const [rows, setRows] = React.useState([]);
   const [date, setDate] = React.useState(dayjs());
   const [sessions, setSessions] = React.useState([]);
   const [session, setSession] = React.useState("0");
   const [isLoading, setIsLoading] = React.useState(false);
-  const getLogs = React.useCallback(() => {
-    setIsLoading(true);
-    (async () => {
-      try {
-        const { data } = await getDeliveryLogs({
-          section,
-          date: date.format("MMDDYYYY"),
-          session,
-        });
-        setRows(data.data);
-        setIsLoading(false);
-      } catch (e) {
-        console.error(e);
-        setRows([]);
-        setIsLoading(false);
-      }
-    })();
-  }, [date, section, session]);
+  const getLogs = React.useCallback(
+    (date, session) => {
+      setIsLoading(true);
+      (async () => {
+        try {
+          const { data } = await getDeliveryLogItems(
+            section,
+            date.format("MMDDYYYY"),
+            session
+          );
+          setRows(data.data);
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
+          setRows([]);
+          setIsLoading(false);
+        }
+      })();
+    },
+    [section]
+  );
   const getSessions = React.useCallback(() => {
     (async () => {
       try {
-        const { data } = await getDeliverySessions({
+        const { data } = await getDeliverySessions(
           section,
-          date: date.format("MMDDYYYY"),
-        });
+          date.format("MMDDYYYY")
+        );
         setSessions(data.data);
       } catch (e) {
         console.error(e);
@@ -75,36 +69,30 @@ export default function Deliveries({ section }) {
     }
   }, []);
   React.useEffect(() => {
-    getLogs();
+    getLogs(date, session);
     getSessions();
-  }, [getLogs, getSessions]);
+  }, [date, session, getLogs, getSessions]);
   const onComplete = React.useCallback(
     (data) => {
-      session === "0" &&
-        (async function () {
-          try {
-            const station = getStation_id();
-            if (!station) {
-              return dispatch(asyncGetDeliveryStations());
-            }
-            const delimiter = "|";
-            if (data.split(delimiter).length !== 12) {
-              return enqueueSnackbar("Invalid barcode reading", {
-                variant: "error",
-              });
-            }
-            const result = await postDRxQR({
-              data,
-              delimiter,
-              station,
+      (async function () {
+        try {
+          const delimiter = "|";
+          if (data.split(delimiter).length !== 12) {
+            return enqueueSnackbar("Invalid barcode reading", {
+              variant: "error",
             });
-            apiRef.current?.updateRows([result.data.data]);
-          } catch (e) {
-            console.error(e);
           }
-        })();
+          const result = await postDeliveryQR(section, {
+            data,
+            delimiter,
+          });
+          apiRef.current?.updateRows([result.data.data]);
+        } catch (e) {
+          console.error(e);
+        }
+      })();
     },
-    [session, apiRef, dispatch, getStation_id]
+    [section, apiRef]
   );
   useScanDetection({ onComplete, disabled: activeApp });
   const columns = React.useMemo(
@@ -181,17 +169,20 @@ export default function Deliveries({ section }) {
     ],
     []
   );
-  const handleChangeDate = React.useCallback((date, context) => {
-    if (!context.validationError) {
-      if (date) {
-        const day = dayjs(date);
-        setDate(day);
-        //   search(day.format("MMDDYYYY"));
-      } else {
-        setDate(null);
+  const handleChangeDate = React.useCallback(
+    (date, context) => {
+      if (!context.validationError) {
+        if (date) {
+          const day = dayjs(date);
+          setDate(day);
+          getLogs(day, session);
+        } else {
+          setDate(null);
+        }
       }
-    }
-  }, []);
+    },
+    [getLogs, session]
+  );
 
   return (
     <PageContainer
@@ -201,7 +192,11 @@ export default function Deliveries({ section }) {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
-              <IconButton size="small" aria-label="refresh" onClick={getLogs}>
+              <IconButton
+                size="small"
+                aria-label="refresh"
+                onClick={() => getLogs(date, session)}
+              >
                 <RefreshIcon />
               </IconButton>
             </div>

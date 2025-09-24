@@ -10,16 +10,18 @@ const generateQuery = (q) =>
 
 /** DELIVERIES **/
 export const getDeliveries = () => client.get("delivery");
-export const getDeliverySessions = ({ section, date }) =>
+export const getDeliverySessions = (section, date) =>
   client.get(`delivery/${section}/${date}`);
-export const getDeliveryLogs = ({ section, date, session }) =>
+export const getDeliveryLogItems = (section, date, session) =>
   client.get(`delivery/${section}/${date}/${session}`);
+export const postDeliveryLog = (section) => client.post(`delivery/${section}`);
+export const postDeliveryQR = (section, body) =>
+  client.post(`delivery/${section}/qr`, body);
 /** INVENTORIES **/
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
 export const getInventoryUsage = (date) => client.get(`inv/usage/${date}`); //MMDDYYYY
 /** dRx **/
-export const postDRxQR = (body) => client.post("dRx/qr", body);
 export const getImportDRx = () => client.get("dRx/import");
 export const postImportDRx = (body) => client.post("dRx/import", body);
 
