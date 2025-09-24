@@ -73,7 +73,7 @@ export default function Deliveries({ section }) {
     if (focusRef.current) {
       focusRef.current.focus();
     }
-  }, [section]);
+  }, []);
   React.useEffect(() => {
     getLogs();
     getSessions();

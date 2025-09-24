@@ -175,6 +175,13 @@ export default function ScanInv({ id }) {
     []
   );
 
+  const focusRef = React.useRef(null);
+  React.useEffect(() => {
+    if (focusRef.current) {
+      focusRef.current.focus();
+    }
+  }, []);
+
   return (
     <AppContainer id={id}>
       <ToggleButtonGroup
@@ -204,6 +211,8 @@ export default function ScanInv({ id }) {
           justifyContent: "center",
           alignItems: "center",
         }}
+        tabIndex="-1"
+        ref={focusRef}
       >
         <StateSvg key={refresh} state={state} />
       </Box>
