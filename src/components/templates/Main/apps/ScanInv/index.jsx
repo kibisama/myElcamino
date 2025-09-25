@@ -184,6 +184,7 @@ export default function ScanInv({ id }) {
 
   return (
     <AppContainer id={id}>
+      <div tabIndex="-1" ref={focusRef} />
       <ToggleButtonGroup
         exclusive
         color="primary"
@@ -211,8 +212,6 @@ export default function ScanInv({ id }) {
           justifyContent: "center",
           alignItems: "center",
         }}
-        tabIndex="-1"
-        ref={focusRef}
       >
         <StateSvg key={refresh} state={state} />
       </Box>

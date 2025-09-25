@@ -5,6 +5,7 @@ export default function Prints() {
   return (
     <Routes>
       <Route path="/pickups/:_id/:rxNumber" element={<PickupReport />} />
+      {/* <Route path="/delivery/:section/:date/:session" /> */}
     </Routes>
   );
 }

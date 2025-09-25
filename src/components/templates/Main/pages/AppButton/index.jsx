@@ -8,13 +8,7 @@ export default function AppButton({ app, onClick, children }) {
     <Button
       variant="contained"
       sx={{ height: 36 }}
-      onClick={
-        onClick
-          ? onClick
-          : () => {
-              dispatch(setApp(app));
-            }
-      }
+      onClick={onClick ? onClick : () => dispatch(setApp(app))}
     >
       {children}
     </Button>

@@ -27,9 +27,14 @@ const mainSlice = createSlice({
   },
   reducers: {
     setApp: (state, action) => {
-      state.app === action.payload
-        ? (state.app = "")
-        : (state.app = action.payload);
+      const { payload } = action;
+      if (state.app === payload) {
+        state.app = "";
+        state.activeApp = "";
+      } else {
+        state.app = payload;
+        state.activeApp = payload;
+      }
     },
     setActiveApp: (state, action) => {
       state.activeApp = action.payload;

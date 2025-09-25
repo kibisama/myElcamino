@@ -17,6 +17,8 @@ export const getDeliveryLogItems = (section, date, session) =>
 export const postDeliveryLog = (section) => client.post(`delivery/${section}`);
 export const postDeliveryQR = (section, body) =>
   client.post(`delivery/${section}/qr`, body);
+export const unsetDeliveryStation = (rxID) =>
+  client.get(`delivery/unset/${rxID}`);
 /** INVENTORIES **/
 export const getAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);

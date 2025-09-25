@@ -14,6 +14,7 @@ import {
   getDeliverySessions,
   postDeliveryQR,
   postDeliveryLog,
+  unsetDeliveryStation,
 } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
@@ -83,7 +84,7 @@ export default function Deliveries({ section }) {
     if (focusRef.current) {
       focusRef.current.focus();
     }
-  }, []);
+  }, [section]);
   React.useEffect(() => {
     getSessions();
     getLogs(date, session);
@@ -93,14 +94,15 @@ export default function Deliveries({ section }) {
   }, [section]);
   const onComplete = React.useCallback(
     (data) => {
+      const delimiter = "|";
+      const split = data.split(delimiter);
+      if (split.length !== 12 || !split[0].match(/^\d{8,}$/)) {
+        return enqueueSnackbar("Invalid barcode reading", {
+          variant: "error",
+        });
+      }
       (async function () {
         try {
-          const delimiter = "|";
-          if (data.split(delimiter).length !== 12) {
-            return enqueueSnackbar("Invalid barcode reading", {
-              variant: "error",
-            });
-          }
           const result = await postDeliveryQR(section, {
             data,
             delimiter,
@@ -108,6 +110,9 @@ export default function Deliveries({ section }) {
           apiRef.current?.updateRows([result.data.data]);
         } catch (e) {
           console.error(e);
+          enqueueSnackbar(e.response?.data.message || e.message, {
+            variant: "error",
+          });
         }
       })();
     },
@@ -178,16 +183,29 @@ export default function Deliveries({ section }) {
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
-            disabled={row.deliveryLog}
+            disabled={row.log}
             key={"delete-item"}
             icon={<DeleteIcon />}
             label={"Delete"}
-            onClick={() => {}}
+            onClick={() =>
+              (async function () {
+                const id = row.id;
+                try {
+                  await unsetDeliveryStation(id);
+                  apiRef.current?.updateRows([{ id, _action: "delete" }]);
+                } catch (e) {
+                  console.error(e);
+                  enqueueSnackbar(e.response?.data.message || e.message, {
+                    variant: "error",
+                  });
+                }
+              })()
+            }
           />,
         ],
       },
     ],
-    []
+    [apiRef]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -203,7 +221,6 @@ export default function Deliveries({ section }) {
     },
     [getLogs, session]
   );
-
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
