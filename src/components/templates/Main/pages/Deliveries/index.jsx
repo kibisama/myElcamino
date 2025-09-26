@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { Box, Button, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import PrintIcon from "@mui/icons-material/Print";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PageContainer from "../PageContainer";
@@ -29,6 +30,14 @@ export default function Deliveries({ section }) {
   const [sessions, setSessions] = React.useState([]);
   const [session, setSession] = React.useState("0");
   const [isLoading, setIsLoading] = React.useState(false);
+  const handlePrint = React.useCallback(
+    () =>
+      window.open(
+        `/print/deliveries/${section}/${date.format("MMDDYYYY")}/${session}`,
+        "_blank"
+      ),
+    [section, date, session]
+  );
   const postLog = React.useCallback(() => {
     setIsLoading(true);
     (async function () {
@@ -38,12 +47,13 @@ export default function Deliveries({ section }) {
         setSessions((prev) => [...prev, session]);
         setSession(session);
         setIsLoading(false);
+        handlePrint();
       } catch (e) {
         console.error(e);
         setIsLoading(false);
       }
     })();
-  }, [section]);
+  }, [section, handlePrint]);
   const getLogs = React.useCallback(
     (date, session) => {
       setIsLoading(true);
@@ -221,12 +231,21 @@ export default function Deliveries({ section }) {
     },
     [getLogs, session]
   );
+
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
       title={section}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
+          <IconButton
+            disabled={isLoading || session === "0"}
+            size="small"
+            aria-label="print"
+            onClick={handlePrint}
+          >
+            <PrintIcon />
+          </IconButton>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
               <IconButton
