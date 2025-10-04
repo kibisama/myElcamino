@@ -31,12 +31,12 @@ export default function Deliveries({ section }) {
   const [session, setSession] = React.useState("0");
   const [isLoading, setIsLoading] = React.useState(false);
   const handlePrint = React.useCallback(
-    () =>
+    (section, date, session) =>
       window.open(
         `/print/deliveries/${section}/${date.format("MMDDYYYY")}/${session}`,
         "_blank"
       ),
-    [section, date, session]
+    []
   );
   const postLog = React.useCallback(() => {
     setIsLoading(true);
@@ -47,13 +47,13 @@ export default function Deliveries({ section }) {
         setSessions((prev) => [...prev, session]);
         setSession(session);
         setIsLoading(false);
-        handlePrint();
+        handlePrint(section, date, session);
       } catch (e) {
         console.error(e);
         setIsLoading(false);
       }
     })();
-  }, [section, handlePrint]);
+  }, [section, date, handlePrint]);
   const getLogs = React.useCallback(
     (date, session) => {
       setIsLoading(true);
@@ -242,7 +242,7 @@ export default function Deliveries({ section }) {
             disabled={isLoading || session === "0"}
             size="small"
             aria-label="print"
-            onClick={handlePrint}
+            onClick={() => handlePrint(section, date, session)}
           >
             <PrintIcon />
           </IconButton>

@@ -1,13 +1,17 @@
 import React from "react";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { getSettings } from "../../../../lib/api/client";
+import Logo from "../../../svg/Logo";
 
-export default function StoreInfoHeader({
-  styles = {},
-  noFax = false,
-  noEmail = false,
-}) {
+const sx = {
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 0,
+  lineHeight: 1.25,
+};
+
+export default function StoreInfoHeader() {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
     (async () => {
@@ -20,38 +24,36 @@ export default function StoreInfoHeader({
       }
     })();
   }, []);
-  const _styles = {
-    name: {
-      fontSize: 18,
-      fontWeight: 600,
-      ...styles.name,
-    },
-  };
 
   return (
-    <div>
+    <Box
+      sx={{
+        width: 408,
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+      }}
+    >
       {settings ? (
         <React.Fragment>
-          <Typography sx={_styles.name}>{settings.storeName}</Typography>
-          <Typography>{settings.storeAddress}</Typography>
-          <Typography>
-            {settings.storeCity +
-              ", " +
-              settings.storeState +
-              " " +
-              settings.storeZip}
-          </Typography>
-          <Typography>
-            {noFax || !settings.storeFax ? "Phone " : "" + settings.storePhone}
-          </Typography>
-          {!noFax && settings.storeFax && (
-            <Typography>{"Fax " + settings.storeFax}</Typography>
-          )}
-          {!noEmail && settings.storeEmail && (
-            <Typography>{settings.storeEmail}</Typography>
-          )}
+          <Logo height={48} />
+          <div>
+            <Typography sx={sx}>{settings.storeName}</Typography>
+            <Typography sx={sx}>{settings.storeAddress}</Typography>
+            <Typography sx={sx}>
+              {settings.storeCity +
+                ", " +
+                settings.storeState +
+                " " +
+                settings.storeZip}
+            </Typography>
+            <Typography sx={sx}>{"Phone " + settings.storePhone}</Typography>
+            {settings.storeFax && (
+              <Typography sx={sx}>{"Fax " + settings.storeFax}</Typography>
+            )}
+          </div>
         </React.Fragment>
       ) : null}
-    </div>
+    </Box>
   );
 }
