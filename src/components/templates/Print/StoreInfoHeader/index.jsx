@@ -5,10 +5,9 @@ import { getSettings } from "../../../../lib/api/client";
 import Logo from "../../../svg/Logo";
 
 const sx = {
-  fontSize: 12,
-  fontWeight: 800,
-  letterSpacing: 0,
-  lineHeight: 1.25,
+  fontSize: 11,
+  fontWeight: 600,
+  lineHeight: "10px",
 };
 
 export default function StoreInfoHeader() {
@@ -36,8 +35,8 @@ export default function StoreInfoHeader() {
     >
       {settings ? (
         <React.Fragment>
-          <Logo height={48} />
-          <div>
+          <Logo height={50} />
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Typography sx={sx}>{settings.storeName}</Typography>
             <Typography sx={sx}>{settings.storeAddress}</Typography>
             <Typography sx={sx}>
@@ -51,7 +50,7 @@ export default function StoreInfoHeader() {
             {settings.storeFax && (
               <Typography sx={sx}>{"Fax " + settings.storeFax}</Typography>
             )}
-          </div>
+          </Box>
         </React.Fragment>
       ) : null}
     </Box>
