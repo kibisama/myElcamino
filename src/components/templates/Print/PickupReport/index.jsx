@@ -33,7 +33,7 @@ export default function PickupReport() {
         const { data } = await getPickupReport({ _id, rxNumber });
         setData(data.data);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
     get();
