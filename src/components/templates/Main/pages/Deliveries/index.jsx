@@ -143,8 +143,9 @@ export default function Deliveries({ section }) {
       },
       {
         field: "rxNumber",
-        headerName: "Rx Number",
+        headerName: "Rx #",
         type: "number",
+        width: 84,
       },
       {
         field: "rxDate",
@@ -152,7 +153,7 @@ export default function Deliveries({ section }) {
         type: "date",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
-        width: 80,
+        width: 84,
       },
       {
         field: "patient",

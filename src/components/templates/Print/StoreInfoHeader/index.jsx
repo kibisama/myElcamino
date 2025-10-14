@@ -4,13 +4,7 @@ import { useState, useEffect } from "react";
 import { getSettings } from "../../../../lib/api/client";
 import Logo from "../../../svg/Logo";
 
-const sx = {
-  fontSize: 11,
-  fontWeight: 600,
-  lineHeight: "10px",
-};
-
-export default function StoreInfoHeader() {
+export default function StoreInfoHeader({ fontFamily }) {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
     (async () => {
@@ -23,6 +17,13 @@ export default function StoreInfoHeader() {
       }
     })();
   }, []);
+
+  const sx = {
+    fontSize: 11,
+    fontWeight: 600,
+    lineHeight: "10px",
+    fontFamily,
+  };
 
   return (
     <Box

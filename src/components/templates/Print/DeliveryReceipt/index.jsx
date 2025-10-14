@@ -1,12 +1,57 @@
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import dayjs from "dayjs";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import StoreInfoHeader from "../StoreInfoHeader";
 import { getDeliveryLogItems } from "../../../../lib/api/client";
 
+const TableCellHeader = ({ children, sx, ...props }) => (
+  <TableCell
+    sx={{ p: 0, border: "1px solid", ...sx }}
+    align="center"
+    {...props}
+  >
+    <Typography
+      sx={{
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: 0,
+      }}
+    >
+      {children}
+    </Typography>
+  </TableCell>
+);
+const TableCellBody = ({ children, sx, ...props }) => (
+  <TableCell
+    sx={{ py: "1px", px: "4px", border: "none", ...sx }}
+    align="right"
+    {...props}
+  >
+    <Typography
+      sx={{
+        fontSize: 11,
+        letterSpacing: 0,
+      }}
+    >
+      {children}
+    </Typography>
+  </TableCell>
+);
+
 export default function DeliveryReceipt() {
   const { section, date, session } = useParams();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   useEffect(() => {
     async function get() {
       try {
@@ -19,30 +64,81 @@ export default function DeliveryReceipt() {
     get();
   }, []);
 
-  if (!data) {
+  if (data.length === 0) {
     return;
   }
+  console.log(data);
 
   return (
-    <Box
-      sx={{
-        p: 2,
-        width: "816px",
-        height: "1054px",
-        "@media print": {
-          p: 0,
-          m: 0,
-          overflow: "hidden",
-          height: "100vh",
-          "@page": {
-            size: "letter portrait",
+    <React.Fragment>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          p: 2,
+          width: "816px",
+          height: "1054px",
+          "@media print": {
+            p: 2,
+            m: 0,
+            overflow: "hidden",
+            height: "100vh",
+            "@page": {
+              size: "letter portrait",
+            },
           },
-        },
-      }}
-    >
-      <Box sx={{ display: "flex" }}>
-        <StoreInfoHeader />
+        }}
+      >
+        <Box sx={{ display: "flex" }}>
+          <StoreInfoHeader />
+        </Box>
+        <Box sx={{ display: "flex" }}>
+          <Typography
+            sx={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: 0,
+              textDecoration: "underline",
+            }}
+          >
+            DELIVER TO
+          </Typography>
+        </Box>
+        <TableContainer component="div">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCellHeader sx={{ width: "72px" }}>
+                  Rx Number
+                </TableCellHeader>
+                <TableCellHeader sx={{ width: "72px" }}>
+                  Rx Date
+                </TableCellHeader>
+                <TableCellHeader sx={{ width: "216px" }}>
+                  Patient
+                </TableCellHeader>
+                <TableCellHeader>Description</TableCellHeader>
+                <TableCellHeader sx={{ width: "48px" }}>Qty</TableCellHeader>
+                <TableCellHeader sx={{ width: "64px" }}>Due</TableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.map((v) => (
+                <TableRow key={v.id}>
+                  <TableCellBody>{v.rxNumber}</TableCellBody>
+                  <TableCellBody>
+                    {dayjs(v.rxDate).format("M/D/YYYY")}
+                  </TableCellBody>
+                  <TableCellBody align="left">{v.patient}</TableCellBody>
+                  <TableCellBody align="left">{v.drugName}</TableCellBody>
+                  <TableCellBody>{v.rxQty}</TableCellBody>
+                  <TableCellBody>{v.patPay}</TableCellBody>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
-    </Box>
+    </React.Fragment>
   );
 }
