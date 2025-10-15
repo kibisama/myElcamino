@@ -48,6 +48,44 @@ const TableCellBody = ({ children, sx, ...props }) => (
     </Typography>
   </TableCell>
 );
+const KeyValueTable = ({ keys, values = [] }) => (
+  <React.Fragment>
+    {keys.map((v, i) => (
+      <div style={{ display: "flex" }}>
+        <Box
+          key={i}
+          sx={{
+            border: "1px solid",
+            minWidth: "84px",
+            maxWidth: "84px",
+            ...(i !== 0 && { borderTop: "0" }),
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: 14,
+              letterSpacing: 0,
+            }}
+          >
+            {v}
+          </Typography>
+        </Box>
+        <Box
+          key={i}
+          sx={{
+            border: "1px solid",
+            borderLeft: "0",
+            minWidth: "100px",
+            maxWidth: "100px",
+            ...(i !== 0 && { borderTop: "0" }),
+          }}
+        >
+          <Typography>{values[i]}</Typography>
+        </Box>
+      </div>
+    ))}
+  </React.Fragment>
+);
 
 export default function DeliveryReceipt() {
   const { section, date, session } = useParams();
@@ -89,8 +127,25 @@ export default function DeliveryReceipt() {
           },
         }}
       >
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <StoreInfoHeader />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 11,
+                letterSpacing: 0,
+              }}
+            >
+              PAGE {} OF {}
+            </Typography>
+            <KeyValueTable keys={["DATE", "SESSION"]} />
+          </Box>
         </Box>
         <Box sx={{ display: "flex" }}>
           <Typography
