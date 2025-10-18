@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import StoreInfoHeader from "../StoreInfoHeader";
+import PortraitContainer from "../PortraitContainer";
 import { getDeliveryLogItems } from "../../../../lib/api/client";
 
 const TableCellHeader = ({ children, sx, ...props }) => (
@@ -109,91 +110,124 @@ export default function DeliveryReceipt() {
 
   return (
     <React.Fragment>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          p: 2,
-          width: "816px",
-          height: "1054px",
-          "@media print": {
-            p: 2,
-            m: 0,
-            overflow: "hidden",
-            height: "100vh",
-            "@page": {
-              size: "letter portrait",
-            },
-          },
-        }}
-      >
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <StoreInfoHeader />
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-            }}
-          >
+      <PortraitContainer>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            height: "100%",
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <StoreInfoHeader />
+            {/* <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  letterSpacing: 0,
+                }}
+              >
+                PAGE {} OF {}
+              </Typography>
+              <KeyValueTable keys={["DATE", "SESSION"]} />
+            </Box> */}
+          </Box>
+          <Box sx={{ display: "flex" }}>
             <Typography
               sx={{
                 fontSize: 11,
+                fontWeight: 600,
                 letterSpacing: 0,
+                textDecoration: "underline",
               }}
             >
-              PAGE {} OF {}
+              DELIVER TO
             </Typography>
-            <KeyValueTable keys={["DATE", "SESSION"]} />
           </Box>
-        </Box>
-        <Box sx={{ display: "flex" }}>
-          <Typography
-            sx={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: 0,
-              textDecoration: "underline",
-            }}
-          >
-            DELIVER TO
-          </Typography>
-        </Box>
-        <TableContainer component="div">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCellHeader sx={{ width: "72px" }}>
-                  Rx Number
-                </TableCellHeader>
-                <TableCellHeader sx={{ width: "72px" }}>
-                  Rx Date
-                </TableCellHeader>
-                <TableCellHeader sx={{ width: "216px" }}>
-                  Patient
-                </TableCellHeader>
-                <TableCellHeader>Description</TableCellHeader>
-                <TableCellHeader sx={{ width: "48px" }}>Qty</TableCellHeader>
-                <TableCellHeader sx={{ width: "64px" }}>Due</TableCellHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((v) => (
-                <TableRow key={v.id}>
-                  <TableCellBody>{v.rxNumber}</TableCellBody>
-                  <TableCellBody>
-                    {dayjs(v.rxDate).format("M/D/YYYY")}
-                  </TableCellBody>
-                  <TableCellBody align="left">{v.patient}</TableCellBody>
-                  <TableCellBody align="left">{v.drugName}</TableCellBody>
-                  <TableCellBody>{v.rxQty}</TableCellBody>
-                  <TableCellBody>{v.patPay}</TableCellBody>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+          <div style={{ height: "720px" }}>
+            <TableContainer component="div">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCellHeader sx={{ width: "72px" }}>
+                      Rx Number
+                    </TableCellHeader>
+                    <TableCellHeader sx={{ width: "72px" }}>
+                      Rx Date
+                    </TableCellHeader>
+                    <TableCellHeader sx={{ width: "216px" }}>
+                      Patient
+                    </TableCellHeader>
+                    <TableCellHeader>Description</TableCellHeader>
+                    <TableCellHeader sx={{ width: "48px" }}>
+                      Qty
+                    </TableCellHeader>
+                    <TableCellHeader sx={{ width: "64px" }}>
+                      Due
+                    </TableCellHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.map((v) => (
+                    <TableRow key={v.id}>
+                      <TableCellBody>{v.rxNumber}</TableCellBody>
+                      <TableCellBody>
+                        {dayjs(v.rxDate).format("M/D/YYYY")}
+                      </TableCellBody>
+                      <TableCellBody align="left">{v.patient}</TableCellBody>
+                      <TableCellBody align="left">{v.drugName}</TableCellBody>
+                      <TableCellBody>{v.rxQty}</TableCellBody>
+                      <TableCellBody>{v.patPay}</TableCellBody>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+          <Box>
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                height: "60px",
+                border: "1px solid",
+              }}
+            >
+              <div
+                style={{
+                  width: "37.5%",
+                  borderRight: "1px solid",
+                  height: "60px",
+                }}
+              >
+                <Typography sx={{ pl: 0.5, fontSize: 9 }}>
+                  RECIPIENT NAME
+                </Typography>
+              </div>
+              <div
+                style={{
+                  width: "37.5%",
+                  borderRight: "1px solid",
+                  height: "60px",
+                }}
+              >
+                <Typography sx={{ pl: 0.5, fontSize: 9 }}>SIGNATURE</Typography>
+              </div>
+              <Typography sx={{ pl: 0.5, fontSize: 9 }}>DATE</Typography>
+            </div>
+            <Typography sx={{ fontSize: 11, letterSpacing: 0 }}>
+              You have the right to a consultation with our pharmacist. Call {}
+            </Typography>
+          </Box>
+        </div>
+      </PortraitContainer>
     </React.Fragment>
   );
 }

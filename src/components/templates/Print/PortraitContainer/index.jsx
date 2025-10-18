@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
-import StoreInfoHeader from "../StoreInfoHeader";
 
-export default function PortraitContainer({ children, slotProps = {} }) {
+export default function PortraitContainer({ children }) {
   return (
     <Box
       sx={{
@@ -9,19 +8,16 @@ export default function PortraitContainer({ children, slotProps = {} }) {
         width: "816px",
         height: "1054px",
         "@media print": {
-          p: 0,
+          p: 2,
           m: 0,
           overflow: "hidden",
-          height: "100vh",
+          height: "1054px",
           "@page": {
             size: "letter portrait",
           },
         },
       }}
     >
-      <Box sx={{ display: "flex" }}>
-        <StoreInfoHeader {...slotProps.storeInfoHeader} />
-      </Box>
       {children}
     </Box>
   );
