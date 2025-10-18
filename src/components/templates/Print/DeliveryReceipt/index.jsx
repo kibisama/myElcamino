@@ -121,6 +121,7 @@ export default function DeliveryReceipt() {
         >
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <StoreInfoHeader />
+            <Typography>Rx Delivery Receipt</Typography>
             {/* <Box
               sx={{
                 display: "flex",
