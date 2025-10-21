@@ -50,42 +50,49 @@ const TableCellBody = ({ children, sx, ...props }) => (
   </TableCell>
 );
 const KeyValueTable = ({ keys, values = [] }) => (
-  <React.Fragment>
+  <div>
     {keys.map((v, i) => (
-      <div style={{ display: "flex" }}>
-        <Box
-          key={i}
-          sx={{
+      <div key={i} style={{ display: "flex" }}>
+        <div
+          key={v}
+          style={{
             border: "1px solid",
-            minWidth: "84px",
-            maxWidth: "84px",
+            height: "24px",
+            minWidth: "104px",
+            maxWidth: "104px",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
             ...(i !== 0 && { borderTop: "0" }),
           }}
         >
           <Typography
             sx={{
-              fontSize: 14,
+              pl: 0.5,
+              fontSize: 13,
               letterSpacing: 0,
+              fontWeight: 600,
             }}
           >
             {v}
           </Typography>
-        </Box>
-        <Box
-          key={i}
-          sx={{
+        </div>
+        <div
+          key={v + i}
+          style={{
             border: "1px solid",
             borderLeft: "0",
+            height: "24px",
             minWidth: "100px",
             maxWidth: "100px",
             ...(i !== 0 && { borderTop: "0" }),
           }}
         >
           <Typography>{values[i]}</Typography>
-        </Box>
+        </div>
       </div>
     ))}
-  </React.Fragment>
+  </div>
 );
 
 export default function DeliveryReceipt() {
@@ -106,7 +113,6 @@ export default function DeliveryReceipt() {
   if (data.length === 0) {
     return;
   }
-  console.log(data);
 
   return (
     <React.Fragment>
@@ -119,28 +125,21 @@ export default function DeliveryReceipt() {
             height: "100%",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <StoreInfoHeader />
-            <Typography>Rx Delivery Receipt</Typography>
-            {/* <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-              }}
+            <Typography
+              sx={{ fontSize: 20, fontWeight: 600, letterSpacing: 0 }}
             >
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  letterSpacing: 0,
-                }}
-              >
-                PAGE {} OF {}
-              </Typography>
-              <KeyValueTable keys={["DATE", "SESSION"]} />
-            </Box> */}
-          </Box>
-          <Box sx={{ display: "flex" }}>
+              Rx Delivery Receipt
+            </Typography>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              height: "76px",
+              justifyContent: "space-between",
+            }}
+          >
             <Typography
               sx={{
                 fontSize: 11,
@@ -151,8 +150,18 @@ export default function DeliveryReceipt() {
             >
               DELIVER TO
             </Typography>
-          </Box>
-          <div style={{ height: "720px" }}>
+            <div
+              style={{
+                width: "438px",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <KeyValueTable keys={["DATE", "SESSION", "INVOICE CODE"]} />
+              <KeyValueTable keys={["PAGE", "TOTAL COUNT", "TOTAL DUE"]} />
+            </div>
+          </div>
+          <div style={{ height: "760px" }}>
             <TableContainer component="div">
               <Table>
                 <TableHead>
@@ -192,7 +201,7 @@ export default function DeliveryReceipt() {
               </Table>
             </TableContainer>
           </div>
-          <Box>
+          <div style={{ height: "112px" }}>
             <div
               style={{
                 display: "flex",
@@ -223,10 +232,12 @@ export default function DeliveryReceipt() {
               </div>
               <Typography sx={{ pl: 0.5, fontSize: 9 }}>DATE</Typography>
             </div>
-            <Typography sx={{ fontSize: 11, letterSpacing: 0 }}>
-              You have the right to a consultation with our pharmacist. Call {}
+            <Typography
+              sx={{ fontSize: 11, fontStyle: "italic", letterSpacing: 0 }}
+            >
+              You are entitled to an oral consultation with our pharmacist.
             </Typography>
-          </Box>
+          </div>
         </div>
       </PortraitContainer>
     </React.Fragment>
