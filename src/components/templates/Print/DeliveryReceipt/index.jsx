@@ -1,7 +1,7 @@
 import React from "react";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
-  Box,
   Table,
   TableBody,
   TableCell,
@@ -14,7 +14,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import StoreInfoHeader from "../StoreInfoHeader";
 import PortraitContainer from "../PortraitContainer";
-import { getDeliveryLogItems } from "../../../../lib/api/client";
+import { getDeliveryReceipt, getSettings } from "../../../../lib/api/client";
+
+dayjs.extend(customParseFormat);
 
 const TableCellHeader = ({ children, sx, ...props }) => (
   <TableCell
@@ -85,10 +87,16 @@ const KeyValueTable = ({ keys, values = [] }) => (
             height: "24px",
             minWidth: "100px",
             maxWidth: "100px",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
             ...(i !== 0 && { borderTop: "0" }),
           }}
         >
-          <Typography>{values[i]}</Typography>
+          <Typography sx={{ pr: 0.5, fontSize: 13, letterSpacing: 0 }}>
+            {values[i]}
+          </Typography>
         </div>
       </div>
     ))}
@@ -97,149 +105,206 @@ const KeyValueTable = ({ keys, values = [] }) => (
 
 export default function DeliveryReceipt() {
   const { section, date, session } = useParams();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
+  const [storeInfo, setStoreInfo] = useState(null);
   useEffect(() => {
-    async function get() {
+    (async function () {
       try {
-        const { data } = await getDeliveryLogItems(section, date, session);
+        const { data } = await getSettings();
+        setStoreInfo(data.data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+    (async function () {
+      try {
+        const { data } = await getDeliveryReceipt(section, date, session);
         setData(data.data);
       } catch (e) {
         console.error(e);
       }
-    }
-    get();
+    })();
   }, []);
 
-  if (data.length === 0) {
+  if (!data || !data.items?.length || !storeInfo) {
     return;
   }
-
+  const { station, items, pages, due, count } = data;
   return (
     <React.Fragment>
-      <PortraitContainer>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "100%",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <StoreInfoHeader />
-            <Typography
-              sx={{ fontSize: 20, fontWeight: 600, letterSpacing: 0 }}
-            >
-              Rx Delivery Receipt
-            </Typography>
-          </div>
+      {items.map((item, index) => (
+        <PortraitContainer>
           <div
             style={{
               display: "flex",
-              height: "76px",
+              flexDirection: "column",
               justifyContent: "space-between",
+              height: "100%",
             }}
           >
-            <Typography
-              sx={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 0,
-                textDecoration: "underline",
-              }}
-            >
-              DELIVER TO
-            </Typography>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <StoreInfoHeader storeInfo={storeInfo} />
+              <Typography
+                sx={{
+                  fontFamily: "Roboto",
+                  fontSize: 24,
+                  fontWeight: 600,
+                  letterSpacing: 0,
+                }}
+              >
+                Rx Delivery Receipt
+              </Typography>
+            </div>
             <div
               style={{
-                width: "438px",
                 display: "flex",
+                height: "76px",
                 justifyContent: "space-between",
               }}
             >
-              <KeyValueTable keys={["DATE", "SESSION", "INVOICE CODE"]} />
-              <KeyValueTable keys={["PAGE", "TOTAL COUNT", "TOTAL DUE"]} />
-            </div>
-          </div>
-          <div style={{ height: "760px" }}>
-            <TableContainer component="div">
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCellHeader sx={{ width: "72px" }}>
-                      Rx Number
-                    </TableCellHeader>
-                    <TableCellHeader sx={{ width: "72px" }}>
-                      Rx Date
-                    </TableCellHeader>
-                    <TableCellHeader sx={{ width: "216px" }}>
-                      Patient
-                    </TableCellHeader>
-                    <TableCellHeader>Description</TableCellHeader>
-                    <TableCellHeader sx={{ width: "48px" }}>
-                      Qty
-                    </TableCellHeader>
-                    <TableCellHeader sx={{ width: "64px" }}>
-                      Due
-                    </TableCellHeader>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((v) => (
-                    <TableRow key={v.id}>
-                      <TableCellBody>{v.rxNumber}</TableCellBody>
-                      <TableCellBody>
-                        {dayjs(v.rxDate).format("M/D/YYYY")}
-                      </TableCellBody>
-                      <TableCellBody align="left">{v.patient}</TableCellBody>
-                      <TableCellBody align="left">{v.drugName}</TableCellBody>
-                      <TableCellBody>{v.rxQty}</TableCellBody>
-                      <TableCellBody>{v.patPay}</TableCellBody>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-          <div style={{ height: "112px" }}>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                height: "60px",
-                border: "1px solid",
-              }}
-            >
-              <div
-                style={{
-                  width: "37.5%",
-                  borderRight: "1px solid",
-                  height: "60px",
-                }}
-              >
-                <Typography sx={{ pl: 0.5, fontSize: 9 }}>
-                  RECIPIENT NAME
+              <div>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    letterSpacing: 0,
+                    lineHeight: "14px",
+                    textDecoration: "underline",
+                    mb: "2px",
+                  }}
+                >
+                  DELIVER TO
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    letterSpacing: 0,
+                    lineHeight: "14px",
+                  }}
+                >
+                  {station.name}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 11, letterSpacing: 0, lineHeight: "12px" }}
+                >
+                  {station.address1}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 11, letterSpacing: 0, lineHeight: "12px" }}
+                >
+                  {station.address2}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 11, letterSpacing: 0, lineHeight: "12px" }}
+                >
+                  {station.phone}
                 </Typography>
               </div>
               <div
                 style={{
-                  width: "37.5%",
-                  borderRight: "1px solid",
-                  height: "60px",
+                  width: "438px",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                <Typography sx={{ pl: 0.5, fontSize: 9 }}>SIGNATURE</Typography>
+                <KeyValueTable
+                  keys={["PAGE", "TOTAL COUNT", "TOTAL DUE"]}
+                  values={[`${index + 1} OF ${pages}`, count, due]}
+                />
+                <KeyValueTable
+                  keys={["DATE", "SESSION", "STATION CODE"]}
+                  values={[
+                    dayjs(date, "MMDDYYYY").format("M. D. YYYY"),
+                    session,
+                    station.code,
+                  ]}
+                />
               </div>
-              <Typography sx={{ pl: 0.5, fontSize: 9 }}>DATE</Typography>
             </div>
-            <Typography
-              sx={{ fontSize: 11, fontStyle: "italic", letterSpacing: 0 }}
-            >
-              You are entitled to an oral consultation with our pharmacist.
-            </Typography>
+            <div style={{ height: "760px" }}>
+              <TableContainer component="div">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCellHeader sx={{ width: "72px" }}>
+                        Rx Number
+                      </TableCellHeader>
+                      <TableCellHeader sx={{ width: "72px" }}>
+                        Rx Date
+                      </TableCellHeader>
+                      <TableCellHeader sx={{ width: "216px" }}>
+                        Patient
+                      </TableCellHeader>
+                      <TableCellHeader>Description</TableCellHeader>
+                      <TableCellHeader sx={{ width: "48px" }}>
+                        Qty
+                      </TableCellHeader>
+                      <TableCellHeader sx={{ width: "64px" }}>
+                        Due
+                      </TableCellHeader>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {item.map((v) => (
+                      <TableRow key={v.id}>
+                        <TableCellBody>{v.rxNumber}</TableCellBody>
+                        <TableCellBody>
+                          {dayjs(v.rxDate).format("M/D/YYYY")}
+                        </TableCellBody>
+                        <TableCellBody align="left">{v.patient}</TableCellBody>
+                        <TableCellBody align="left">{v.drugName}</TableCellBody>
+                        <TableCellBody>{v.rxQty}</TableCellBody>
+                        <TableCellBody>{v.patPay}</TableCellBody>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+            <div style={{ height: "112px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  height: "60px",
+                  border: "1px solid",
+                }}
+              >
+                <div
+                  style={{
+                    width: "37.5%",
+                    borderRight: "1px solid",
+                    height: "60px",
+                  }}
+                >
+                  <Typography sx={{ pl: 0.5, fontSize: 9 }}>
+                    RECIPIENT NAME
+                  </Typography>
+                </div>
+                <div
+                  style={{
+                    width: "37.5%",
+                    borderRight: "1px solid",
+                    height: "60px",
+                  }}
+                >
+                  <Typography sx={{ pl: 0.5, fontSize: 9 }}>
+                    SIGNATURE
+                  </Typography>
+                </div>
+                <Typography sx={{ pl: 0.5, fontSize: 9 }}>DATE</Typography>
+              </div>
+              <Typography
+                sx={{ fontSize: 11, fontStyle: "italic", letterSpacing: 0 }}
+              >
+                You are entitled to an oral consultation with our pharmacist.
+                Please Call {storeInfo.storePhone}
+              </Typography>
+            </div>
           </div>
-        </div>
-      </PortraitContainer>
+        </PortraitContainer>
+      ))}
     </React.Fragment>
   );
 }

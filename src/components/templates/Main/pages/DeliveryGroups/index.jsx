@@ -3,7 +3,8 @@ import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import DeleteIcon from "@mui/icons-material/Delete";
+import LayersIcon from "@mui/icons-material/Layers";
+import LayersClearIcon from "@mui/icons-material/LayersClear";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
@@ -69,9 +70,9 @@ export default function DeliveryGroups() {
           />,
           <GridActionsCellItem
             disabled
-            key="delete"
-            icon={<DeleteIcon />}
-            label="Delete"
+            key="deactivate"
+            icon={<LayersClearIcon />}
+            label="Deactivate"
             onClick={() => {}}
           />,
         ],

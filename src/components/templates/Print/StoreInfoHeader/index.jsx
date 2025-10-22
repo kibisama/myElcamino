@@ -4,25 +4,28 @@ import { useState, useEffect } from "react";
 import { getSettings } from "../../../../lib/api/client";
 import Logo from "../../../svg/Logo";
 
-export default function StoreInfoHeader({ fontFamily }) {
+export default function StoreInfoHeader({ storeInfo }) {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await getSettings();
-        setSettings(data.data);
-      } catch (e) {
-        setSettings(null);
-        console.error(e);
-      }
-    })();
+    if (storeInfo) {
+      setSettings(storeInfo);
+    } else {
+      (async () => {
+        try {
+          const { data } = await getSettings();
+          setSettings(data.data);
+        } catch (e) {
+          setSettings(null);
+          console.error(e);
+        }
+      })();
+    }
   }, []);
 
   const sx = {
     fontSize: 11,
     fontWeight: 600,
-    lineHeight: "10px",
-    fontFamily,
+    lineHeight: "11px",
   };
 
   return (
@@ -36,7 +39,7 @@ export default function StoreInfoHeader({ fontFamily }) {
     >
       {settings ? (
         <React.Fragment>
-          <Logo height={50} />
+          <Logo height={55} />
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Typography sx={sx}>{settings.storeName}</Typography>
             <Typography sx={sx}>{settings.storeAddress}</Typography>

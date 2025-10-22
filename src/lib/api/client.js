@@ -14,6 +14,8 @@ export const getDeliverySessions = (section, date) =>
   client.get(`delivery/${section}/${date}`);
 export const getDeliveryLogItems = (section, date, session) =>
   client.get(`delivery/${section}/${date}/${session}`);
+export const getDeliveryReceipt = (section, date, session) =>
+  client.get(`delivery/${section}/${date}/${session}/receipt`);
 export const postDeliveryLog = (section) => client.post(`delivery/${section}`);
 export const postDeliveryQR = (section, body) =>
   client.post(`delivery/${section}/qr`, body);
