@@ -118,6 +118,9 @@ export default function Deliveries({ section }) {
             delimiter,
           });
           apiRef.current?.updateRows([result.data.data]);
+          enqueueSnackbar("The Rx has been updated successfully.", {
+            variant: "success",
+          });
         } catch (e) {
           console.error(e);
           enqueueSnackbar(e.response?.data.message || e.message, {
