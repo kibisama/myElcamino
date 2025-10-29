@@ -17,6 +17,7 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import MedicationIcon from "@mui/icons-material/Medication";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import DescriptionIcon from "@mui/icons-material/Description";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { DashboardSidebarContext } from "../../context";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "../../constants";
 import PageItem from "./PageItem";
@@ -205,6 +206,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             />
             <DividerItem />
             <HeaderItem>Invoices</HeaderItem>
+            <PageItem id="Invoices" icon={<ReceiptLongIcon />} />
             <DividerItem />
             <PageItem id="Settings" icon={<SettingsIcon />} />
           </List>
@@ -217,7 +219,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       isFullyExpanded,
       expandedItemIds,
       page,
-      // deliveryGroups,
+      deliveries,
     ]
   );
 
