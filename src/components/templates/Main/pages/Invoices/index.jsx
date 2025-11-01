@@ -30,7 +30,7 @@ export default function Invoices() {
       {
         field: "invoiceNumber",
         headerName: "Invoice #",
-        width: 120,
+        // width: 120,
       },
       {
         field: "date",
@@ -38,12 +38,12 @@ export default function Invoices() {
         type: "date",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
-        width: 120,
+        // width: 120,
       },
       {
         field: "stationDisplayName",
         headerName: "Station",
-        width: 104,
+        // width: 104,
       },
       {
         field: "datePeriodStart",
@@ -51,7 +51,7 @@ export default function Invoices() {
         type: "date",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
-        width: 120,
+        // width: 120,
       },
       {
         field: "datePeriodEnd",
@@ -59,7 +59,7 @@ export default function Invoices() {
         type: "date",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
-        width: 120,
+        // width: 120,
       },
       {
         field: "billingAddress",
@@ -69,19 +69,19 @@ export default function Invoices() {
       {
         field: "count",
         headerName: "Count",
-        type: "number",
-        width: 120,
+        // type: "number",
+        // width: 120,
       },
       {
         field: "due",
         headerName: "Total",
-        type: "number",
-        width: 120,
+        // type: "number",
+        // width: 120,
       },
       {
         field: "paid",
         headerName: "Status",
-        width: 104,
+        // width: 104,
       },
       {
         field: "actions",

@@ -13,6 +13,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
+import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import MedicationIcon from "@mui/icons-material/Medication";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -166,6 +167,11 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                     id="PrivateDelivery"
                     title="Private"
                     icon={<PersonIcon />}
+                  />
+                  <PageItem
+                    id="SearchDelivery"
+                    title="Search"
+                    icon={<SearchIcon />}
                   />
                   <PageItem
                     id="DeliveryGroups"
