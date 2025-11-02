@@ -8,6 +8,9 @@ const generateQuery = (q) =>
     .map((v) => (q[v] ? `${v}=${q[v]}` : ""))
     .join("&");
 
+/** PATIENTS **/
+export const getPtAutocompleteOptions = (q) => client.get(`dRx/pt/?q=${q}`);
+
 /** DELIVERIES **/
 export const getDeliveries = () => client.get("delivery");
 export const getDeliverySessions = (section, date) =>
@@ -21,10 +24,10 @@ export const postDeliveryQR = (section, body) =>
   client.post(`delivery/${section}/qr`, body);
 export const unsetDeliveryStation = (rxID) =>
   client.get(`delivery/unset/${rxID}`);
-export const searchDeliveries = (rxNumber) =>
-  client.get(`delivery/search/?rxNumber=${rxNumber}`);
+export const searchDeliveries = (q) =>
+  client.get(`delivery/search?${generateQuery(q)}`);
 /** INVENTORIES **/
-export const getAutocompleteOptions = () => client.get("inv/alt");
+export const getAltAutocompleteOptions = () => client.get("inv/alt");
 export const getInventories = (q) => client.get(`inv/?${generateQuery(q)}`);
 export const getInventoryUsage = (date) => client.get(`inv/usage/${date}`); //MMDDYYYY
 /** dRx **/

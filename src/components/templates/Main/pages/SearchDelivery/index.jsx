@@ -8,26 +8,28 @@ import Search from "../../../../inputs/Search";
 import { searchDeliveries } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import NumericFormat from "../../apps/Pickup/NumericFormat";
+import PtAutocomplete from "../../../../inputs/PatientAutocomplete";
 
 const rowHeight = 42;
 
 export default function SearchDelivery() {
   const [rows, setRows] = React.useState([]);
   const [rxNumber, setRxNumber] = React.useState("");
+  const [patient, setPatient] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const columns = React.useMemo(
     () => [
       {
-        field: "rxID",
-        headerName: "ID",
+        field: "id",
+        headerName: "Rx ID",
         type: "number",
-        width: 120,
+        width: 100,
       },
       {
         field: "rxNumber",
         headerName: "Rx Number",
         type: "number",
-        width: 120,
+        width: 100,
       },
       {
         field: "rxDate",
@@ -35,7 +37,7 @@ export default function SearchDelivery() {
         type: "date",
         valueGetter: (v) => v && new Date(v),
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
-        width: 84,
+        width: 100,
       },
       {
         field: "patient",
@@ -55,7 +57,7 @@ export default function SearchDelivery() {
       {
         field: "date",
         headerName: "Log Date",
-        width: 84,
+        width: 100,
       },
       {
         field: "session",
@@ -65,11 +67,11 @@ export default function SearchDelivery() {
     ],
     []
   );
-  const search = React.useCallback((rxNumber) => {
+  const search = React.useCallback((rxNumber, patient) => {
     setIsLoading(true);
     (async () => {
       try {
-        const { data } = await searchDeliveries(rxNumber);
+        const { data } = await searchDeliveries({ rxNumber, patient });
         setRows(data.data);
       } catch (e) {
         console.error(e);
@@ -87,13 +89,24 @@ export default function SearchDelivery() {
   const handleChangeRxNumber = React.useCallback((e) => {
     setRxNumber(e.target.value);
   }, []);
-  const handleKeyDown = React.useCallback(
-    (e) => {
-      if (e.key === "Enter" && rxNumber) {
-        search(rxNumber);
+  const handleChangePatient = React.useCallback(
+    (option) => {
+      if (option) {
+        setPatient(option._id);
+        search(rxNumber, option._id);
+      } else {
+        setPatient("");
       }
     },
-    [search, rxNumber]
+    [rxNumber, search]
+  );
+  const handleKeyDown = React.useCallback(
+    (e) => {
+      if (e.key === "Enter" && (rxNumber || patient)) {
+        search(rxNumber, patient);
+      }
+    },
+    [search, rxNumber, patient]
   );
 
   return (
@@ -124,6 +137,7 @@ export default function SearchDelivery() {
             onChange={handleChangeRxNumber}
             onKeyDown={handleKeyDown}
           />
+          <PtAutocomplete onChange={handleChangePatient} />
         </Stack>
       }
     >

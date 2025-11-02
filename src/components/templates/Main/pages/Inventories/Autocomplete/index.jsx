@@ -5,7 +5,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Search from "../../../../../inputs/Search";
-import { getAutocompleteOptions } from "../../../../../../lib/api/client";
+import { getAltAutocompleteOptions } from "../../../../../../lib/api/client";
 
 export default function Autocomplete({ refresh, ...props }) {
   const theme = useTheme();
@@ -13,7 +13,7 @@ export default function Autocomplete({ refresh, ...props }) {
   const getOptions = React.useCallback(() => {
     (async () => {
       try {
-        const { data } = await getAutocompleteOptions();
+        const { data } = await getAltAutocompleteOptions();
         setOptions(data.data);
       } catch (e) {
         console.error(e);
