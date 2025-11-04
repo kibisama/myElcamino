@@ -6,6 +6,7 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import PrintIcon from "@mui/icons-material/Print";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
@@ -16,6 +17,7 @@ import {
   postDeliveryQR,
   postDeliveryLog,
   unsetDeliveryStation,
+  reverseDelivery,
 } from "../../../../../lib/api/client";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
@@ -197,23 +199,39 @@ export default function Deliveries({ section }) {
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
-            disabled={row.log}
             key={"delete-item"}
-            icon={<DeleteIcon />}
+            disabled={row.log && row.returnDate}
+            icon={row.log ? <AssignmentReturnIcon /> : <DeleteIcon />}
             label={"Delete"}
-            onClick={() =>
-              (async function () {
-                const id = row.id;
-                try {
-                  await unsetDeliveryStation(id);
-                  apiRef.current?.updateRows([{ id, _action: "delete" }]);
-                } catch (e) {
-                  console.error(e);
-                  enqueueSnackbar(e.response?.data.message || e.message, {
-                    variant: "error",
-                  });
-                }
-              })()
+            onClick={
+              row.log
+                ? (async function () {
+                    const id = row.id;
+                    try {
+                      const { data } = await reverseDelivery(id);
+                      apiRef.current?.updateRows([
+                        { id, returnDate: data.data.returnDate },
+                      ]);
+                    } catch (e) {
+                      console.error(e);
+                      enqueueSnackbar(e.response?.data.message || e.message, {
+                        variant: "error",
+                      });
+                    }
+                  })()
+                : () =>
+                    (async function () {
+                      const id = row.id;
+                      try {
+                        await unsetDeliveryStation(id);
+                        apiRef.current?.updateRows([{ id, _action: "delete" }]);
+                      } catch (e) {
+                        console.error(e);
+                        enqueueSnackbar(e.response?.data.message || e.message, {
+                          variant: "error",
+                        });
+                      }
+                    })()
             }
           />,
         ],
@@ -307,7 +325,9 @@ export default function Deliveries({ section }) {
           pageSizeOptions={[]}
           sx={{
             maxHeight: rowHeight * 100,
+            "& .returned": { textDecoration: "line-through" },
           }}
+          getRowClassName={(params) => params.row.returnDate && "returned"}
           slotProps={{
             loadingOverlay: {
               variant: "circular-progress",

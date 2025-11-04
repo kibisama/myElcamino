@@ -24,6 +24,7 @@ export const postDeliveryQR = (section, body) =>
   client.post(`delivery/${section}/qr`, body);
 export const unsetDeliveryStation = (rxID) =>
   client.get(`delivery/unset/${rxID}`);
+export const reverseDelivery = (rxID) => client.get(`delivery/reverse/${rxID}`);
 export const searchDeliveries = (q) =>
   client.get(`delivery/search?${generateQuery(q)}`);
 /** INVENTORIES **/

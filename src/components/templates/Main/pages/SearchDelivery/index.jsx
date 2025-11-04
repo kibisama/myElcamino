@@ -64,6 +64,11 @@ export default function SearchDelivery() {
         headerName: "Session",
         width: 120,
       },
+      {
+        field: "returnDate",
+        headerName: "Return Date",
+        width: 100,
+      },
     ],
     []
   );
