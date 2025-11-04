@@ -205,20 +205,21 @@ export default function Deliveries({ section }) {
             label={"Delete"}
             onClick={
               row.log
-                ? (async function () {
-                    const id = row.id;
-                    try {
-                      const { data } = await reverseDelivery(id);
-                      apiRef.current?.updateRows([
-                        { id, returnDate: data.data.returnDate },
-                      ]);
-                    } catch (e) {
-                      console.error(e);
-                      enqueueSnackbar(e.response?.data.message || e.message, {
-                        variant: "error",
-                      });
-                    }
-                  })()
+                ? () =>
+                    (async function () {
+                      const id = row.id;
+                      try {
+                        const { data } = await reverseDelivery(id);
+                        apiRef.current?.updateRows([
+                          { id, returnDate: data.data.returnDate },
+                        ]);
+                      } catch (e) {
+                        console.error(e);
+                        enqueueSnackbar(e.response?.data.message || e.message, {
+                          variant: "error",
+                        });
+                      }
+                    })()
                 : () =>
                     (async function () {
                       const id = row.id;
