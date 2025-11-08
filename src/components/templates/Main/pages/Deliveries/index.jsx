@@ -134,6 +134,12 @@ export default function Deliveries({ section }) {
     [section, apiRef]
   );
   useScanDetection({ onComplete, disabled: activeApp });
+
+  const handleRefresh = React.useCallback(
+    () => getLogs(date, session),
+    [getLogs, date, session]
+  );
+
   const columns = React.useMemo(
     () => [
       {
@@ -209,10 +215,14 @@ export default function Deliveries({ section }) {
                     (async function () {
                       const id = row.id;
                       try {
-                        const { data } = await reverseDelivery(id);
-                        apiRef.current?.updateRows([
-                          { id, returnDate: data.data.returnDate },
-                        ]);
+                        await reverseDelivery(id);
+                        handleRefresh();
+                        enqueueSnackbar(
+                          "The Rx has been returned successfully.",
+                          {
+                            variant: "success",
+                          }
+                        );
                       } catch (e) {
                         console.error(e);
                         enqueueSnackbar(e.response?.data.message || e.message, {
@@ -238,7 +248,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [apiRef]
+    [apiRef, handleRefresh]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -275,7 +285,7 @@ export default function Deliveries({ section }) {
                 disabled={isLoading}
                 size="small"
                 aria-label="refresh"
-                onClick={() => getLogs(date, session)}
+                onClick={handleRefresh}
               >
                 <RefreshIcon />
               </IconButton>
@@ -328,7 +338,9 @@ export default function Deliveries({ section }) {
             maxHeight: rowHeight * 100,
             "& .returned": { textDecoration: "line-through" },
           }}
-          getRowClassName={(params) => params.row.returnDate && "returned"}
+          getRowClassName={(params) =>
+            params.row.returnDate && session !== "0" && "returned"
+          }
           slotProps={{
             loadingOverlay: {
               variant: "circular-progress",
