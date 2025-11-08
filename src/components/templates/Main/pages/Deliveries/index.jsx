@@ -216,7 +216,10 @@ export default function Deliveries({ section }) {
                       const id = row.id;
                       try {
                         await reverseDelivery(id);
-                        handleRefresh();
+                        const { data } = await reverseDelivery(id);
+                        apiRef.current?.updateRows([
+                          { id, returnDate: data.data.returnDate },
+                        ]);
                         enqueueSnackbar(
                           "The Rx has been returned successfully.",
                           {
@@ -248,7 +251,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [apiRef, handleRefresh]
+    [apiRef]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
