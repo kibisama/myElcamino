@@ -45,9 +45,10 @@ export default function Deliveries({ section }) {
     (async function () {
       try {
         const { data } = await postDeliveryLog(section);
-        const session = data.data?.session;
-        setSessions((prev) => [...prev, session]);
-        setSession(session);
+        const { session, _id } = data.data;
+        const _session = { session, logId: _id };
+        setSessions((prev) => [...prev, _session]);
+        setSession(_session);
         setIsLoading(false);
         handlePrint(section, date, session);
       } catch (e) {
@@ -99,7 +100,7 @@ export default function Deliveries({ section }) {
   }, [section]);
   React.useEffect(() => {
     getSessions();
-    getLogs(date, session);
+    getLogs(date, session === "0" ? "0" : session.session);
   }, [date, session, getLogs, getSessions]);
   React.useEffect(() => {
     setSession("0");
@@ -136,7 +137,7 @@ export default function Deliveries({ section }) {
   useScanDetection({ onComplete, disabled: activeApp });
 
   const handleRefresh = React.useCallback(
-    () => getLogs(date, session),
+    () => getLogs(date, session === "0" ? "0" : session.session),
     [getLogs, date, session]
   );
 
@@ -206,12 +207,25 @@ export default function Deliveries({ section }) {
         getActions: ({ row }) => [
           <GridActionsCellItem
             key={"delete-item"}
-            disabled={session !== "0" && row.log && row.returnDate}
-            icon={session !== "0" ? <AssignmentReturnIcon /> : <DeleteIcon />}
+            disabled={session !== "0" && row.logHistory.includes(session.logId)}
+            icon={session === "0" ? <DeleteIcon /> : <AssignmentReturnIcon />}
             label={"Delete"}
             onClick={
-              row.log
+              session === "0"
                 ? () =>
+                    (async function () {
+                      const id = row.id;
+                      try {
+                        await unsetDeliveryStation(id);
+                        apiRef.current?.updateRows([{ id, _action: "delete" }]);
+                      } catch (e) {
+                        console.error(e);
+                        enqueueSnackbar(e.response?.data.message || e.message, {
+                          variant: "error",
+                        });
+                      }
+                    })()
+                : () =>
                     (async function () {
                       const id = row.id;
                       try {
@@ -233,19 +247,6 @@ export default function Deliveries({ section }) {
                         });
                       }
                     })()
-                : () =>
-                    (async function () {
-                      const id = row.id;
-                      try {
-                        await unsetDeliveryStation(id);
-                        apiRef.current?.updateRows([{ id, _action: "delete" }]);
-                      } catch (e) {
-                        console.error(e);
-                        enqueueSnackbar(e.response?.data.message || e.message, {
-                          variant: "error",
-                        });
-                      }
-                    })()
             }
           />,
         ],
@@ -259,7 +260,7 @@ export default function Deliveries({ section }) {
         if (date) {
           const day = dayjs(date);
           setDate(day);
-          getLogs(day, session);
+          getLogs(day, session === "0" ? "0" : session.session);
         } else {
           setDate(null);
         }
@@ -278,7 +279,13 @@ export default function Deliveries({ section }) {
             disabled={isLoading || session === "0"}
             size="small"
             aria-label="print"
-            onClick={() => handlePrint(section, date, session)}
+            onClick={() =>
+              handlePrint(
+                section,
+                date,
+                session === "0" ? "0" : session.session
+              )
+            }
           >
             <PrintIcon />
           </IconButton>
@@ -308,7 +315,7 @@ export default function Deliveries({ section }) {
                 width: 120,
                 color: session === v ? "primary.main" : "text.secondary",
               }}
-              children={v}
+              children={v.session}
               key={i}
             />
           ))}
@@ -342,7 +349,9 @@ export default function Deliveries({ section }) {
             "& .returned": { textDecoration: "line-through" },
           }}
           getRowClassName={(params) =>
-            params.row.returnDate && session !== "0" && "returned"
+            session !== "0" &&
+            params.row.lowHistory.includes(session.logId) &&
+            "returned"
           }
           slotProps={{
             loadingOverlay: {
