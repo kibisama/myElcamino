@@ -206,8 +206,8 @@ export default function Deliveries({ section }) {
         getActions: ({ row }) => [
           <GridActionsCellItem
             key={"delete-item"}
-            disabled={row.log && row.returnDate}
-            icon={row.log ? <AssignmentReturnIcon /> : <DeleteIcon />}
+            disabled={session !== "0" && row.log && row.returnDate}
+            icon={session !== "0" ? <AssignmentReturnIcon /> : <DeleteIcon />}
             label={"Delete"}
             onClick={
               row.log
@@ -251,7 +251,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [apiRef]
+    [apiRef, session]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
