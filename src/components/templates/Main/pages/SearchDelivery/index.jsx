@@ -68,6 +68,8 @@ export default function SearchDelivery() {
         field: "returnDate",
         headerName: "Return Date",
         width: 100,
+        valueGetter: (v) => v && new Date(v),
+        valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
       },
     ],
     []
