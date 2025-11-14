@@ -207,7 +207,9 @@ export default function Deliveries({ section }) {
         getActions: ({ row }) => [
           <GridActionsCellItem
             key={"delete-item"}
-            disabled={session !== "0" && row.logHistory.includes(session.logId)}
+            disabled={
+              session !== "0" && row.logHistory?.includes(session.logId)
+            }
             icon={session === "0" ? <DeleteIcon /> : <AssignmentReturnIcon />}
             label={"Delete"}
             onClick={
@@ -350,7 +352,7 @@ export default function Deliveries({ section }) {
           }}
           getRowClassName={(params) =>
             session !== "0" &&
-            params.row.lowHistory.includes(session.logId) &&
+            params.row.logHistory?.includes(session.logId) &&
             "returned"
           }
           slotProps={{
