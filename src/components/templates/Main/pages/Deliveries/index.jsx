@@ -208,9 +208,9 @@ export default function Deliveries({ section }) {
           <GridActionsCellItem
             key={"delete-item"}
             disabled={
-              session !== "0" && row.logHistory?.includes(session.logId)
+              row.logHistory?.includes(session.logId) && session !== "0"
             }
-            icon={session === "0" ? <DeleteIcon /> : <AssignmentReturnIcon />}
+            icon={row.log ? <DeleteIcon /> : <AssignmentReturnIcon />}
             label={"Delete"}
             onClick={
               session === "0"
