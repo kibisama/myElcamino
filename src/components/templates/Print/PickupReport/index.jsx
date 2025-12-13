@@ -1,8 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getPickupReport } from "../../../../lib/api/client";
+import { getPickupReport, getSettings } from "../../../../lib/api/client";
 import PortraitContainer from "../PortraitContainer";
+import StoreInfoHeader from "../StoreInfoHeader";
 
 const style = {
   title: {
@@ -27,16 +28,24 @@ const style = {
 export default function PickupReport() {
   const { _id, rxNumber } = useParams();
   const [data, setData] = useState(null);
+  const [storeInfo, setStoreInfo] = useState(null);
   useEffect(() => {
-    async function get() {
+    (async function () {
+      try {
+        const { data } = await getSettings();
+        setStoreInfo(data.data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+    (async function () {
       try {
         const { data } = await getPickupReport({ _id, rxNumber });
         setData(data.data);
       } catch (e) {
         console.error(e);
       }
-    }
-    get();
+    })();
   }, []);
 
   if (!data) {
@@ -45,6 +54,7 @@ export default function PickupReport() {
 
   return (
     <PortraitContainer>
+      <StoreInfoHeader storeInfo={storeInfo} />
       <Typography sx={style.title}>Proof of Prescription Delivery</Typography>
       <Box
         sx={{
