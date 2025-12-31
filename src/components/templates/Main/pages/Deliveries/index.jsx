@@ -136,10 +136,10 @@ export default function Deliveries({ section }) {
   );
   useScanDetection({ onComplete, disabled: activeApp });
 
-  const handleRefresh = React.useCallback(
-    () => getLogs(date, session === "0" ? "0" : session.session),
-    [getLogs, date, session]
-  );
+  const handleRefresh = () => {
+    getSessions();
+    getLogs(date, session === "0" ? "0" : session.session);
+  };
 
   const columns = React.useMemo(
     () => [
