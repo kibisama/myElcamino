@@ -55,7 +55,7 @@ export default function SearchDelivery() {
         width: 120,
       },
       {
-        field: "date",
+        field: "deliveryLogDate",
         headerName: "Log Date",
         width: 100,
       },
@@ -72,7 +72,7 @@ export default function SearchDelivery() {
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
       },
     ],
-    []
+    [],
   );
   const search = React.useCallback((rxNumber, patient) => {
     setIsLoading(true);
@@ -105,7 +105,7 @@ export default function SearchDelivery() {
         setPatient("");
       }
     },
-    [rxNumber, search]
+    [rxNumber, search],
   );
   const handleKeyDown = React.useCallback(
     (e) => {
@@ -113,7 +113,7 @@ export default function SearchDelivery() {
         search(rxNumber, patient);
       }
     },
-    [search, rxNumber, patient]
+    [search, rxNumber, patient],
   );
 
   return (

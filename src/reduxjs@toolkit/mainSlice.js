@@ -10,7 +10,7 @@ const asyncGetDeliveryStations = createAsyncThunk(
     } catch (e) {
       return rejectWithValue(e.response.data);
     }
-  }
+  },
 );
 
 const mainSlice = createSlice({
