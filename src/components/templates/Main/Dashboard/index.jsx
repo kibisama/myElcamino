@@ -12,7 +12,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const handleClick = React.useCallback(() => {
     dispatch(setActiveApp(""));
-  }, [dispatch]);
+  }, []);
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(true);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] =

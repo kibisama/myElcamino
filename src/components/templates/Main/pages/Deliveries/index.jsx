@@ -19,19 +19,49 @@ import {
   unsetDeliveryStation,
   reverseDelivery,
 } from "../../../../../lib/api/client";
+import { get, post } from "../../../../../lib/api";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
   const apiRef = useGridApiRef();
-  const { activeApp } = useSelector((s) => s.main);
-  const [rows, setRows] = React.useState([]);
+  const { activeApp, deliveries } = useSelector((s) => s.main);
   const [date, setDate] = React.useState(dayjs());
-  const [sessions, setSessions] = React.useState([]);
   const [session, setSession] = React.useState("0");
-  const [isLoading, setIsLoading] = React.useState(false);
+
+  const station = deliveries[section];
+
+  const {
+    data: sessions,
+    isLoading: isLoadingSessions,
+    error: sessionsError,
+  } = useSWR(
+    station
+      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
+      : null,
+    get
+  );
+
+  const {
+    data: rows,
+    isLoading: isLoadingRows,
+    error: rowsError,
+  } = useSWR(
+    station
+      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${session}`
+      : null,
+    get
+  );
+
+  const { trigger: triggerQr } = useSWRMutation(
+    station ? `/delivery/${station.invoiceCode}` : null,
+    post
+  );
+
   const handlePrint = React.useCallback(
     (section, date, session) =>
       window.open(
@@ -40,6 +70,7 @@ export default function Deliveries({ section }) {
       ),
     []
   );
+
   const postLog = React.useCallback(() => {
     setIsLoading(true);
     (async function () {
@@ -57,41 +88,7 @@ export default function Deliveries({ section }) {
       }
     })();
   }, [section, date, handlePrint]);
-  const getLogs = React.useCallback(
-    (date, session) => {
-      setIsLoading(true);
-      (async () => {
-        try {
-          const { data } = await getDeliveryLogItems(
-            section,
-            date.format("MMDDYYYY"),
-            session
-          );
-          setRows(data.data);
-          setIsLoading(false);
-        } catch (e) {
-          console.error(e);
-          setRows([]);
-          setIsLoading(false);
-        }
-      })();
-    },
-    [section]
-  );
-  const getSessions = React.useCallback(() => {
-    (async () => {
-      try {
-        const { data } = await getDeliverySessions(
-          section,
-          date.format("MMDDYYYY")
-        );
-        setSessions(data.data);
-      } catch (e) {
-        console.error(e);
-        setSessions([]);
-      }
-    })();
-  }, [date, section]);
+
   const focusRef = React.useRef(null);
   React.useEffect(() => {
     if (focusRef.current) {

@@ -12,10 +12,8 @@ import GestureIcon from "@mui/icons-material/Gesture";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupIcon from "@mui/icons-material/Group";
-import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import MedicationIcon from "@mui/icons-material/Medication";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -29,7 +27,13 @@ import {
   getDrawerWidthTransitionMixin,
 } from "../../mixins";
 import { useDispatch, useSelector } from "react-redux";
-import { setSidebar } from "../../../../../reduxjs@toolkit/mainSlice";
+import {
+  setSidebar,
+  setDeliveries,
+} from "../../../../../reduxjs@toolkit/mainSlice";
+import useSWR from "swr";
+import { get } from "../../../../../lib/api";
+import { enqueueSnackbar } from "notistack";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
   const theme = useTheme();
@@ -42,6 +46,19 @@ function Sidebar({ expanded = true, setExpanded, container }) {
   const [isFullyExpanded, setIsFullyExpanded] = React.useState(expanded);
   const [isFullyCollapsed, setIsFullyCollapsed] = React.useState(!expanded);
 
+  const { data, error } = useSWR("/delivery/stations", get);
+  React.useLayoutEffect(
+    function handleStationData() {
+      if (error) {
+        enqueueSnackbar(error.message, { variant: "error" });
+        dispatch(setDeliveries([]));
+      } else if (data) {
+        dispatch(setDeliveries(data));
+      }
+    },
+    [data, error]
+  );
+
   React.useEffect(() => {
     if (expanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
@@ -50,37 +67,26 @@ function Sidebar({ expanded = true, setExpanded, container }) {
 
       return () => clearTimeout(drawerWidthTransitionTimeout);
     }
-
     setIsFullyExpanded(false);
-
     return () => {};
   }, [expanded, theme.transitions.duration.enteringScreen]);
-
   React.useEffect(() => {
     if (!expanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
         setIsFullyCollapsed(true);
         dispatch(setSidebar(isOverSmViewport ? "mini" : "collapsed"));
       }, theme.transitions.duration.leavingScreen);
-
       return () => clearTimeout(drawerWidthTransitionTimeout);
     }
-
     setIsFullyCollapsed(false);
     dispatch(setSidebar(isOverSmViewport ? "expanded" : "mobile-expanded"));
-
     return () => {};
-  }, [
-    dispatch,
-    expanded,
-    theme.transitions.duration.leavingScreen,
-    isOverSmViewport,
-  ]);
+  }, [expanded, theme.transitions.duration.leavingScreen, isOverSmViewport]);
   const handleSetSidebarExpanded = React.useCallback(
     (newExpanded) => () => {
       setExpanded(newExpanded);
     },
-    [setExpanded],
+    [setExpanded]
   );
   const handlePageItemClick = React.useCallback(
     (itemId, hasNestedNavigation) => {
@@ -88,19 +94,18 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         setExpandedItemIds((previousValue) =>
           previousValue.includes(itemId)
             ? previousValue.filter(
-                (previousValueItemId) => previousValueItemId !== itemId,
+                (previousValueItemId) => previousValueItemId !== itemId
               )
-            : [...previousValue, itemId],
+            : [...previousValue, itemId]
         );
       } else if (!isOverSmViewport && !hasNestedNavigation) {
         setExpanded(false);
       }
     },
-    [expanded, setExpanded, isOverSmViewport],
+    [expanded, setExpanded, isOverSmViewport]
   );
 
   const mini = !expanded;
-
   const hasDrawerTransitions = isOverSmViewport && isOverMdViewport;
 
   const getDrawerContent = React.useCallback(
@@ -153,26 +158,21 @@ function Sidebar({ expanded = true, setExpanded, container }) {
                   {deliveries.map((v, i) => (
                     <PageItem
                       id="Deliveries"
-                      key={v.displayName}
-                      section={v.displayName}
+                      key={i}
+                      section={i}
                       title={v.displayName}
                       icon={<GroupIcon />}
                     />
                   ))}
                   <PageItem
-                    id="PrivateDelivery"
-                    title="Private"
-                    icon={<PersonIcon />}
+                    id="DeliveryGroups"
+                    title="Manage Groups"
+                    icon={<GroupAddIcon />}
                   />
                   <PageItem
                     id="SearchDelivery"
                     title="Search"
                     icon={<SearchIcon />}
-                  />
-                  <PageItem
-                    id="DeliveryGroups"
-                    title="Manage Groups"
-                    icon={<GroupAddIcon />}
                   />
                 </List>
               }
@@ -181,7 +181,6 @@ function Sidebar({ expanded = true, setExpanded, container }) {
             <PageItem id="Pickups" icon={<GestureIcon />} />
             <DividerItem />
             <HeaderItem>Inventories</HeaderItem>
-            <PageItem id="Drugs" icon={<MedicationIcon />} />
             <PageItem id="Inventories" icon={<InventoryIcon />} />
             <PageItem
               id="InventoryReports"
@@ -222,7 +221,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       expandedItemIds,
       page,
       deliveries,
-    ],
+    ]
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -244,7 +243,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         },
       };
     },
-    [expanded, mini],
+    [expanded, mini]
   );
 
   const sidebarContextValue = React.useMemo(() => {
