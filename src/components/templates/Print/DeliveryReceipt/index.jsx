@@ -299,7 +299,7 @@ export default function DeliveryReceipt() {
                 sx={{ fontSize: 11, fontStyle: "italic", letterSpacing: 0 }}
               >
                 You are entitled to an oral consultation with our pharmacist.
-                Please Call {storeInfo.storePhone}
+                Please call {storeInfo.storePhone}
               </Typography>
             </div>
           </div>
