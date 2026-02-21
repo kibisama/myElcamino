@@ -1,7 +1,7 @@
 import * as React from "react";
 import dayjs from "dayjs";
 import { Box, Button, IconButton, Stack, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import PrintIcon from "@mui/icons-material/Print";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -11,15 +11,7 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useSelector } from "react-redux";
-import {
-  getDeliveryLogItems,
-  getDeliverySessions,
-  postDeliveryQR,
-  postDeliveryLog,
-  unsetDeliveryStation,
-  reverseDelivery,
-} from "../../../../../lib/api/client";
-import { get, post } from "../../../../../lib/api";
+import { client, get, post } from "../../../../../lib/api";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import useSWR from "swr";
@@ -28,7 +20,7 @@ import useSWRMutation from "swr/mutation";
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
-  const apiRef = useGridApiRef();
+  // const apiRef = useGridApiRef();
   const { activeApp, deliveries } = useSelector((s) => s.main);
   const [date, setDate] = React.useState(dayjs());
   const [session, setSession] = React.useState("0");
@@ -37,8 +29,9 @@ export default function Deliveries({ section }) {
 
   const {
     data: sessions,
-    isLoading: isLoadingSessions,
+    // isLoading: isLoadingSessions,
     error: sessionsError,
+    mutate: refreshSessions,
   } = useSWR(
     station
       ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
@@ -50,6 +43,7 @@ export default function Deliveries({ section }) {
     data: rows,
     isLoading: isLoadingRows,
     error: rowsError,
+    mutate: refreshRows,
   } = useSWR(
     station
       ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${session}`
@@ -57,9 +51,28 @@ export default function Deliveries({ section }) {
     get
   );
 
-  const { trigger: triggerQr } = useSWRMutation(
+  const { trigger: triggerPostQr } = useSWRMutation(
+    station ? `/delivery/${station.invoiceCode}/qr` : null,
+    post,
+    {
+      onSuccess: () => {
+        refreshRows();
+        enqueueSnackbar("The Rx has been updated successfully.", {
+          variant: "success",
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar(e.response?.data.message || e.message, {
+          variant: "error",
+        });
+      },
+    }
+  );
+
+  const { trigger: triggerPostLog } = useSWRMutation(
     station ? `/delivery/${station.invoiceCode}` : null,
-    post
+    post,
+    { onSuccess: refreshRows }
   );
 
   const handlePrint = React.useCallback(
@@ -71,37 +84,13 @@ export default function Deliveries({ section }) {
     []
   );
 
-  const postLog = React.useCallback(() => {
-    setIsLoading(true);
-    (async function () {
-      try {
-        const { data } = await postDeliveryLog(section);
-        const { session, _id } = data.data;
-        const _session = { session, logId: _id };
-        setSessions((prev) => [...prev, _session]);
-        setSession(_session);
-        setIsLoading(false);
-        handlePrint(section, date, session);
-      } catch (e) {
-        console.error(e);
-        setIsLoading(false);
-      }
-    })();
-  }, [section, date, handlePrint]);
-
   const focusRef = React.useRef(null);
   React.useEffect(() => {
     if (focusRef.current) {
       focusRef.current.focus();
     }
   }, [section]);
-  React.useEffect(() => {
-    getSessions();
-    getLogs(date, session === "0" ? "0" : session.session);
-  }, [date, session, getLogs, getSessions]);
-  React.useEffect(() => {
-    setSession("0");
-  }, [section]);
+
   const onComplete = React.useCallback(
     (data) => {
       const delimiter = "|";
@@ -111,31 +100,52 @@ export default function Deliveries({ section }) {
           variant: "error",
         });
       }
-      (async function () {
-        try {
-          const result = await postDeliveryQR(section, {
-            data,
-            delimiter,
-          });
-          apiRef.current?.updateRows([result.data.data]);
-          enqueueSnackbar("The Rx has been updated successfully.", {
-            variant: "success",
-          });
-        } catch (e) {
-          console.error(e);
-          enqueueSnackbar(e.response?.data.message || e.message, {
-            variant: "error",
-          });
-        }
-      })();
+      triggerPostQr({ data, delimiter });
     },
-    [section, apiRef]
+    [triggerPostQr]
   );
+
+  const { trigger: triggerUnset } = useSWRMutation(
+    station ? `/delivery/unset` : null,
+    (url, { arg }) => client.get(`${url}/${arg.rxID}`),
+    {
+      onSuccess: () => {
+        refreshRows();
+        enqueueSnackbar("The Rx has been updated successfully.", {
+          variant: "success",
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar(e.response?.data.message || e.message, {
+          variant: "error",
+        });
+      },
+    }
+  );
+
+  const { trigger: triggerReturn } = useSWRMutation(
+    station ? `/delivery/return` : null,
+    (url, { arg }) => client.get(`${url}/${arg.rxID}`),
+    {
+      onSuccess: () => {
+        refreshRows();
+        enqueueSnackbar("The Rx has been updated successfully.", {
+          variant: "success",
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar(e.response?.data.message || e.message, {
+          variant: "error",
+        });
+      },
+    }
+  );
+
   useScanDetection({ onComplete, disabled: activeApp });
 
   const handleRefresh = () => {
-    getSessions();
-    getLogs(date, session === "0" ? "0" : session.session);
+    refreshSessions();
+    refreshRows();
   };
 
   const columns = React.useMemo(
@@ -211,47 +221,14 @@ export default function Deliveries({ section }) {
             label={"Delete"}
             onClick={
               session === "0"
-                ? () =>
-                    (async function () {
-                      const id = row.id;
-                      try {
-                        await unsetDeliveryStation(id);
-                        apiRef.current?.updateRows([{ id, _action: "delete" }]);
-                      } catch (e) {
-                        console.error(e);
-                        enqueueSnackbar(e.response?.data.message || e.message, {
-                          variant: "error",
-                        });
-                      }
-                    })()
-                : () =>
-                    (async function () {
-                      const id = row.id;
-                      try {
-                        await reverseDelivery(id);
-                        const { data } = await reverseDelivery(id);
-                        apiRef.current?.updateRows([
-                          { id, returnDate: data.data.returnDate },
-                        ]);
-                        enqueueSnackbar(
-                          "The Rx has been returned successfully.",
-                          {
-                            variant: "success",
-                          }
-                        );
-                      } catch (e) {
-                        console.error(e);
-                        enqueueSnackbar(e.response?.data.message || e.message, {
-                          variant: "error",
-                        });
-                      }
-                    })()
+                ? () => triggerUnset({ rxID: row.id })
+                : () => triggerReturn({ rxID: row.id })
             }
           />,
         ],
       },
     ],
-    [apiRef, session]
+    [session, triggerReturn, triggerUnset]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -259,13 +236,13 @@ export default function Deliveries({ section }) {
         if (date) {
           const day = dayjs(date);
           setDate(day);
-          getLogs(day, session === "0" ? "0" : session.session);
+          refreshRows();
         } else {
           setDate(null);
         }
       }
     },
-    [getLogs, session]
+    [refreshRows]
   );
 
   return (
@@ -275,7 +252,7 @@ export default function Deliveries({ section }) {
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <IconButton
-            disabled={isLoading || session === "0"}
+            disabled={isLoadingRows || session === "0"}
             size="small"
             aria-label="print"
             onClick={() =>
@@ -291,7 +268,7 @@ export default function Deliveries({ section }) {
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
               <IconButton
-                disabled={isLoading}
+                disabled={isLoadingRows}
                 size="small"
                 aria-label="refresh"
                 onClick={handleRefresh}
@@ -300,7 +277,7 @@ export default function Deliveries({ section }) {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<NoteAddIcon />} onClick={postLog} />
+          <AppButton children={<NoteAddIcon />} onClick={triggerPostLog} />
         </Stack>
       }
       extraActions={
@@ -337,14 +314,13 @@ export default function Deliveries({ section }) {
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <DataGrid
-          apiRef={apiRef}
           autoPageSize
           columns={columns}
           rows={rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
-          loading={isLoading}
+          loading={isLoadingRows}
           pageSizeOptions={[]}
           sx={{
             maxHeight: rowHeight * 100,
