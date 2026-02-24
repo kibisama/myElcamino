@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getPickupReport, getSettings } from "../../../../lib/api/client";
 import PortraitContainer from "../PortraitContainer";
 import StoreInfoHeader from "../StoreInfoHeader";
 
@@ -30,22 +29,22 @@ export default function PickupReport() {
   const [data, setData] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
   useEffect(() => {
-    (async function () {
-      try {
-        const { data } = await getSettings();
-        setStoreInfo(data.data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-    (async function () {
-      try {
-        const { data } = await getPickupReport({ _id, rxNumber });
-        setData(data.data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
+    // (async function () {
+    //   try {
+    //     const { data } = await getSettings();
+    //     setStoreInfo(data.data);
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // })();
+    // (async function () {
+    //   try {
+    //     const { data } = await getPickupReport({ _id, rxNumber });
+    //     setData(data.data);
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // })();
   }, []);
 
   if (!data) {

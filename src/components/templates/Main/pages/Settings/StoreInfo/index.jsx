@@ -8,7 +8,9 @@ import {
   useTheme,
   useColorScheme,
 } from "@mui/material";
-import { getSettings, postSettings } from "../../../../../../lib/api/client";
+import { get, post } from "../../../../../../lib/api";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 import { enqueueSnackbar } from "notistack";
 
 const Section = ({ title, subtitle, Input }) => {
@@ -52,6 +54,10 @@ const StoreInfo = () => {
   const [email, setEmail] = React.useState("");
   const [managerLN, setManagerLN] = React.useState("");
   const [managerFN, setManagerFN] = React.useState("");
+
+  const { data, mutate: refreshSettings } = useSWR("/apps/settings", get);
+  const { trigger: postSettings } = useSWRMutation("/apps/settings", post);
+
   const onGetSettings = React.useCallback((settings) => {
     setSettings(settings);
     setName(settings.storeName);
@@ -65,21 +71,10 @@ const StoreInfo = () => {
     setManagerLN(settings.storeManagerLN);
     setManagerFN(settings.storeManagerFN);
   }, []);
+
   React.useEffect(() => {
-    (async function () {
-      try {
-        const { data } = await getSettings();
-        setSettings(data.data);
-        onGetSettings(data.data);
-      } catch (e) {
-        setSettings(null);
-        console.error(e);
-        enqueueSnackbar("Failed to load store information from the server.", {
-          variant: "error",
-        });
-      }
-    })();
-  }, [onGetSettings]);
+    data && onGetSettings(data);
+  }, [data, onGetSettings]);
 
   const disable =
     !(
@@ -104,6 +99,7 @@ const StoreInfo = () => {
       email === settings?.storeEmail &&
       managerLN === settings?.storeManagerLN &&
       managerFN === settings?.storeManagerFN);
+
   return (
     <div>
       <Section
@@ -225,32 +221,20 @@ const StoreInfo = () => {
           disabled={disable}
           variant="outlined"
           children="SAVE"
-          onClick={async () => {
-            try {
-              const { data } = await postSettings({
-                storeName: name,
-                storeAddress: address,
-                storeCity: city,
-                storeState: state,
-                storeZip: zip,
-                storePhone: phone,
-                storeFax: fax,
-                storeEmail: email,
-                storeManagerLN: managerLN,
-                storeManagerFN: managerFN,
-              });
-              setSettings(data.data);
-              onGetSettings(data.data);
-              enqueueSnackbar("Store information has been saved.", {
-                variant: "success",
-              });
-            } catch (e) {
-              enqueueSnackbar("Failed to update store information.", {
-                variant: "error",
-              });
-              console.error(e);
-            }
-          }}
+          onClick={() =>
+            postSettings({
+              storeName: name,
+              storeAddress: address,
+              storeCity: city,
+              storeState: state,
+              storeZip: zip,
+              storePhone: phone,
+              storeFax: fax,
+              storeEmail: email,
+              storeManagerLN: managerLN,
+              storeManagerFN: managerFN,
+            })
+          }
         />
       </Box>
     </div>

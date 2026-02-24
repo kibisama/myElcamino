@@ -1,33 +1,18 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { useState, useEffect } from "react";
-import { getSettings } from "../../../../lib/api/client";
+import { get } from "../../../../lib/api";
 import Logo from "../../../svg/Logo";
+import useSWR from "swr";
 
-export default function StoreInfoHeader({ storeInfo }) {
-  const [settings, setSettings] = useState(null);
-  useEffect(() => {
-    if (storeInfo) {
-      setSettings(storeInfo);
-    } else {
-      (async () => {
-        try {
-          const { data } = await getSettings();
-          setSettings(data.data);
-        } catch (e) {
-          setSettings(null);
-          console.error(e);
-        }
-      })();
-    }
-  }, []);
+const sx = {
+  fontSize: 11,
+  fontWeight: 600,
+  lineHeight: "11px",
+};
 
-  const sx = {
-    fontSize: 11,
-    fontWeight: 600,
-    lineHeight: "11px",
-  };
-
+export default function StoreInfoHeader() {
+  const { data: settings } = useSWR("/apps/settings", get);
+  if (!settings) return;
   return (
     <Box
       sx={{

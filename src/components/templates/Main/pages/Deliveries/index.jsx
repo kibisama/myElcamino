@@ -16,14 +16,15 @@ import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
+import { useReactToPrint } from "react-to-print";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
-  // const apiRef = useGridApiRef();
   const { activeApp, deliveries } = useSelector((s) => s.main);
   const [date, setDate] = React.useState(dayjs());
   const [session, setSession] = React.useState("0");
+  const [print, setPrint] = React.useState(false);
 
   const station = deliveries[section];
   const {
@@ -35,7 +36,7 @@ export default function Deliveries({ section }) {
     station
       ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
       : null,
-    get,
+    get
   );
 
   const {
@@ -45,9 +46,11 @@ export default function Deliveries({ section }) {
     mutate: refreshRows,
   } = useSWR(
     station
-      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${session === "0" ? "0" : session.session}`
+      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${
+          session === "0" ? "0" : session.session
+        }`
       : null,
-    get,
+    get
   );
 
   const { trigger: triggerPostQr } = useSWRMutation(
@@ -60,17 +63,12 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-      onError: (e) => {
-        enqueueSnackbar(e.response?.data.message || e.message, {
-          variant: "error",
-        });
-      },
-    },
+    }
   );
 
   const { trigger: triggerPostLog } = useSWRMutation(
     station ? `/delivery/${station.invoiceCode}` : null,
-    post,
+    post
     // { onSuccess: refreshRows },
   );
 
@@ -78,18 +76,23 @@ export default function Deliveries({ section }) {
     (section, date, session) =>
       window.open(
         `/print/deliveries/${section}/${date.format("MMDDYYYY")}/${session}`,
-        "_blank",
+        "_blank"
       ),
-    [],
+    []
   );
 
   const focusRef = React.useRef(null);
+  const contentRef = React.useRef(null);
+  const reactToPrint = useReactToPrint({
+    contentRef,
+    onAfterPrint: () => setPrint(false),
+  });
+
   React.useEffect(() => {
     setSession("0");
-    if (focusRef.current) {
-      focusRef.current.focus();
-    }
-  }, [section]);
+    focusRef.current && focusRef.current.focus();
+    print && reactToPrint();
+  }, [section, reactToPrint, print]);
 
   const onComplete = React.useCallback(
     (data) => {
@@ -102,7 +105,7 @@ export default function Deliveries({ section }) {
       }
       triggerPostQr({ data, delimiter });
     },
-    [triggerPostQr],
+    [triggerPostQr]
   );
 
   const { trigger: triggerUnset } = useSWRMutation(
@@ -115,12 +118,7 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-      onError: (e) => {
-        enqueueSnackbar(e.response?.data.message || e.message, {
-          variant: "error",
-        });
-      },
-    },
+    }
   );
 
   const { trigger: triggerReturn } = useSWRMutation(
@@ -133,12 +131,7 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-      onError: (e) => {
-        enqueueSnackbar(e.response?.data.message || e.message, {
-          variant: "error",
-        });
-      },
-    },
+    }
   );
 
   useScanDetection({ onComplete, disabled: activeApp });
@@ -228,7 +221,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [session, triggerReturn, triggerUnset],
+    [session, triggerReturn, triggerUnset]
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -242,7 +235,7 @@ export default function Deliveries({ section }) {
         }
       }
     },
-    [refreshRows],
+    [refreshRows]
   );
 
   return (
@@ -259,7 +252,7 @@ export default function Deliveries({ section }) {
               handlePrint(
                 section,
                 date,
-                session === "0" ? "0" : session.session,
+                session === "0" ? "0" : session.session
               )
             }
           >
@@ -345,6 +338,15 @@ export default function Deliveries({ section }) {
           }}
         />
       </Box>
+      {print && (
+        <div ref={contentRef}>
+          {/* <PrintDeliveries
+            station={station}
+            date={date}
+            data={rows.filter((row) => apiRef.current?.isRowSelected(row.id))}
+          /> */}
+        </div>
+      )}
       <div tabIndex="-1" ref={focusRef} />
     </PageContainer>
   );

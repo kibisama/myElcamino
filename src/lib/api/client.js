@@ -12,19 +12,8 @@ const generateQuery = (q) =>
 export const getPtAutocompleteOptions = (q) => client.get(`dRx/pt/?q=${q}`);
 
 /** DELIVERIES **/
-export const getDeliveries = () => client.get("delivery");
-export const getDeliverySessions = (section, date) =>
-  client.get(`delivery/${section}/${date}`);
-export const getDeliveryLogItems = (section, date, session) =>
-  client.get(`delivery/${section}/${date}/${session}`);
 export const getDeliveryReceipt = (section, date, session) =>
   client.get(`delivery/${section}/${date}/${session}/receipt`);
-export const postDeliveryLog = (section) => client.post(`delivery/${section}`);
-export const postDeliveryQR = (section, body) =>
-  client.post(`delivery/${section}/qr`, body);
-export const unsetDeliveryStation = (rxID) =>
-  client.get(`delivery/unset/${rxID}`);
-export const reverseDelivery = (rxID) => client.get(`delivery/reverse/${rxID}`);
 export const searchDeliveries = (q) =>
   client.get(`delivery/search?${generateQuery(q)}`);
 /** INVENTORIES **/
@@ -44,7 +33,6 @@ export const searchPickup = (q) =>
 export const getPickupReport = ({ _id, rxNumber }) =>
   client.get(`apps/pickup/report/${_id}/${rxNumber}`);
 /** APPS_SETTINGS **/
-export const getSettings = () => client.get("apps/settings");
 export const postSettings = (body) => client.post("apps/settings", body);
 
 export const checkDRxCSV = (body) =>
