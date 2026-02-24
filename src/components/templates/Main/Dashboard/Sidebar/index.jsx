@@ -39,7 +39,6 @@ function Sidebar({ expanded = true, setExpanded, container }) {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { page, deliveries } = useSelector((s) => s.main);
-
   const [expandedItemIds, setExpandedItemIds] = React.useState([]);
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
   const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));
@@ -56,7 +55,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         dispatch(setDeliveries(data));
       }
     },
-    [data, error]
+    [data, error],
   );
 
   React.useEffect(() => {
@@ -86,7 +85,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     (newExpanded) => () => {
       setExpanded(newExpanded);
     },
-    [setExpanded]
+    [setExpanded],
   );
   const handlePageItemClick = React.useCallback(
     (itemId, hasNestedNavigation) => {
@@ -94,15 +93,15 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         setExpandedItemIds((previousValue) =>
           previousValue.includes(itemId)
             ? previousValue.filter(
-                (previousValueItemId) => previousValueItemId !== itemId
+                (previousValueItemId) => previousValueItemId !== itemId,
               )
-            : [...previousValue, itemId]
+            : [...previousValue, itemId],
         );
       } else if (!isOverSmViewport && !hasNestedNavigation) {
         setExpanded(false);
       }
     },
-    [expanded, setExpanded, isOverSmViewport]
+    [expanded, setExpanded, isOverSmViewport],
   );
 
   const mini = !expanded;
@@ -221,7 +220,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       expandedItemIds,
       page,
       deliveries,
-    ]
+    ],
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -243,7 +242,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         },
       };
     },
-    [expanded, mini]
+    [expanded, mini],
   );
 
   const sidebarContextValue = React.useMemo(() => {

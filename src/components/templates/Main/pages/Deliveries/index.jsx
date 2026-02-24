@@ -26,7 +26,6 @@ export default function Deliveries({ section }) {
   const [session, setSession] = React.useState("0");
 
   const station = deliveries[section];
-
   const {
     data: sessions,
     // isLoading: isLoadingSessions,
@@ -36,7 +35,7 @@ export default function Deliveries({ section }) {
     station
       ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
       : null,
-    get
+    get,
   );
 
   const {
@@ -46,9 +45,9 @@ export default function Deliveries({ section }) {
     mutate: refreshRows,
   } = useSWR(
     station
-      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${session}`
+      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${session === "0" ? "0" : session.session}`
       : null,
-    get
+    get,
   );
 
   const { trigger: triggerPostQr } = useSWRMutation(
@@ -66,26 +65,27 @@ export default function Deliveries({ section }) {
           variant: "error",
         });
       },
-    }
+    },
   );
 
   const { trigger: triggerPostLog } = useSWRMutation(
     station ? `/delivery/${station.invoiceCode}` : null,
     post,
-    { onSuccess: refreshRows }
+    // { onSuccess: refreshRows },
   );
 
   const handlePrint = React.useCallback(
     (section, date, session) =>
       window.open(
         `/print/deliveries/${section}/${date.format("MMDDYYYY")}/${session}`,
-        "_blank"
+        "_blank",
       ),
-    []
+    [],
   );
 
   const focusRef = React.useRef(null);
   React.useEffect(() => {
+    setSession("0");
     if (focusRef.current) {
       focusRef.current.focus();
     }
@@ -102,7 +102,7 @@ export default function Deliveries({ section }) {
       }
       triggerPostQr({ data, delimiter });
     },
-    [triggerPostQr]
+    [triggerPostQr],
   );
 
   const { trigger: triggerUnset } = useSWRMutation(
@@ -120,7 +120,7 @@ export default function Deliveries({ section }) {
           variant: "error",
         });
       },
-    }
+    },
   );
 
   const { trigger: triggerReturn } = useSWRMutation(
@@ -138,7 +138,7 @@ export default function Deliveries({ section }) {
           variant: "error",
         });
       },
-    }
+    },
   );
 
   useScanDetection({ onComplete, disabled: activeApp });
@@ -228,7 +228,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [session, triggerReturn, triggerUnset]
+    [session, triggerReturn, triggerUnset],
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -242,13 +242,13 @@ export default function Deliveries({ section }) {
         }
       }
     },
-    [refreshRows]
+    [refreshRows],
   );
 
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
-      title={section}
+      title={station.name}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <IconButton
@@ -259,7 +259,7 @@ export default function Deliveries({ section }) {
               handlePrint(
                 section,
                 date,
-                session === "0" ? "0" : session.session
+                session === "0" ? "0" : session.session,
               )
             }
           >
@@ -277,13 +277,16 @@ export default function Deliveries({ section }) {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<NoteAddIcon />} onClick={triggerPostLog} />
+          <AppButton
+            children={<NoteAddIcon />}
+            onClick={() => triggerPostLog()}
+          />
         </Stack>
       }
       extraActions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <DatePickerSm value={date} onChange={handleChangeDate} />
-          {sessions.map((v, i) => (
+          {sessions?.map((v, i) => (
             <Button
               onClick={() => setSession(v)}
               size="small"
@@ -316,7 +319,7 @@ export default function Deliveries({ section }) {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={rows}
+          rows={rowsError ? [] : rows}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick

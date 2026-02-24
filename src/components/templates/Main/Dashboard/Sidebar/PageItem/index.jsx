@@ -41,7 +41,9 @@ function PageItem({
 
   const { page, section: _section } = useSelector((s) => s.main);
   const selected =
-    !nestedNavigation && page === id && (section ? section === _section : true);
+    !nestedNavigation &&
+    page === id &&
+    (section != null ? section === _section : true);
 
   const [isHovered, setIsHovered] = React.useState(false);
 

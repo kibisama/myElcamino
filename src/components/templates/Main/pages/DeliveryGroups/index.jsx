@@ -9,7 +9,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import { useDispatch, useSelector } from "react-redux";
-import { asyncGetDeliveryStations } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const rowHeight = 52;
 
@@ -17,13 +16,13 @@ export default function DeliveryGroups() {
   const dispatch = useDispatch();
   const { deliveries, isLoadingDeliveries } = useSelector((s) => s.main);
   const refresh = React.useCallback(() => {
-    (async function () {
-      try {
-        dispatch(asyncGetDeliveryStations());
-      } catch (e) {
-        console.error(e);
-      }
-    })();
+    // (async function () {
+    //   try {
+    //     dispatch(asyncGetDeliveryStations());
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // })();
   }, [dispatch]);
   React.useEffect(() => {
     refresh();
@@ -78,7 +77,7 @@ export default function DeliveryGroups() {
         ],
       },
     ],
-    []
+    [],
   );
   return (
     <PageContainer
