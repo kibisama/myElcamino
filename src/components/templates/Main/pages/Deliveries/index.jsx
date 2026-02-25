@@ -23,20 +23,21 @@ const rowHeight = 52;
 export default function Deliveries({ section }) {
   const { activeApp, deliveries } = useSelector((s) => s.main);
   const [date, setDate] = React.useState(dayjs());
-  const [session, setSession] = React.useState("0");
+  const [session, setSession] = React.useState({});
   const [print, setPrint] = React.useState(false);
 
   const station = deliveries[section];
   const {
     data: sessions,
-    // isLoading: isLoadingSessions,
+    isLoading: isLoadingSessions,
     error: sessionsError,
     mutate: refreshSessions,
   } = useSWR(
     station
       ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
       : null,
-    get
+    get,
+    { onSuccess: () => setSession("0") }
   );
 
   const {
@@ -88,11 +89,16 @@ export default function Deliveries({ section }) {
     onAfterPrint: () => setPrint(false),
   });
 
-  React.useEffect(() => {
-    setSession("0");
+  React.useEffect(
+    function callReactToPrint() {
+      print && reactToPrint();
+    },
+    [reactToPrint, print]
+  );
+
+  React.useEffect(function initialize() {
     focusRef.current && focusRef.current.focus();
-    print && reactToPrint();
-  }, [section, reactToPrint, print]);
+  }, []);
 
   const onComplete = React.useCallback(
     (data) => {
@@ -316,7 +322,7 @@ export default function Deliveries({ section }) {
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
-          loading={isLoadingRows}
+          loading={isLoadingSessions || isLoadingRows}
           pageSizeOptions={[]}
           sx={{
             maxHeight: rowHeight * 100,
