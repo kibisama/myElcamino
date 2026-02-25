@@ -10,11 +10,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 import StoreInfoHeader from "../StoreInfoHeader";
 import PortraitContainer from "../PortraitContainer";
-import { getDeliveryReceipt, getSettings } from "../../../../lib/api/client";
+import useSWR from "swr";
 
 dayjs.extend(customParseFormat);
 
@@ -103,19 +102,8 @@ const KeyValueTable = ({ keys, values = [] }) => (
   </div>
 );
 
-export default function DeliveryReceipt() {
-  const { section, date, session } = useParams();
-  const [data, setData] = useState(null);
-  const [storeInfo, setStoreInfo] = useState(null);
+export default function DeliveryReceipt({}) {
   useEffect(() => {
-    (async function () {
-      try {
-        const { data } = await getSettings();
-        setStoreInfo(data.data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
     (async function () {
       try {
         const { data } = await getDeliveryReceipt(section, date, session);
@@ -126,7 +114,7 @@ export default function DeliveryReceipt() {
     })();
   }, []);
 
-  if (!data || !data.items?.length || !storeInfo) {
+  if (!data || !data.items?.length) {
     return;
   }
   const { station, items, pages, due, count } = data;
@@ -143,7 +131,7 @@ export default function DeliveryReceipt() {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <StoreInfoHeader storeInfo={storeInfo} />
+              <StoreInfoHeader />
               <Typography
                 sx={{
                   fontFamily: "Roboto",
