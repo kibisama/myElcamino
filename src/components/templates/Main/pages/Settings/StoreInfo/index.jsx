@@ -1,46 +1,9 @@
 import React from "react";
-import {
-  Box,
-  OutlinedInput,
-  Button,
-  Typography,
-  Stack,
-  useTheme,
-  useColorScheme,
-} from "@mui/material";
+import { Box, OutlinedInput, Button, Stack } from "@mui/material";
 import { get, post } from "../../../../../../lib/api";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import { enqueueSnackbar } from "notistack";
-
-const Section = ({ title, subtitle, Input }) => {
-  const theme = useTheme();
-  const { systemMode, mode } = useColorScheme();
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        borderBottom: 1,
-        borderColor:
-          mode === "dark" || systemMode === "dark"
-            ? (theme.vars || theme).palette.grey[800]
-            : (theme.vars || theme).palette.grey[100],
-        py: 2,
-      }}
-    >
-      <Box sx={{ width: "45%" }}>
-        <Typography sx={{ fontSize: 13 }}>{title}</Typography>
-        {subtitle && (
-          <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
-            {subtitle}
-          </Typography>
-        )}
-      </Box>
-      <Box sx={{ width: "45%" }}>{Input}</Box>
-    </Box>
-  );
-};
+import Section from "../../../../../inputs/Section";
 
 const StoreInfo = () => {
   const [settings, setSettings] = React.useState(null);
@@ -56,7 +19,9 @@ const StoreInfo = () => {
   const [managerFN, setManagerFN] = React.useState("");
 
   const { data, mutate: refreshSettings } = useSWR("/apps/settings", get);
-  const { trigger: postSettings } = useSWRMutation("/apps/settings", post);
+  const { trigger: postSettings } = useSWRMutation("/apps/settings", post, {
+    onSuccess: refreshSettings,
+  });
 
   const onGetSettings = React.useCallback((settings) => {
     setSettings(settings);
@@ -74,7 +39,7 @@ const StoreInfo = () => {
 
   React.useEffect(() => {
     data && onGetSettings(data);
-  }, [data, onGetSettings]);
+  }, [data]);
 
   const disable =
     !(

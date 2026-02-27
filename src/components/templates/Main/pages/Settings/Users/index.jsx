@@ -1,33 +1,23 @@
 import * as React from "react";
-import dayjs from "dayjs";
-import { Box, Button, IconButton, Stack, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import { Box, IconButton, Stack } from "@mui/material";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import useSWR from "swr";
-import { enqueueSnackbar } from "notistack";
+import { getClient } from "../../../../../../lib/api";
+import AppButton from "../../AppButton";
 
 const rowHeight = 52;
 
-export default function Users() {
-  const apiRef = useGridApiRef();
-  const [rows, setRows] = React.useState([]);
-  const { data, isLoading, error, mutate } = useSWR("");
-  React.useEffect(
-    function handleData() {
-      if (error) {
-        if (error.status !== 404) {
-          enqueueSnackbar(error.message, { variant: "error" });
-        }
-        setRows([]);
-      } else if (data) {
-        setRows(data);
-      }
-    },
-    [data, error]
-  );
+export default function Users({ handleModeChange }) {
+  const {
+    data: rows,
+    isLoading,
+    error,
+    mutate,
+  } = useSWR("/admin/users", getClient);
   const columns = React.useMemo(
     () => [
       {
@@ -61,7 +51,7 @@ export default function Users() {
         ],
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -75,16 +65,21 @@ export default function Users() {
         gap: 1,
       }}
     >
-      <Stack sx={{ alignSelf: "flex-end" }}>
+      <Stack
+        sx={{ py: 1, alignSelf: "flex-end" }}
+        direction="row"
+        alignItems="center"
+        spacing={1}
+      >
         <IconButton size="small">
           <RefreshIcon />
         </IconButton>
+        <AppButton children={<PersonAddIcon />} onClick={handleModeChange} />
       </Stack>
       <DataGrid
-        apiRef={apiRef}
         autoPageSize
         columns={columns}
-        rows={rows}
+        rows={rows || []}
         showCellVerticalBorder
         disableColumnMenu
         disableRowSelectionOnClick

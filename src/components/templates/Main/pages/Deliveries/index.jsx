@@ -11,33 +11,32 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useSelector } from "react-redux";
-import { client, get, post } from "../../../../../lib/api";
+import { api, get, post } from "../../../../../lib/api";
 import { enqueueSnackbar } from "notistack";
 import DatePickerSm from "../../../../inputs/DatePickerSm";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import { useReactToPrint } from "react-to-print";
+import DeliveryReceipt from "../../../Print/DeliveryReceipt";
 
 const rowHeight = 52;
 
 export default function Deliveries({ section }) {
   const { activeApp, deliveries } = useSelector((s) => s.main);
   const [date, setDate] = React.useState(dayjs());
-  const [session, setSession] = React.useState({});
-  const [print, setPrint] = React.useState(false);
+  const [session, setSession] = React.useState("0");
+  const [print, setPrint] = React.useState(null);
 
   const station = deliveries[section];
+  const MMDDYYYY = date.format("MMDDYYYY");
   const {
     data: sessions,
     isLoading: isLoadingSessions,
     error: sessionsError,
     mutate: refreshSessions,
   } = useSWR(
-    station
-      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}`
-      : null,
+    station ? `/delivery/${station.invoiceCode}/${MMDDYYYY}` : null,
     get,
-    { onSuccess: () => setSession("0") }
   );
 
   const {
@@ -47,11 +46,11 @@ export default function Deliveries({ section }) {
     mutate: refreshRows,
   } = useSWR(
     station
-      ? `/delivery/${station.invoiceCode}/${date.format("MMDDYYYY")}/${
+      ? `/delivery/${station.invoiceCode}/${MMDDYYYY}/${
           session === "0" ? "0" : session.session
         }`
       : null,
-    get
+    get,
   );
 
   const { trigger: triggerPostQr } = useSWRMutation(
@@ -64,41 +63,51 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-    }
+    },
   );
 
   const { trigger: triggerPostLog } = useSWRMutation(
     station ? `/delivery/${station.invoiceCode}` : null,
-    post
-    // { onSuccess: refreshRows },
+    post,
+    {
+      onSuccess: () => {
+        refreshSessions();
+        refreshRows();
+      },
+    },
   );
 
-  const handlePrint = React.useCallback(
-    (section, date, session) =>
-      window.open(
-        `/print/deliveries/${section}/${date.format("MMDDYYYY")}/${session}`,
-        "_blank"
-      ),
-    []
+  const { trigger: triggerPrint } = useSWRMutation(
+    station
+      ? `/delivery/${station.invoiceCode}/${MMDDYYYY}/${session.session}/receipt`
+      : null,
+    get,
+    {
+      onSuccess: (data) => setPrint(data),
+    },
   );
 
   const focusRef = React.useRef(null);
   const contentRef = React.useRef(null);
   const reactToPrint = useReactToPrint({
     contentRef,
-    onAfterPrint: () => setPrint(false),
+    onAfterPrint: () => setPrint(null),
   });
 
   React.useEffect(
     function callReactToPrint() {
       print && reactToPrint();
     },
-    [reactToPrint, print]
+    [print],
   );
 
-  React.useEffect(function initialize() {
-    focusRef.current && focusRef.current.focus();
-  }, []);
+  React.useEffect(
+    function initialize() {
+      setSession("0");
+      focusRef.current && focusRef.current.focus();
+    },
+    [section],
+  );
 
   const onComplete = React.useCallback(
     (data) => {
@@ -111,12 +120,12 @@ export default function Deliveries({ section }) {
       }
       triggerPostQr({ data, delimiter });
     },
-    [triggerPostQr]
+    [triggerPostQr],
   );
 
   const { trigger: triggerUnset } = useSWRMutation(
     station ? `/delivery/unset` : null,
-    (url, { arg }) => client.get(`${url}/${arg.rxID}`),
+    (url, { arg }) => api.get(`${url}/${arg.rxID}`),
     {
       onSuccess: () => {
         refreshRows();
@@ -124,12 +133,12 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-    }
+    },
   );
 
   const { trigger: triggerReturn } = useSWRMutation(
     station ? `/delivery/return` : null,
-    (url, { arg }) => client.get(`${url}/${arg.rxID}`),
+    (url, { arg }) => api.get(`${url}/${arg.rxID}`),
     {
       onSuccess: () => {
         refreshRows();
@@ -137,7 +146,7 @@ export default function Deliveries({ section }) {
           variant: "success",
         });
       },
-    }
+    },
   );
 
   useScanDetection({ onComplete, disabled: activeApp });
@@ -227,7 +236,7 @@ export default function Deliveries({ section }) {
         ],
       },
     ],
-    [session, triggerReturn, triggerUnset]
+    [session, triggerReturn, triggerUnset],
   );
   const handleChangeDate = React.useCallback(
     (date, context) => {
@@ -241,8 +250,12 @@ export default function Deliveries({ section }) {
         }
       }
     },
-    [refreshRows]
+    [refreshRows],
   );
+
+  if (!station) {
+    return;
+  }
 
   return (
     <PageContainer
@@ -254,13 +267,7 @@ export default function Deliveries({ section }) {
             disabled={isLoadingRows || session === "0"}
             size="small"
             aria-label="print"
-            onClick={() =>
-              handlePrint(
-                section,
-                date,
-                session === "0" ? "0" : session.session
-              )
-            }
+            onClick={triggerPrint}
           >
             <PrintIcon />
           </IconButton>
@@ -346,11 +353,7 @@ export default function Deliveries({ section }) {
       </Box>
       {print && (
         <div ref={contentRef}>
-          {/* <PrintDeliveries
-            station={station}
-            date={date}
-            data={rows.filter((row) => apiRef.current?.isRowSelected(row.id))}
-          /> */}
+          <DeliveryReceipt data={print} />
         </div>
       )}
       <div tabIndex="-1" ref={focusRef} />

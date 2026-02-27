@@ -3,30 +3,16 @@ import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import LayersIcon from "@mui/icons-material/Layers";
-import LayersClearIcon from "@mui/icons-material/LayersClear";
 import EditIcon from "@mui/icons-material/Edit";
 import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
-import { useDispatch, useSelector } from "react-redux";
+import useSWR from "swr";
+import { get } from "../../../../../lib/api";
 
 const rowHeight = 52;
 
 export default function DeliveryGroups() {
-  const dispatch = useDispatch();
-  const { deliveries, isLoadingDeliveries } = useSelector((s) => s.main);
-  const refresh = React.useCallback(() => {
-    // (async function () {
-    //   try {
-    //     dispatch(asyncGetDeliveryStations());
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // })();
-  }, [dispatch]);
-  React.useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const { data, mutate } = useSWR("/delivery/stations/all", get);
 
   const columns = React.useMemo(
     () => [
@@ -58,20 +44,13 @@ export default function DeliveryGroups() {
       {
         field: "actions",
         type: "actions",
-        width: 96,
+        width: 52,
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
             key="edit"
             icon={<EditIcon />}
             label="Edit"
-            onClick={() => {}}
-          />,
-          <GridActionsCellItem
-            disabled
-            key="deactivate"
-            icon={<LayersClearIcon />}
-            label="Deactivate"
             onClick={() => {}}
           />,
         ],
@@ -87,7 +66,7 @@ export default function DeliveryGroups() {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
-              <IconButton size="small" aria-label="refresh" onClick={refresh}>
+              <IconButton size="small" aria-label="refresh" onClick={mutate}>
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -100,11 +79,10 @@ export default function DeliveryGroups() {
         <DataGrid
           autoPageSize
           columns={columns}
-          rows={deliveries}
+          rows={data}
           showCellVerticalBorder
           disableColumnMenu
           disableRowSelectionOnClick
-          loading={isLoadingDeliveries}
           pageSizeOptions={[]}
           sx={{
             maxHeight: rowHeight * 100,

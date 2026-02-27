@@ -31,6 +31,7 @@ import {
   setSidebar,
   setDeliveries,
 } from "../../../../../reduxjs@toolkit/mainSlice";
+import { setUser } from "../../../../../reduxjs@toolkit/userSlice";
 import useSWR from "swr";
 import { get } from "../../../../../lib/api";
 import { enqueueSnackbar } from "notistack";
@@ -56,6 +57,13 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       }
     },
     [data, error],
+  );
+  const { data: settings } = useSWR("/apps/settings", get);
+  React.useEffect(
+    function setSettings() {
+      settings && dispatch(setUser(settings));
+    },
+    [settings],
   );
 
   React.useEffect(() => {

@@ -9,7 +9,6 @@ const mainSlice = createSlice({
     section: "",
     /** @type {"expanded"|"mobile-expanded"|"mini"|"collapsed"} */
     sidebar: "expanded",
-    isLoadingDeliveries: false,
     deliveries: [],
   },
   reducers: {

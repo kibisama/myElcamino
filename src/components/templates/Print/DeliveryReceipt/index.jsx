@@ -10,10 +10,8 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { useEffect } from "react";
 import StoreInfoHeader from "../StoreInfoHeader";
 import PortraitContainer from "../PortraitContainer";
-import useSWR from "swr";
 
 dayjs.extend(customParseFormat);
 
@@ -102,26 +100,23 @@ const KeyValueTable = ({ keys, values = [] }) => (
   </div>
 );
 
-export default function DeliveryReceipt({}) {
-  useEffect(() => {
-    (async function () {
-      try {
-        const { data } = await getDeliveryReceipt(section, date, session);
-        setData(data.data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, []);
+const ROWS_PER_PAGE = 40;
 
-  if (!data || !data.items?.length) {
+export default function DeliveryReceipt({ data }) {
+  if (!data) {
     return;
   }
-  const { station, items, pages, due, count } = data;
+  const { station, items, due, count, date, session } = data;
+  const totalPages = Math.ceil(count / ROWS_PER_PAGE);
+  const pages = [];
+  for (let i = 0; i < totalPages; i++) {
+    pages.push(items.splice(0, ROWS_PER_PAGE));
+  }
+
   return (
     <React.Fragment>
-      {items.map((item, index) => (
-        <PortraitContainer>
+      {pages.map((page, index) => (
+        <PortraitContainer key={index}>
           <div
             style={{
               display: "flex",
@@ -198,7 +193,7 @@ export default function DeliveryReceipt({}) {
               >
                 <KeyValueTable
                   keys={["PAGE", "TOTAL COUNT", "TOTAL DUE"]}
-                  values={[`${index + 1} OF ${pages}`, count, due]}
+                  values={[`${index + 1} OF ${totalPages}`, count, due]}
                 />
                 <KeyValueTable
                   keys={["DATE", "SESSION", "STATION CODE"]}
@@ -234,7 +229,7 @@ export default function DeliveryReceipt({}) {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {item.map((v) => (
+                    {page.map((v) => (
                       <TableRow key={v.id}>
                         <TableCellBody>{v.rxNumber}</TableCellBody>
                         <TableCellBody>

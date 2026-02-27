@@ -1,8 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { get } from "../../../../lib/api";
 import Logo from "../../../svg/Logo";
-import useSWR from "swr";
+import { useSelector } from "react-redux";
 
 const sx = {
   fontSize: 11,
@@ -11,8 +10,8 @@ const sx = {
 };
 
 export default function StoreInfoHeader() {
-  const { data: settings } = useSWR("/apps/settings", get);
-  if (!settings) return;
+  const settings = useSelector((s) => s.user);
+
   return (
     <Box
       sx={{

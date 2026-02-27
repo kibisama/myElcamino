@@ -4,12 +4,15 @@ import PageContainer from "../PageContainer";
 import ImportDRx from "./ImportDRx";
 import StoreInfo from "./StoreInfo";
 import Users from "./Users";
+import AddUser from "./AddUser";
 
 export default function Settings() {
   const [value, setValue] = React.useState(0);
+  const [addUser, setAddUser] = React.useState(false);
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
+  const handleModeChange = () => setAddUser((prev) => !prev);
   return (
     <PageContainer title="Settings">
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -22,7 +25,12 @@ export default function Settings() {
         </Box>
         {value === 0 && <ImportDRx />}
         {value === 1 && <StoreInfo />}
-        {value === 2 && <Users />}
+        {value === 2 &&
+          (addUser ? (
+            <AddUser handleModeChange={handleModeChange} />
+          ) : (
+            <Users handleModeChange={handleModeChange} />
+          ))}
       </Box>
     </PageContainer>
   );
