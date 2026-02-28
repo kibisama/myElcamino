@@ -6,7 +6,6 @@ import useSWRMutation from "swr/mutation";
 import Section from "../../../../../inputs/Section";
 
 const StoreInfo = () => {
-  const [settings, setSettings] = React.useState(null);
   const [name, setName] = React.useState("");
   const [address, setAddress] = React.useState("");
   const [city, setCity] = React.useState("");
@@ -18,13 +17,15 @@ const StoreInfo = () => {
   const [managerLN, setManagerLN] = React.useState("");
   const [managerFN, setManagerFN] = React.useState("");
 
-  const { data, mutate: refreshSettings } = useSWR("/apps/settings", get);
+  const { data: settings, mutate: refreshSettings } = useSWR(
+    "/apps/settings",
+    get
+  );
   const { trigger: postSettings } = useSWRMutation("/apps/settings", post, {
     onSuccess: refreshSettings,
   });
 
-  const onGetSettings = React.useCallback((settings) => {
-    setSettings(settings);
+  const onGetSettings = React.useCallback(() => {
     setName(settings.storeName);
     setAddress(settings.storeAddress);
     setCity(settings.storeCity);
@@ -38,10 +39,11 @@ const StoreInfo = () => {
   }, []);
 
   React.useEffect(() => {
-    data && onGetSettings(data);
-  }, [data]);
+    settings && onGetSettings();
+  }, [settings]);
 
   const disable =
+    !settings ||
     !(
       name &&
       address &&

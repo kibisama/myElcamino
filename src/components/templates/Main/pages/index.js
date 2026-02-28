@@ -6,3 +6,4 @@ export { default as Inventories } from "./Inventories";
 export { default as UsageReport } from "./UsageReport";
 export { default as Settings } from "./Settings";
 export { default as Invoices } from "./Invoices";
+export { default as EditDeliveryGroup } from "./EditDeliveryGroup";

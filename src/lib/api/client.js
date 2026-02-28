@@ -12,8 +12,6 @@ const generateQuery = (q) =>
 export const getPtAutocompleteOptions = (q) => client.get(`dRx/pt/?q=${q}`);
 
 /** DELIVERIES **/
-export const getDeliveryReceipt = (section, date, session) =>
-  client.get(`delivery/${section}/${date}/${session}/receipt`);
 export const searchDeliveries = (q) =>
   client.get(`delivery/search?${generateQuery(q)}`);
 /** INVENTORIES **/

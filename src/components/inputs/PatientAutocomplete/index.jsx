@@ -2,21 +2,17 @@ import * as React from "react";
 import { Autocomplete as MuiAutoComplete } from "@mui/material";
 import { useDebouncedCallback } from "use-debounce";
 import Search from "../Search";
-import { getPtAutocompleteOptions } from "../../../lib/api/client";
+import useSWRMutation from "swr/mutation";
+import { api } from "../../../lib/api";
 
 export default function PtAutocomplete({ onChange = () => {}, ...props }) {
   const [options, setOptions] = React.useState([]);
-  const getOptions = React.useCallback((q) => {
-    (async () => {
-      try {
-        const { data } = await getPtAutocompleteOptions(q);
-        setOptions(data.data);
-      } catch (e) {
-        setOptions([]);
-      }
-    })();
-  }, []);
-  const debounced = useDebouncedCallback((q) => getOptions(q), 500);
+  const { trigger } = useSWRMutation(
+    "/dRx/pt/?q=",
+    (url, { arg }) => api.get(url + arg.q),
+    { onSuccess: (data) => setOptions(data), onError: () => setOptions([]) }
+  );
+  const debounced = useDebouncedCallback((q) => trigger(q), 500);
   const handleChange = React.useCallback(
     (e) => debounced(e.target.value),
     [debounced]

@@ -8,6 +8,8 @@ import PageContainer from "../PageContainer";
 import AppButton from "../AppButton";
 import useSWR from "swr";
 import { get } from "../../../../../lib/api";
+import { useDispatch } from "react-redux";
+import { setPage } from "../../../../../reduxjs@toolkit/mainSlice";
 
 const rowHeight = 52;
 
@@ -56,8 +58,11 @@ export default function DeliveryGroups() {
         ],
       },
     ],
-    [],
+    []
   );
+
+  const dispatch = useDispatch();
+
   return (
     <PageContainer
       breadcrumbs={[{ title: "Deliveries" }, { title: "" }]}
@@ -71,7 +76,14 @@ export default function DeliveryGroups() {
               </IconButton>
             </div>
           </Tooltip>
-          <AppButton children={<GroupAddIcon />} onClick={() => {}} />
+          <AppButton
+            children={<GroupAddIcon />}
+            onClick={() =>
+              dispatch(
+                setPage({ page: "EditDeliveryGroup", section: "CREATE" })
+              )
+            }
+          />
         </Stack>
       }
     >

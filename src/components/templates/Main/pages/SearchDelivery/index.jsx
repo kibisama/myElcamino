@@ -5,10 +5,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PageContainer from "../PageContainer";
 import Search from "../../../../inputs/Search";
-import { searchDeliveries } from "../../../../../lib/api/client";
+// import { searchDeliveries } from "../../../../../lib/api";
 import { enqueueSnackbar } from "notistack";
 import NumericFormat from "../../apps/Pickup/NumericFormat";
 import PtAutocomplete from "../../../../inputs/PatientAutocomplete";
+import useSWRMutation from "swr/mutation";
 
 const rowHeight = 42;
 
@@ -17,6 +18,9 @@ export default function SearchDelivery() {
   const [rxNumber, setRxNumber] = React.useState("");
   const [patient, setPatient] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const {} = useSWRMutation();
+
   const columns = React.useMemo(
     () => [
       {
@@ -72,14 +76,14 @@ export default function SearchDelivery() {
         valueFormatter: (v) => v && dayjs(v).format("M. DD. YY"),
       },
     ],
-    [],
+    []
   );
   const search = React.useCallback((rxNumber, patient) => {
     setIsLoading(true);
     (async () => {
       try {
-        const { data } = await searchDeliveries({ rxNumber, patient });
-        setRows(data.data);
+        // const { data } = await searchDeliveries({ rxNumber, patient });
+        // setRows(data.data);
       } catch (e) {
         console.error(e);
         const { status } = e;
@@ -105,7 +109,7 @@ export default function SearchDelivery() {
         setPatient("");
       }
     },
-    [rxNumber, search],
+    [rxNumber, search]
   );
   const handleKeyDown = React.useCallback(
     (e) => {
@@ -113,7 +117,7 @@ export default function SearchDelivery() {
         search(rxNumber, patient);
       }
     },
-    [search, rxNumber, patient],
+    [search, rxNumber, patient]
   );
 
   return (

@@ -11,20 +11,9 @@ export default function AddUser({ handleModeChange }) {
   const [name, setName] = React.useState("");
   const [stations, setStations] = React.useState([]);
 
-  const { trigger: postSettings } = useSWRMutation("/user", postClient);
+  const { trigger: postUser } = useSWRMutation("/user", postClient);
 
-  // const disable =
-  //   !(username && name && stations.length > 0) ||
-  //   (name === settings?.storeName &&
-  //     address === settings?.storeAddress &&
-  //     city === settings?.storeCity &&
-  //     state === settings?.storeState &&
-  //     zip === settings?.storeZip &&
-  //     phone === settings?.storePhone &&
-  //     fax === settings?.storeFax &&
-  //     email === settings?.storeEmail &&
-  //     managerLN === settings?.storeManagerLN &&
-  //     managerFN === settings?.storeManagerFN);
+  const disable = !(username && name && stations.length > 0);
 
   return (
     <div>
@@ -76,28 +65,21 @@ export default function AddUser({ handleModeChange }) {
       >
         <Button
           sx={{ width: 100 }}
-          // disabled={disable}
           variant="outlined"
           children="BACK"
           onClick={handleModeChange}
         />
         <Button
           sx={{ width: 100 }}
-          // disabled={disable}
+          disabled={disable}
           variant="outlined"
           children="CREATE"
           onClick={() =>
-            postSettings({
-              // storeName: name,
-              // storeAddress: address,
-              // storeCity: city,
-              // storeState: state,
-              // storeZip: zip,
-              // storePhone: phone,
-              // storeFax: fax,
-              // storeEmail: email,
-              // storeManagerLN: managerLN,
-              // storeManagerFN: managerFN,
+            postUser({
+              username,
+              name,
+              password,
+              stations,
             })
           }
         />

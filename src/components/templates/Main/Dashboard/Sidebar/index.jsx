@@ -34,7 +34,6 @@ import {
 import { setUser } from "../../../../../reduxjs@toolkit/userSlice";
 import useSWR from "swr";
 import { get } from "../../../../../lib/api";
-import { enqueueSnackbar } from "notistack";
 
 function Sidebar({ expanded = true, setExpanded, container }) {
   const theme = useTheme();
@@ -50,20 +49,22 @@ function Sidebar({ expanded = true, setExpanded, container }) {
   React.useLayoutEffect(
     function handleStationData() {
       if (error) {
-        enqueueSnackbar(error.message, { variant: "error" });
         dispatch(setDeliveries([]));
       } else if (data) {
         dispatch(setDeliveries(data));
       }
     },
-    [data, error],
+    [data, error]
   );
-  const { data: settings } = useSWR("/apps/settings", get);
+  const { data: settings } = useSWR(
+    deliveries.length > 0 ? "/apps/settings" : null,
+    get
+  );
   React.useEffect(
     function setSettings() {
       settings && dispatch(setUser(settings));
     },
-    [settings],
+    [settings]
   );
 
   React.useEffect(() => {
@@ -93,7 +94,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
     (newExpanded) => () => {
       setExpanded(newExpanded);
     },
-    [setExpanded],
+    [setExpanded]
   );
   const handlePageItemClick = React.useCallback(
     (itemId, hasNestedNavigation) => {
@@ -101,15 +102,15 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         setExpandedItemIds((previousValue) =>
           previousValue.includes(itemId)
             ? previousValue.filter(
-                (previousValueItemId) => previousValueItemId !== itemId,
+                (previousValueItemId) => previousValueItemId !== itemId
               )
-            : [...previousValue, itemId],
+            : [...previousValue, itemId]
         );
       } else if (!isOverSmViewport && !hasNestedNavigation) {
         setExpanded(false);
       }
     },
-    [expanded, setExpanded, isOverSmViewport],
+    [expanded, setExpanded, isOverSmViewport]
   );
 
   const mini = !expanded;
@@ -228,7 +229,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
       expandedItemIds,
       page,
       deliveries,
-    ],
+    ]
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -250,7 +251,7 @@ function Sidebar({ expanded = true, setExpanded, container }) {
         },
       };
     },
-    [expanded, mini],
+    [expanded, mini]
   );
 
   const sidebarContextValue = React.useMemo(() => {
