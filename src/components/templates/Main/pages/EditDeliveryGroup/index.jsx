@@ -1,15 +1,16 @@
 import React from "react";
 import { Box, Checkbox, OutlinedInput, Button, Stack } from "@mui/material";
 import useSWRMutation from "swr/mutation";
-import { get, post } from "../../../../../lib/api";
+import { get, post, api } from "../../../../../lib/api";
 import Section from "../../../../inputs/Section";
 import PageContainer from "../PageContainer";
 import { useDispatch, useSelector } from "react-redux";
 import { setPage } from "../../../../../reduxjs@toolkit/mainSlice";
-import useSWR from "swr";
+import { enqueueSnackbar } from "notistack";
 
 export default function EditDeliveryGroup() {
   const { section } = useSelector((s) => s.main);
+  const [data, setData] = React.useState(null);
   const [name, setName] = React.useState("");
   const [invoiceCode, setInvoiceCode] = React.useState("");
   const [address, setAddress] = React.useState("");
@@ -22,37 +23,86 @@ export default function EditDeliveryGroup() {
 
   const isCreateMode = section === "CREATE";
 
-  const { trigger } = useSWRMutation("/delivery/station", post);
-  const { data } = useSWR(
-    isCreateMode ? null : `/delivery/station/${section}`,
-    get
+  const { trigger: create, isMutating: isCreating } = useSWRMutation(
+    isCreateMode ? "/delivery/station" : null,
+    post,
+    {
+      throwOnError: false,
+      onSuccess: () => {
+        enqueueSnackbar("The delivery group has been created successfully.", {
+          variant: "success",
+        });
+        dispatch(setPage({ page: "DeliveryGroups" }));
+      },
+    },
+  );
+  const { trigger: load, isMutating: isLoading } = useSWRMutation(
+    isCreateMode ? null : `/delivery/${section}`,
+    get,
+    {
+      throwOnError: false,
+      onSuccess: (data) => {
+        setData(data);
+        setName(data.name);
+        setInvoiceCode(data.invoiceCode);
+        setAddress(data.address);
+        setCity(data.city);
+        setState(data.state);
+        setZip(data.zip);
+        setPhone(data.phone);
+        setDisplayName(data.displayName);
+        setActive(data.active);
+      },
+    },
+  );
+  const { trigger: edit, isMutating: isEditing } = useSWRMutation(
+    isCreateMode ? null : `/main/delivery/${section}`,
+    (url, { arg }) => api.put(url, arg),
+    {
+      throwOnError: false,
+      onSuccess: () => {
+        enqueueSnackbar("The information has been updated successfully.", {
+          variant: "success",
+        });
+        dispatch(setPage({ page: "DeliveryGroups" }));
+      },
+    },
   );
 
-  const disable = isCreateMode
-    ? !(
-        name &&
-        invoiceCode &&
-        address &&
-        city &&
-        state &&
-        zip &&
-        phone &&
-        displayName
-      )
-    : true;
-  //   !(username && name && stations.length > 0) ||
-  //   (name === settings?.storeName &&
-  //     address === settings?.storeAddress &&
-  //     city === settings?.storeCity &&
-  //     state === settings?.storeState &&
-  //     zip === settings?.storeZip &&
-  //     phone === settings?.storePhone &&
-  //     fax === settings?.storeFax &&
-  //     email === settings?.storeEmail &&
-  //     managerLN === settings?.storeManagerLN &&
-  //     managerFN === settings?.storeManagerFN);
+  const disable =
+    isCreating ||
+    isLoading ||
+    isEditing ||
+    !(
+      name &&
+      invoiceCode &&
+      address &&
+      city &&
+      state &&
+      zip &&
+      phone &&
+      displayName
+    ) ||
+    (isEditing &&
+      name === data.name &&
+      invoiceCode === data.invoiceCode &&
+      address === data.address &&
+      city === data.city &&
+      state === data.state &&
+      zip === data.zip &&
+      phone === data.phone &&
+      displayName === data.displayName &&
+      active === data.active);
 
   const dispatch = useDispatch();
+
+  React.useLayoutEffect(function loadStationData() {
+    if (!isCreateMode) {
+      (async function () {
+        await load();
+      })();
+    }
+  }, []);
 
   return (
     <PageContainer
@@ -149,6 +199,7 @@ export default function EditDeliveryGroup() {
         title="Active"
         Input={
           <Checkbox
+            disabled={isCreateMode}
             checked={active}
             onChange={(e) => setActive((prev) => !prev)}
           />
@@ -174,19 +225,32 @@ export default function EditDeliveryGroup() {
             sx={{ width: 100 }}
             disabled={disable}
             variant="outlined"
-            children="CREATE"
-            onClick={() =>
-              trigger({
-                name,
-                address,
-                city,
-                state,
-                zip,
-                phone,
-                active,
-                displayName,
-                invoiceCode,
-              })
+            children={isCreateMode ? "CREATE" : "SAVE"}
+            onClick={
+              isCreateMode
+                ? () =>
+                    create({
+                      name,
+                      address,
+                      city,
+                      state,
+                      zip,
+                      phone,
+                      active,
+                      displayName,
+                      invoiceCode,
+                    })
+                : () =>
+                    edit({
+                      name,
+                      address,
+                      city,
+                      state,
+                      zip,
+                      phone,
+                      active,
+                      displayName,
+                    })
             }
           />
         </Box>

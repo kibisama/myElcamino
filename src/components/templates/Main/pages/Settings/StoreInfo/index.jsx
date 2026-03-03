@@ -4,6 +4,7 @@ import { get, post } from "../../../../../../lib/api";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import Section from "../../../../../inputs/Section";
+import { enqueueSnackbar } from "notistack";
 
 const StoreInfo = () => {
   const [name, setName] = React.useState("");
@@ -19,10 +20,16 @@ const StoreInfo = () => {
 
   const { data: settings, mutate: refreshSettings } = useSWR(
     "/apps/settings",
-    get
+    get,
   );
   const { trigger: postSettings } = useSWRMutation("/apps/settings", post, {
-    onSuccess: refreshSettings,
+    throwOnError: false,
+    onSuccess: () => {
+      refreshSettings();
+      enqueueSnackbar("The Store Info has been updated successfully.", {
+        variant: "success",
+      });
+    },
   });
 
   const onGetSettings = React.useCallback(() => {
@@ -36,11 +43,11 @@ const StoreInfo = () => {
     setEmail(settings.storeEmail);
     setManagerLN(settings.storeManagerLN);
     setManagerFN(settings.storeManagerFN);
-  }, []);
+  }, [settings]);
 
   React.useEffect(() => {
     settings && onGetSettings();
-  }, [settings]);
+  }, [settings, onGetSettings]);
 
   const disable =
     !settings ||

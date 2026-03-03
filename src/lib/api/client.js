@@ -30,8 +30,6 @@ export const searchPickup = (q) =>
   client.get(`apps/pickup/search?${generateQuery(q)}`);
 export const getPickupReport = ({ _id, rxNumber }) =>
   client.get(`apps/pickup/report/${_id}/${rxNumber}`);
-/** APPS_SETTINGS **/
-export const postSettings = (body) => client.post("apps/settings", body);
 
 export const checkDRxCSV = (body) =>
   client.post("apps/upload/checkDRxCSV", body);

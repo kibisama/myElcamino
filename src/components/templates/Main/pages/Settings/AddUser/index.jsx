@@ -1,19 +1,32 @@
 import React from "react";
-import { Box, OutlinedInput, Button, Stack } from "@mui/material";
+import { Box, OutlinedInput, Button } from "@mui/material";
 import { postClient } from "../../../../../../lib/api";
 import useSWRMutation from "swr/mutation";
 import Section from "../../../../../inputs/Section";
 import StationSelector from "../../../../../inputs/StationSelector";
+import { enqueueSnackbar } from "notistack";
 
 export default function AddUser({ handleModeChange }) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [name, setName] = React.useState("");
-  const [stations, setStations] = React.useState([]);
+  const [stationCodes, setStationCodes] = React.useState([]);
 
-  const { trigger: postUser } = useSWRMutation("/user", postClient);
+  const { trigger: postUser, isMutating } = useSWRMutation(
+    "/user",
+    postClient,
+    {
+      throwOnError: false,
+      onSuccess: () => {
+        enqueueSnackbar("The user has been created successfully.", {
+          variant: "success",
+        });
+        handleModeChange();
+      },
+    },
+  );
 
-  const disable = !(username && name && stations.length > 0);
+  const disable = isMutating || !(username && name && password);
 
   return (
     <div>
@@ -49,11 +62,24 @@ export default function AddUser({ handleModeChange }) {
             fullWidth
             onChange={(e) => setName(e.target.value)}
             placeholder="Name"
-            value={password}
+            value={name}
           />
         }
       />
-      <Section title="Roles" Input={<StationSelector />} />
+      <Section
+        title="Roles"
+        Input={
+          <StationSelector
+            handleChange={(e) =>
+              setStationCodes((prev) => {
+                const s = e.target.value;
+                if (prev.includes(s)) return prev.filter((v) => v !== s);
+                return [...prev, s];
+              })
+            }
+          />
+        }
+      />
       <Box
         sx={{
           justifySelf: "flex-end",
@@ -79,7 +105,7 @@ export default function AddUser({ handleModeChange }) {
               username,
               name,
               password,
-              stations,
+              stationCodes,
             })
           }
         />

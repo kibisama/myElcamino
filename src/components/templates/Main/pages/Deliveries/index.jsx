@@ -57,6 +57,7 @@ export default function Deliveries({ section }) {
     station ? `/delivery/${station.invoiceCode}/qr` : null,
     post,
     {
+      throwOnError: false,
       onSuccess: () => {
         refreshRows();
         enqueueSnackbar("The Rx has been updated successfully.", {
@@ -70,9 +71,14 @@ export default function Deliveries({ section }) {
     station ? `/delivery/${station.invoiceCode}` : null,
     post,
     {
-      onSuccess: () => {
-        refreshSessions();
-        refreshRows();
+      throwOnError: false,
+      onSuccess: async (data) => {
+        setPrint(
+          await get(
+            `/delivery/${station.invoiceCode}/${data.date}/${data.session}/receipt`,
+          ),
+        );
+        handleRefresh();
       },
     },
   );
@@ -83,6 +89,7 @@ export default function Deliveries({ section }) {
       : null,
     get,
     {
+      throwOnError: false,
       onSuccess: (data) => setPrint(data),
     },
   );
@@ -106,7 +113,7 @@ export default function Deliveries({ section }) {
       setSession("0");
       focusRef.current && focusRef.current.focus();
     },
-    [section],
+    [section, date],
   );
 
   const onComplete = React.useCallback(
@@ -125,8 +132,9 @@ export default function Deliveries({ section }) {
 
   const { trigger: triggerUnset } = useSWRMutation(
     station ? `/delivery/unset` : null,
-    (url, { arg }) => api.get(`${url}/${arg.rxID}`),
+    (url, { arg }) => api.get(`/main/${url}/${arg.rxID}`),
     {
+      throwOnError: false,
       onSuccess: () => {
         refreshRows();
         enqueueSnackbar("The Rx has been updated successfully.", {
@@ -138,8 +146,9 @@ export default function Deliveries({ section }) {
 
   const { trigger: triggerReturn } = useSWRMutation(
     station ? `/delivery/return` : null,
-    (url, { arg }) => api.get(`${url}/${arg.rxID}`),
+    (url, { arg }) => api.get(`/main/${url}/${arg.rxID}`),
     {
+      throwOnError: false,
       onSuccess: () => {
         refreshRows();
         enqueueSnackbar("The Rx has been updated successfully.", {
@@ -221,12 +230,12 @@ export default function Deliveries({ section }) {
         align: "center",
         getActions: ({ row }) => [
           <GridActionsCellItem
-            key={"delete-item"}
+            key="delete-item"
             disabled={
               session !== "0" && row.logHistory?.includes(session.logId)
             }
             icon={row.log ? <AssignmentReturnIcon /> : <DeleteIcon />}
-            label={"Delete"}
+            label="Delete"
             onClick={
               session === "0"
                 ? () => triggerUnset({ rxID: row.id })

@@ -53,12 +53,19 @@ export default function DeliveryGroups() {
             key="edit"
             icon={<EditIcon />}
             label="Edit"
-            onClick={() => {}}
+            onClick={() =>
+              dispatch(
+                setPage({
+                  page: "EditDeliveryGroup",
+                  section: row.invoiceCode,
+                }),
+              )
+            }
           />,
         ],
       },
     ],
-    []
+    [],
   );
 
   const dispatch = useDispatch();
@@ -80,7 +87,7 @@ export default function DeliveryGroups() {
             children={<GroupAddIcon />}
             onClick={() =>
               dispatch(
-                setPage({ page: "EditDeliveryGroup", section: "CREATE" })
+                setPage({ page: "EditDeliveryGroup", section: "CREATE" }),
               )
             }
           />

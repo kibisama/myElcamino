@@ -31,7 +31,7 @@ const Main = () => {
                 key,
                 config,
                 revalidate,
-                revalidateOpts
+                revalidateOpts,
               ) => {
                 if (error.status === 404) {
                   return;
