@@ -11,7 +11,7 @@ import VerifiedSvg from "../../svg/Verified";
 import WarningSvg from "../../svg/Warning";
 import { io } from "socket.io-client";
 
-const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
+const URL = process.env.REACT_APP_API_ADDRESS + "/pickup";
 let socket;
 
 const Pickup = () => {
@@ -19,11 +19,11 @@ const Pickup = () => {
   const [items, setItems] = React.useState(false);
   const [state, setState] = React.useState("standby");
   if (!socket) {
-    socket = io(URL);
+    socket = io(URL, { path: "/api/main/socket.io" });
   }
   const timeout = React.useRef(null);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     document.title = "Customer Pickup";
   }, []);
 

@@ -9,7 +9,8 @@ import SignatureBox from "./SignatureBox";
 import ItemsList from "./ItemsList";
 import RelationBox from "./RelationBox";
 import Clock from "./Clock";
-import { postPickup } from "../../../../../lib/api/client";
+import { post } from "../../../../../lib/api";
+import useSWRMutation from "swr/mutation";
 import { io } from "socket.io-client";
 import useScanDetection from "../../../../../hooks/useScanDetection";
 import { useDebouncedCallback } from "use-debounce";
@@ -18,15 +19,16 @@ import { enqueueSnackbar, closeSnackbar } from "notistack";
 import NumericFormat from "./NumericFormat";
 import { useSelector } from "react-redux";
 
-const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/pickup";
+const URL = process.env.REACT_APP_API_ADDRESS + "/pickup";
 let socket;
 
 export default function Pickup({ id }) {
   if (!socket) {
-    socket = io(URL);
+    socket = io(URL, { path: "/api/main/socket.io" });
   } else {
     socket.connect();
   }
+
   const { activeApp } = useSelector((s) => s.main);
   const [state, setState] = useState("standby");
   const [rxNumber, setRxNumber] = useState("");
@@ -41,6 +43,8 @@ export default function Pickup({ id }) {
       });
   }, []);
   useScanDetection({ onComplete, disabled: activeApp !== id });
+
+  const { trigger } = useSWRMutation("/apps/pickup", post);
 
   useEffect(() => {
     function onState(data) {
@@ -244,26 +248,29 @@ export default function Pickup({ id }) {
               sx={{ width: 100, color: "primary.main" }}
               variant="outlined"
               disabled={disableSubmit}
-              onClick={async () => {
-                try {
-                  const { data } = await postPickup({ notes });
-                  enqueueSnackbar(data.message, { variant: "success" });
-                } catch (e) {
-                  console.error(e);
-                  const key = enqueueSnackbar(
-                    e.response?.data.message || e.message,
-                    {
-                      variant: "error",
-                      onEnter: () => errorKeys.current.push(key),
-                      onExited: () =>
-                        errorKeys.current.splice(
-                          errorKeys.current.indexOf(key),
-                          1
-                        ),
-                    }
-                  );
-                }
-              }}
+              onClick={
+                () => trigger({ notes })
+                // async () => {
+                // try {
+                //   const { data } = await postPickup({ notes });
+                //   enqueueSnackbar(data.message, { variant: "success" });
+                // } catch (e) {
+                //   console.error(e);
+                //   const key = enqueueSnackbar(
+                //     e.response?.data.message || e.message,
+                //     {
+                //       variant: "error",
+                //       onEnter: () => errorKeys.current.push(key),
+                //       onExited: () =>
+                //         errorKeys.current.splice(
+                //           errorKeys.current.indexOf(key),
+                //           1
+                //         ),
+                //     }
+                //   );
+                // }
+                // }
+              }
               children="SUBMIT"
             />
           </Box>

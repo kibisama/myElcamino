@@ -8,7 +8,7 @@ import { api } from "../../../lib/api";
 export default function PtAutocomplete({ onChange = () => {}, ...props }) {
   const [options, setOptions] = React.useState([]);
   const { trigger } = useSWRMutation(
-    "/dRx/pt/?q=",
+    "/main/dRx/pt/?q=",
     (url, { arg }) => api.get(url + arg.q),
     { onSuccess: (data) => setOptions(data), onError: () => setOptions([]) }
   );

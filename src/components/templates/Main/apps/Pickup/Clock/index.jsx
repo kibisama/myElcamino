@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography } from "@mui/material";
 
-const URL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/time";
+const URL = process.env.REACT_APP_API_ADDRESS + "/api/main/time";
 
 export default function Clock({ sx }) {
   const [time, setTime] = React.useState("Retrieving Time Data ...");
@@ -11,7 +11,8 @@ export default function Clock({ sx }) {
       setTime(JSON.parse(data).message);
     }
     sse.onmessage = (e) => handleEvent(e.data);
-    sse.onerror = () => {
+    sse.onerror = (e) => {
+      console.error(e);
       sse.close();
     };
     return () => {

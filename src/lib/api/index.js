@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create();
-api.defaults.baseURL = process.env.REACT_APP_CLIENT_API_ADDRESS + "/api";
+api.defaults.baseURL = process.env.REACT_APP_API_ADDRESS + "/api";
 api.interceptors.response.use((res) => res.data);
 
 export const post = (url, { arg }) => api.post("/main" + url, arg);
